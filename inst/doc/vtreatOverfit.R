@@ -1,7 +1,7 @@
 ## ------------------------------------------------------------------------
 set.seed(22626)
-d <- data.frame(x=sample(paste('level',1:1000,sep=''),2000,replace=TRUE)) # indpendent variables.
-d$y <- runif(nrow(d))>0.5  # the quantity to be predicted, notice: indpendent of variables.
+d <- data.frame(x=sample(paste('level',1:1000,sep=''),2000,replace=TRUE)) # independent variables.
+d$y <- runif(nrow(d))>0.5  # the quantity to be predicted, notice: independent of variables.
 d$rgroup <- round(100*runif(nrow(d)))  # the random group used for splitting the data set, not a variable.
 
 ## ------------------------------------------------------------------------

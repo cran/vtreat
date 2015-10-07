@@ -1,7 +1,7 @@
 # variable treatments type def: list { origvar, newvars, f(col,args), args, treatmentName, scales } can share orig var
 
 
-#' @importFrom stats anova as.formula binomial glm lm lm.wfit pchisq pf quantile
+#' @importFrom stats aggregate anova as.formula binomial glm lm lm.wfit pchisq pf quantile
 NULL
 
 
@@ -358,19 +358,9 @@ print.vtreatment <- function(x,...) {
   col <- .preProcCat(col,args$levRestriction)
   nres <- length(args$tracked)
   vals <- vector('list',nres)
-  sum <- rep(0,length(col))
-  for(j in 1:nres) {
+  for(j in seq_len(nres)) {
     vi <- ifelse(col==args$tracked[j],1.0,0.0) 
     vals[[j]] <- vi
-    sum <- sum + vi
-  }
-  if(nres>1) {
-     for(ri in which(sum==0)) { 
-        # For novel levels put fraction of time each level was on in original data
-        for(j in 1:nres) {
-           vals[[j]][[ri]] <- args$dist[[j]]
-        }
-     }
   }
   vals
 }
@@ -391,19 +381,17 @@ print.vtreatment <- function(x,...) {
   if(missingMass>maxMissing) {
     return(c())
   }
-  dist <- as.numeric(counts/sum(counts))
   treatment <- list(origvar=origVarName,origColClass=origColClass,
                     newvars=make.names(paste(origVarName,'lev',tracked,sep="_"),unique=TRUE),
                     f=.catInd,
                     args=list(tracked=tracked,
-                              levRestriction=levRestriction,
-                              dist=dist),
+                              levRestriction=levRestriction),
                     treatmentName='Categoric Indicators')
   class(treatment) <- 'vtreatment'
   pred <- treatment$f(vcolin,treatment$args)
   nvar <- length(pred)
   treatment$scales <- list('a'=rep(1.0,nvar),'b'=rep(0.0,nvar))  
-  for(j in 1:nvar) {
+  for(j in seq_len(nvar)) {
     scales <- .getScales(pred[[j]],ynumeric,weights)
     treatment$scales$a[j] <- scales$a
     treatment$scales$b[j] <- scales$b
@@ -424,7 +412,7 @@ print.vtreatment <- function(x,...) {
     pred <- as.numeric(args$scores[keys]) 
   }
   # mean delta impact averaged over all possibilities, should be zero in scaled mode, mean dist in unscaled
-  pred[novel] <- args$novelvalue  
+  pred[novel] <- 0.0 
   pred
 }
 
@@ -437,14 +425,12 @@ print.vtreatment <- function(x,...) {
   num <- tapply(rescol*weights,vcol,sum)
   den <- tapply(weights,vcol,sum)
   scores <- (num+smFactor*baseMean)/(den+smFactor)-baseMean
-  novelvalue <- sum(scores*den)/sum(den)
   scores <- as.list(scores)
   scores <- scores[names(scores)!='zap'] # don't let zap code
   treatment <- list(origvar=origVarName,origColClass=origColClass,
                     newvars=make.names(paste(origVarName,'catN',sep='_')),
                     f=.catNum,
                     args=list(scores=scores,
-                              novelvalue=novelvalue,
                               levRestriction=levRestriction),
                     treatmentName='Scalable Impact Code')
   pred <- treatment$f(vcolin,treatment$args)
@@ -466,7 +452,7 @@ print.vtreatment <- function(x,...) {
      keys[novel] <- names(args$logLift)[[1]]  # just to prevent bad lookups
      pred <- as.numeric(args$logLift[keys]) 
   }
-  pred[novel] <- args$novelvalue
+  pred[novel] <- 0.0
   pred
 }
 
@@ -489,16 +475,13 @@ print.vtreatment <- function(x,...) {
   pFgivenCunnorm <- pCgivenF*(1-probT)  # Bayes law, corret missing a /pC term (which we will normalize out)
   pTgivenC <- pTgivenCunnorm/(pTgivenCunnorm+pFgivenCunnorm)
   logLift <- log(pTgivenC/probT)  # log probability ratio (so no effect is coded as zero)
-  # fall back for novel levels, use average response of model during training
-  den <- tapply(weights,vcol,sum)
-  novelvalue <- sum(logLift*den)/sum(den)
   logLift <- as.list(logLift)
   logLift <- logLift[names(logLift)!='zap']  # don't let zap group code
+  # fall back for novel levels, use zero impact
   treatment <- list(origvar=origVarName,origColClass=origColClass,
                     newvars=make.names(paste(origVarName,'catB',sep='_')),
                     f=.catBayes,
                     args=list(logLift=logLift,
-                              novelvalue=novelvalue,
                               levRestriction=levRestriction),
                     treatmentName='Bayesian Impact Code')
   pred <- treatment$f(vcolin,treatment$args)
@@ -578,7 +561,7 @@ pressStatOfBestLinearFit <- function(x,y,weights=c(),normalizationStrat='total')
   a[1,1] <- 1.0e-5
   a[2,2] <- 1.0e-5
   b <- matrix(data=0,nrow=2,ncol=1)
-  for(i in 1:n) {
+  for(i in seq_len(n)) {
     xi <- x[i]
     yi <- y[i]
     wi <- weights[i]
@@ -591,7 +574,7 @@ pressStatOfBestLinearFit <- function(x,y,weights=c(),normalizationStrat='total')
   }
   aM <- matrix(data=0,nrow=2,ncol=2)
   bM <- matrix(data=0,nrow=2,ncol=1)
-  for(i in 1:n) {
+  for(i in seq_len(n)) {
     xi <- x[i]
     yi <- y[i]
     wi <- weights[i]
@@ -739,6 +722,81 @@ catScore <- function(x,yC,yTarget,weights=c()) {
   }
 }
 
+# find the fairest cutpoint number sequence (similar count on each side)
+.cutPoint <- function(y) {
+  d <- data.frame(y=y,count=1,
+                  stringsAsFactors=FALSE)
+  tab <- aggregate(count~y,data=d,FUN=sum)
+  if(nrow(tab)<=1) {
+    return(tab$y[[1]])
+  }
+  if(nrow(tab)<=2) {
+    return((tab$y[[1]]+tab$y[[2]])/2)
+  }
+  tab <- tab[order(tab$y),]
+  tab$sum <- cumsum(tab$count)
+  idx <- findInterval(length(y)/2,tab$sum)
+  if(idx>=(length(y)-1)) {
+    return((tab$y[[nrow(tab)-1]]+tab$y[[nrow(tab)]])/2)
+  }
+  return((tab$y[[idx+1]]+tab$y[[idx+2]])/2)
+}
+
+
+# build sets for out of sample evaluatin, train on complement of eval
+# ensure y varies training set (complement of eval set)
+.buildEvalSets <- function(zoY,fullCross) {
+  nRows = length(zoY)
+  # build a partition plan
+  evalSets <- list()
+  if((nRows<=1) || (min(zoY)>=max(zoY))) {
+    return(evalSets) # no plan possible
+  }
+  if(nRows<=100) {
+    # small case, 1-holdout Jackknife style
+    for(i in seq_len(nRows)) {
+      evalG <- i
+      trainG <- setdiff(seq_len(nRows),evalG)
+      if(min(zoY[trainG])<max(zoY[trainG])) {
+        evalSets[[1+length(evalSets)]] <- evalG
+      }
+    }
+    return(evalSets)
+  }
+  if(fullCross || (nRows<=1000)) {
+    #  Try for full k-way cross val
+    ncross <- 2
+    # stratify the cut accross "large/small" zoY
+    yCut <- .cutPoint(zoY)
+    ySmall <- which(zoY<yCut)
+    yLarge <- setdiff(seq_len(length(zoY)),ySmall)
+    rareCount <- min(length(ySmall),length(yLarge))
+    if(rareCount>=2) {
+      # permute 
+      ySmall <- sample(ySmall,length(ySmall),replace=FALSE)
+      yLarge <- sample(yLarge,length(yLarge),replace=FALSE)
+      ncross <- floor(min(ncross,rareCount/2))
+      smallChunks <- split(ySmall, ceiling(seq_along(ySmall)/(length(ySmall)/ncross)))
+      largeChunks <- split(yLarge, ceiling(seq_along(yLarge)/(length(yLarge)/ncross)))
+      evalSets <- lapply(seq_len(ncross),
+                         function(i) { c(smallChunks[[i]],largeChunks[[i]]) })
+    }
+  }
+  if(length(evalSets)<1) {
+    # fall back to test/train split
+    repeat {
+      evalTrainRows <- sort(sample.int(nRows,size=floor(0.75*nRows)))
+      # technically need to check that y is varying to gaurantee we have good sample
+      # with high probability we get on of each, so shouldn't repeat often (if at all)
+      if(min(zoY[evalTrainRows])<max(zoY[evalTrainRows])) {
+        break
+      }
+    }
+    evalSets <- list(setdiff(seq_len(nRows),evalTrainRows))
+  }
+  evalSets
+}
+
 
 # build out-of-sample treated columns, can have any number of rows
 .outSampleXform <- function(outcomename,zoY,
@@ -746,7 +804,7 @@ catScore <- function(x,yC,yTarget,weights=c()) {
                             weights,
                             minFraction,smFactor,rareCount,rareSig,maxMissing,
                             collarProb,
-                            scale,doCollar,tryCrossVal) {
+                            scale,doCollar,fullCross) {
   force(outcomename)
   force(zoY)
   force(zC)
@@ -760,59 +818,10 @@ catScore <- function(x,yC,yTarget,weights=c()) {
   force(collarProb)
   force(scale)
   force(doCollar)
-  force(tryCrossVal)
+  force(fullCross)
   nRows = length(zoY)
   # build a partition plan
-  evalSets <- list()
-  if(nRows<=100) {
-    # small case, 1-holdout Jacknife style
-    for(i in seq_len(nRows)) {
-      evalG <- i
-      trainG <- setdiff(seq_len(nRows),evalG)
-      if(min(zoY[trainG])>=max(zoY[trainG])) {
-        evalSets[[1+length(evalSets)]] <- evalG
-      }
-    }
-    evalSets <- as.list(seq_len(nRows))
-  } else {
-    if(tryCrossVal) {
-      #  Try for 4-way cross val
-      ncross <- 4
-      for(tries in 1:20) {
-        evalSets <- list()
-        groups <- sample.int(ncross,nRows,replace=TRUE)
-        good <- FALSE
-        if(length(groups)>1) {
-          good <- TRUE
-          for(g in unique(groups)) {
-            evalG <- which(groups==g)
-            trainG <- which(groups!=g)
-            evalSets[[length(evalSets)+1]] <- evalG
-            if(min(zoY[trainG])>=max(zoY[trainG])) {
-              good <- FALSE
-            }
-          }
-        }
-        if(good) {
-          break
-        } else {
-          evalSets <- list()
-        }
-      }
-    }
-    if(length(evalSets)<1) {
-      # fall back to test/train split
-      repeat {
-        evalTrainRows <- sort(sample.int(nRows,size=floor(0.75*nRows)))
-        # technically need to check that y is varying to gaurantee we have good sample
-        # with high probability we get on of each, so shouldn't repeat often (if at all)
-        if(min(zoY[evalTrainRows])<max(zoY[evalTrainRows])) {
-          break
-        }
-      }
-      evalSets <- list(setdiff(seq_len(nRows),evalTrainRows))
-    }
-  }
+  evalSets <- .buildEvalSets(zoY,fullCross)
   function(argpair) {
     v <- argpair$v
     vcolOrig <- argpair$vcolOrig
@@ -943,7 +952,7 @@ catScore <- function(x,yC,yTarget,weights=c()) {
   if(!is.data.frame(dframe)) {
     stop("dframe must be a data frame")
   }
-  if(nrow(dframe)<=0) {
+  if(nrow(dframe)<4) {
     stop("not enough rows in data frame")
   }
   if(collarProb>=0.5) {
@@ -989,6 +998,12 @@ catScore <- function(x,yC,yTarget,weights=c()) {
   if(min(zoY)>=max(zoY)) {
     stop("outcome variable doesn't vary")
   }
+  yCut <- .cutPoint(zoY)
+  nAbove <- sum(zoY>yCut)
+  nBelow <- sum(zoY<yCut)
+  if(min(nAbove,nBelow)<2) {
+    stop("there must be a cut that the outcome variable is above at least twice and below at least twice")
+  }
   # In building the workList don't transform any variables (such as making
   # row selections), only select columns out of frame.  This prevents
   # data growth prior to doing the work.
@@ -999,7 +1014,7 @@ catScore <- function(x,yC,yTarget,weights=c()) {
                           weights,
                           minFraction,smFactor,rareCount,rareSig,maxMissing,
                           collarProb,
-                          1:nrow(dframe),nrow(dframe),
+                          seq_len(nrow(dframe)),nrow(dframe),
                           verbose)
   if(is.null(parallelCluster)) {
     # print("design serial")
@@ -1081,6 +1096,26 @@ catScore <- function(x,yC,yTarget,weights=c()) {
 }
 
 
+.checkArgs <- function(dframe,varlist,outcomename,...) {
+  args <- list(...)
+  if(missing(dframe)||(!is.data.frame(dframe))||(nrow(dframe)<0)||(ncol(dframe)<=0)) {
+    stop("dframe must be a non-empty data frame")
+  }
+  if(missing(varlist)||(!is.character(varlist))||(length(varlist)<1)) {
+    stop("varlist must be a non-empty character vector")
+  }
+  if(missing(outcomename)||(!is.character(outcomename))||(length(outcomename)!=1)) {
+    stop("outcomename must be a length 1 character vector")
+  }
+  if(length(args)!=0) {
+    nm <- setdiff(paste(names(args),collapse=", "),'')
+    nv <- length(args)-length(nm)
+    stop(paste("unexpected arguments",nm,"(and",nv,"unexpected values)"))
+  }
+}
+
+
+
 
 # build all treatments for a data frame to predict a categorical outcome
 
@@ -1095,19 +1130,20 @@ catScore <- function(x,yC,yTarget,weights=c()) {
 #' 
 #' - vars : (character array without names) names of variables (in same order as names on the other diagnostic vectors)
 #' - varMoves : logical TRUE if the variable varied during hold out scoring, only variables that move will be in the treated frame
-#' - #' - sig : an estimate signficance of effect
+#' - #' - sig : an estimate significance of effect
 #'
 #' See the vtreat vignette for a bit more detail and a worked example.
 #'
-#' @param dframe Data frame to learn treatments from (training data).
+#' @param dframe Data frame to learn treatments from (training data), must have at least 4 rows.
 #' @param varlist Names of columns to treat (effective variables).
-#' @param outcomename Name of column holding outcome variable.
-#' @param outcometarget Value/level of outcome to be considered "success"
+#' @param outcomename Name of column holding outcome variable. dframe[[outcomename]] must be only finite non-missing values.
+#' @param outcometarget Value/level of outcome to be considered "success",  and there must be a cut such that dframe[[outcomename]]==outcometarget at least twice and dframe[[outcomename]]!=outcometarget at least twice.
+#' @param ... no additional arguments, declared to forced named binding of later arguments
 #' @param weights optional training weights for each row
 #' @param minFraction optional minimum frequency a categorical level must have to be converted to an indicator column.
 #' @param smFactor optional smoothing factor for impact coding models.
-#' @param rareCount optional integer, supress direct effects of level of this count or less.
-#' @param rareSig optional integer, supress direct effects of level of this signficance or less.
+#' @param rareCount optional integer, suppress direct effects of level of this count or less.
+#' @param rareSig optional integer, suppress direct effects of level of this significance or less.
 #' @param maxMissing optional maximum fraction (by data weight) of a categorical variable that are allowed before switching from indicators to impact coding.
 #' @param collarProb what fraction of the data (pseudo-probability) to collar data at (<0.5).
 #' @param returnXFrame optional if TRUE return out of sample transformed frame.
@@ -1130,6 +1166,7 @@ catScore <- function(x,yC,yTarget,weights=c()) {
 #' 
 #' @export
 designTreatmentsC <- function(dframe,varlist,outcomename,outcometarget,
+                              ...,
                               weights=c(),
                               minFraction=0.02,smFactor=0.0,
                               rareCount=2,rareSig=0.3,maxMissing=0.04,
@@ -1137,6 +1174,7 @@ designTreatmentsC <- function(dframe,varlist,outcomename,outcometarget,
                               returnXFrame=FALSE,scale=FALSE,doCollar=TRUE,
                               verbose=TRUE,
                               parallelCluster=NULL) {
+  .checkArgs(dframe=dframe,varlist=varlist,outcomename=outcomename,...)
    zoY <- ifelse(dframe[[outcomename]]==outcometarget,1.0,0.0)
   .designTreatmentsX(dframe,varlist,outcomename,zoY,
                      dframe[[outcomename]],outcometarget,
@@ -1163,18 +1201,19 @@ designTreatmentsC <- function(dframe,varlist,outcomename,outcometarget,
 #' 
 #' - vars : (character array without names) names of variables (in same order as names on the other diagnostic vectors)
 #' - varMoves : logical TRUE if the variable varied during hold out scoring, only variables that move will be in the treated frame
-#' - sig : an estimate signficance of effect
+#' - sig : an estimate significance of effect
 #'
 #' See the vtreat vignette for a bit more detail and a worked example.
 #' 
-#' @param dframe Data frame to learn treatments from (training data).
+#' @param dframe Data frame to learn treatments from (training data), must have at least 4 rows.
 #' @param varlist Names of columns to treat (effective variables).
-#' @param outcomename Name of column holding outcome variable.
+#' @param outcomename Name of column holding outcome variable. dframe[[outcomename]] must be only finite non-missing values and there must be a cut such that dframe[[outcomename]] is both above the cut at least twice and below the cut at least twice.
+#' @param ... no additional arguments, declared to forced named binding of later arguments
 #' @param weights optional training weights for each row
 #' @param minFraction optional minimum frequency a categorical level must have to be converted to an indicator column.
 #' @param smFactor optional smoothing factor for impact coding models.
-#' @param rareCount optional integer, supress direct effects of level of this count or less.
-#' @param rareSig optional integer, supress direct effects of level of this signficance or less.
+#' @param rareCount optional integer, suppress direct effects of level of this count or less.
+#' @param rareSig optional integer, suppress direct effects of level of this significance or less.
 #' @param maxMissing optional maximum fraction (by data weight) of a categorical variable that are allowed before switching from indicators to impact coding.
 #' @param collarProb what fraction of the data (pseudo-probability) to collar data at (<0.5).
 #' @param returnXFrame optional if TRUE return out of sample transformed frame.
@@ -1196,6 +1235,7 @@ designTreatmentsC <- function(dframe,varlist,outcomename,outcometarget,
 #' 
 #' @export
 designTreatmentsN <- function(dframe,varlist,outcomename,
+                              ...,
                               weights=c(),
                               minFraction=0.02,smFactor=0.0,
                               rareCount=2,rareSig=0.3,maxMissing=0.04,
@@ -1203,6 +1243,7 @@ designTreatmentsN <- function(dframe,varlist,outcomename,
                               returnXFrame=FALSE,scale=FALSE,doCollar=TRUE,
                               verbose=TRUE,
                               parallelCluster=NULL) {
+  .checkArgs(dframe=dframe,varlist=varlist,outcomename=outcomename,...)
   ycol <- dframe[[outcomename]]
   .designTreatmentsX(dframe,varlist,outcomename,ycol,
                      c(),c(),
@@ -1233,6 +1274,7 @@ designTreatmentsN <- function(dframe,varlist,outcomename,
 #' @param treatmentplan Plan built by designTreantmentsC() or designTreatmentsN()
 #' @param dframe Data frame to be treated
 #' @param pruneSig suppress variables with significance above this level
+#' @param ... no additional arguments, declared to forced named binding of later arguments
 #' @param scale optional if TRUE replace numeric variables with regression ("move to outcome-scale").
 #' @param doCollar optional if TRUE collar numeric variables by cutting off after a tail-probability specified by collarProb during treatment design.
 #' @param varRestriction optional list of treated variable names to restrict to
@@ -1258,9 +1300,11 @@ designTreatmentsN <- function(dframe,varlist,outcomename,
 #' 
 #' @export
 prepare <- function(treatmentplan,dframe,pruneSig,
-  scale=FALSE,doCollar=TRUE,
-  varRestriction=c(),
-  parallelCluster=NULL) {
+                    ...,
+                    scale=FALSE,doCollar=TRUE,
+                    varRestriction=c(),
+                    parallelCluster=NULL) {
+  .checkArgs(dframe=dframe,varlist=c('x'),outcomename=c('x'),...)
   if(!requireNamespace("parallel",quietly=TRUE)) {
     parallelCluster <- NULL
   }

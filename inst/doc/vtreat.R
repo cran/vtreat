@@ -11,7 +11,7 @@ treatmentsC <- designTreatmentsC(dTrainC,colnames(dTrainC),'y',TRUE)
 print(treatmentsC)
 print(treatmentsC$treatments[[1]])
 
-dTrainCTreated <- prepare(treatmentsC,dTrainC,pruneLevel=c(),scale=TRUE)
+dTrainCTreated <- prepare(treatmentsC,dTrainC,pruneSig=c(),scale=TRUE)
 head(dTrainCTreated)
 
 varsC <- setdiff(colnames(dTrainCTreated),'y')
@@ -21,7 +21,7 @@ sapply(dTrainCTreated[,varsC,drop=FALSE],mean)
 sapply(varsC,function(c) { lm(paste('y',c,sep='~'),
    data=dTrainCTreated)$coefficients[[2]]})
 
-dTestCTreated <- prepare(treatmentsC,dTestC,pruneLevel=c(),scale=TRUE)
+dTestCTreated <- prepare(treatmentsC,dTestC,pruneSig=c(),scale=TRUE)
 head(dTestCTreated)
 
 
@@ -37,7 +37,7 @@ treatmentsN = designTreatmentsN(dTrainN,colnames(dTrainN),'y')
 print(treatmentsN)
 
 dTrainNTreated <- prepare(treatmentsN,dTrainN,
-                          pruneLevel=c(),scale=TRUE)
+                          pruneSig=c(),scale=TRUE)
 head(dTrainNTreated)
 
 varsN <- setdiff(colnames(dTrainNTreated),'y')
@@ -46,7 +46,15 @@ sapply(dTrainNTreated[,varsN,drop=FALSE],mean)
 # all slopes should be 1
 sapply(varsN,function(c) { lm(paste('y',c,sep='~'),
    data=dTrainNTreated)$coefficients[[2]]}) 
+
+
+# prepared frame
 dTestNTreated <- prepare(treatmentsN,dTestN,
-                         pruneLevel=c(),scale=TRUE)
+                         pruneSig=c())
 head(dTestNTreated)
+
+# scaled prepared frame
+dTestNTreatedS <- prepare(treatmentsN,dTestN,
+                         pruneSig=c(),scale=TRUE)
+head(dTestNTreatedS)
 
