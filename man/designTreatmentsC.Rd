@@ -2,7 +2,7 @@
 % Please edit documentation in R/vtreat.R
 \name{designTreatmentsC}
 \alias{designTreatmentsC}
-\title{designTreatmentsC}
+\title{Build all treatments for a data frame to predict a categorical outcome.}
 \usage{
 designTreatmentsC(dframe, varlist, outcomename, outcometarget, ...,
   weights = c(), minFraction = 0.02, smFactor = 0, rareCount = 2,
@@ -11,7 +11,7 @@ designTreatmentsC(dframe, varlist, outcomename, outcometarget, ...,
   parallelCluster = NULL)
 }
 \arguments{
-\item{dframe}{Data frame to learn treatments from (training data), must have at least 4 rows.}
+\item{dframe}{Data frame to learn treatments from (training data), must have at least 1 row.}
 
 \item{varlist}{Names of columns to treat (effective variables).}
 
@@ -29,7 +29,7 @@ designTreatmentsC(dframe, varlist, outcomename, outcometarget, ...,
 
 \item{rareCount}{optional integer, suppress direct effects of level of this count or less.}
 
-\item{rareSig}{optional integer, suppress direct effects of level of this significance or less.}
+\item{rareSig}{optional numeric, suppress direct effects of level of this significance value greater.  Set to one to turn off effect.}
 
 \item{maxMissing}{optional maximum fraction (by data weight) of a categorical variable that are allowed before switching from indicators to impact coding.}
 
