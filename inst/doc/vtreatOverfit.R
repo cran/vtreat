@@ -45,8 +45,7 @@ print(treatments$scoreFrame)
 dCode <- d[d$rgroup<=20,,drop=FALSE]
 dTrain <- d[(d$rgroup>20) & (d$rgroup<=80),,drop=FALSE]
 treatments <- vtreat::designTreatmentsC(dCode,'x','y',TRUE,
-                                        rareCount=0,  # Note set this to something larger, like 5
-                                        rareSig=c() # Note set this to something like 0.3
+                                        rareCount=0  # Note set this to something larger, like 5
 )
 dTrainTreated <- vtreat::prepare(treatments,dTrain,
                                  pruneSig=c() # Note: set this to filter, like 0.05 or 1/nvars
@@ -78,6 +77,6 @@ dTrain <- d[(d$rgroup>20) & (d$rgroup<=80),,drop=FALSE]
 tryCatch(
   { treatments <- vtreat::designTreatmentsC(dCode,'x','y',TRUE)
   dTrainTreated <- vtreat::prepare(treatments,dTrain,pruneSig=0.01)},
-  error=function(x) { print(paste('caught',x)); return(c()) }
+  error=function(x) print(paste('caught',x))
 )
 

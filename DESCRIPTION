@@ -1,8 +1,8 @@
 Package: vtreat
 Type: Package
 Title: Simple Variable Treatment
-Version: 0.5.21
-Date: 2015-11-10
+Version: 0.5.22
+Date: 2016-01-07
 Author: John Mount, Nina Zumel
 URL: https://github.com/WinVector/vtreat
 Maintainer: John Mount <jmount@win-vector.com>
@@ -12,6 +12,6 @@ Suggests: testthat, knitr, parallel
 LazyData: true
 VignetteBuilder: knitr
 NeedsCompilation: no
-Packaged: 2015-11-10 20:28:27 UTC; ninazumel
+Packaged: 2016-01-07 19:53:02 UTC; johnmount
 Repository: CRAN
-Date/Publication: 2015-11-11 00:39:54
+Date/Publication: 2016-01-08 00:27:02

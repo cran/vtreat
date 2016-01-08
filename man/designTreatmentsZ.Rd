@@ -4,8 +4,8 @@
 \alias{designTreatmentsZ}
 \title{Design variable treatments with no outcome variable.}
 \usage{
-designTreatmentsZ(dframe, varlist, ..., weights = c(), minFraction = 0.02,
-  rareCount = 2, collarProb = 0, verbose = TRUE, parallelCluster = NULL)
+designTreatmentsZ(dframe, varlist, ..., weights = c(), rareCount = 0,
+  collarProb = 0, verbose = TRUE, parallelCluster = NULL)
 }
 \arguments{
 \item{dframe}{Data frame to learn treatments from (training data), must have at least 1 row.}
@@ -15,8 +15,6 @@ designTreatmentsZ(dframe, varlist, ..., weights = c(), minFraction = 0.02,
 \item{...}{no additional arguments, declared to forced named binding of later arguments}
 
 \item{weights}{optional training weights for each row}
-
-\item{minFraction}{optional minimum frequency a categorical level must have to be converted to an indicator column.}
 
 \item{rareCount}{optional integer, suppress direct effects of level of this count or less.}
 
@@ -43,9 +41,9 @@ The main fields are mostly vectors with names (all with the same names in the sa
 See the vtreat vignette for a bit more detail and a worked example.
 }
 \examples{
-dTrainZ <- data.frame(x=c('a','a','a','a','b','b','b'),
-    z=c(1,2,3,4,5,6,7))
-dTestZ <- data.frame(x=c('a','b','c',NA),
+dTrainZ <- data.frame(x=c('a','a','a','a','b','b',NA,'e','e'),
+    z=c(1,2,3,4,5,6,7,NA,9))
+dTestZ <- data.frame(x=c('a','x','c',NA),
     z=c(10,20,30,NA))
 treatmentsZ = designTreatmentsZ(dTrainZ,colnames(dTrainZ),
   rareCount=0)
