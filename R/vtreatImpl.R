@@ -1,6 +1,7 @@
 
 
-
+# TODO: put correct significance model for out of sample evalution (right now using in-sample,
+# but that is not the right distribution).
 
 
 .vtreatA <- function(vtreat,xcol,scale,doCollar) {
@@ -46,6 +47,7 @@
       stop(gi)
     }
   }
+  # unpack sub-frames into a list of columns
   cols <- vector('list',length(colNames))
   names(cols) <- colNames
   for(ii in seq_len(length(toProcess))) {
@@ -57,6 +59,12 @@
     }
   }
   cols <- Filter(Negate(is.null),cols)
+  # corner case, make sure we get the number of rows correct
+  if(length(cols)<=0) {
+    d <- data.frame(x=numeric(nrow(dframe)),stringsAsFactors=FALSE)
+    d[['x']] <- NULL
+    return(d)
+  }
   as.data.frame(cols,stringsAsFactors=FALSE)
 }
 
@@ -76,17 +84,15 @@
   lmaty[,1] <- ycol-meany
   model <- stats::lm.wfit(lmatx,lmaty,weights)
   a <- 0.0
-  if(!is.na(model$coefficients[[2]])) {
+  if((!is.na(model$coefficients[[2]]))&&
+     (!is.infinite(model$coefficients[[2]]))) {
     a <- model$coefficients[[2]]
-  }
-  if(abs(a)>1.0e-6) {
-    if(!is.na(model$coefficients[[1]])) {
-      b <- model$coefficients[[1]]
+    effect <- a*xcol
+    if((max(effect)-min(effect))<1.0e-8) {
+      a <- 0 # give up and suppress
     }
-  } else {
-    a = 1
-    b = 0
   }
+  b <- -.wmean(a*xcol,weights)
   list(a=a,b=b)
 }
 
@@ -171,9 +177,9 @@
 
 
 
-# TODO: pivot warnings/print out of here
 # design a treatment for a single variables
 # bind a bunch of variables, so we pass exactly what we need to sub-processes
+# TODO: pivot warnings/print out of here
 .varDesigner <- function(zoY,
                          zC,zTarget,
                          weights,
@@ -331,6 +337,8 @@
 }
 
 
+
+
 .mkScoreVarWorker <- function(dframe,zoY,zC,zTarget,weights) {
   force(dframe)
   force(zoY)
@@ -349,15 +357,16 @@
       scoreFrame <- vector('list',length(vnames(ti)))
       xcolClean <- .cleanColumn(dframe[[origName]],nRows)
       fi <- .vtreatA(ti,xcolClean,FALSE,FALSE)
-      for(nv in vnames(ti)) {
+      for(nvi in seq_len(length(vnames(ti)))) {
+        nv <- vnames(ti)[[nvi]]
         scoreFrameij <- .scoreCol(nv,fi[[nv]],zoY,zC,zTarget,weights) 
-        scoreFrame[[length(scoreFrame)+1]] <- scoreFrameij
+        scoreFrame[[nvi]] <- scoreFrameij
       }
       scoreFrame <- Filter(Negate(is.null),scoreFrame)
       if(length(scoreFrame)<=0) {
         return(NULL)
       }
-      sFrame <- do.call(rbind,scoreFrame)
+      sFrame <- .rbindListOfFrames(scoreFrame)
       sFrame$needsSplit <- ti$needsSplit
     } else {
       sFrame <- scoreFrame
@@ -428,7 +437,7 @@
   scrW <- .mkScoreVarWorker(dframe,zoY,zC,zTarget,weights)
   sFrames <- plapply(treatments,scrW,parallelCluster)
   sFrames <- Filter(Negate(is.null),sFrames)
-  sFrame <- do.call(rbind,sFrames)
+  sFrame <- .rbindListOfFrames(sFrames)
   plan <- list(treatments=treatments,
                scoreFrame=sFrame,
                outcomename=outcomename)
@@ -543,7 +552,7 @@
       swkr <- .mkScoreColWorker(scoreFrame,zoYS,zCS,zTarget,scoreWeights)
       sframe <- plapply(newVarsS,swkr,parallelCluster) 
       sframe <- Filter(Negate(is.null),sframe)
-      sframe <- do.call(rbind,sframe)
+      sframe <- .rbindListOfFrames(sframe)
       # overlay these results into treatments$scoreFrame
       nukeCols <- intersect(colnames(treatments$scoreFrame),
                             c('PRESSRsquared', 'psig', 'sig', 'catPRSquared', 'csig'))

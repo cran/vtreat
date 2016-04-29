@@ -1,6 +1,6 @@
 # variable treatments type def: list { origvar, newvars, f(col,args), args, treatmentName, scales } can share orig var
 
-# Would be nice to have: Jacknifed GLM significance
+# Would be nice to have: Jackknifed GLM significance
 
 #' @importFrom stats aggregate anova as.formula binomial fisher.test glm lm lm.wfit pchisq pf quantile
 NULL
@@ -273,7 +273,7 @@ designTreatmentsZ <- function(dframe,varlist,
 #' @param dframe Data frame to be treated
 #' @param pruneSig suppress variables with significance above this level
 #' @param ... no additional arguments, declared to forced named binding of later arguments
-#' @param scale optional if TRUE replace numeric variables with regression ("move to outcome-scale").
+#' @param scale optional if TRUE replace numeric variables with single variable model regressions ("move to outcome-scale").  These have mean zero and (for varaibles with signficant less than 1) slope 1 when regressed against outcome.
 #' @param doCollar optional if TRUE collar numeric variables by cutting off after a tail-probability specified by collarProb during treatment design.
 #' @param varRestriction optional list of treated variable names to restrict to
 #' @return treated data frame (all columns numeric, without NA,NaN)
@@ -349,12 +349,12 @@ prepare <- function(treatmentplan,dframe,pruneSig,
 
 
 
-#' Run categorical cross-frame experiment.Experimental code, may or may not help depending on situation.
+#' Run categorical cross-frame experiment.
 #' 
 #' Builds a \code{\link{designTreatmentsC}} treatment plan and a data frame prepared 
 #' from \code{dframe} that is "cross" in the sense each row is treated using a treatment
 #' plan built from a subset of dframe disjoint from the given row.
-#' The goal is to try to and suppply a method of breaking nested model bias other than splitting
+#' The goal is to try to and supply a method of breaking nested model bias other than splitting
 #' into calibration, training, test sets.
 #' 
 #'
@@ -442,12 +442,12 @@ mkCrossFrameCExperiment <- function(dframe,varlist,
 }
 
 
-#' Run numeric cross frame experiment.  Experimental code, may or may not help depending on situation.
+#' Run numeric cross frame experiment.
 #' 
 #' Builds a \code{\link{designTreatmentsC}} treatment plan and a data frame prepared 
 #' from \code{dframe} that is "cross" in the sense each row is treated using a treatment
 #' plan built from a subset of dframe disjoint from the given row.
-#' The goal is to try to and suppply a method of breaking nested model bias other than splitting
+#' The goal is to try to and supply a method of breaking nested model bias other than splitting
 #' into calibration, training, test sets.
 #'  
 #' @param dframe Data frame to learn treatments from (training data), must have at least 1 row.

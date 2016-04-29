@@ -1,6 +1,6 @@
 ## ------------------------------------------------------------------------
 set.seed(22626)
-d <- data.frame(x=sample(paste('level',1:1000,sep=''),2000,replace=TRUE)) # independent variables.
+d <- data.frame(x=sample(paste('level',1:1000,sep=''),2000,replace=TRUE)) # independent variable.
 d$y <- runif(nrow(d))>0.5  # the quantity to be predicted, notice: independent of variables.
 d$rgroup <- round(100*runif(nrow(d)))  # the random group used for splitting the data set, not a variable.
 
@@ -33,7 +33,10 @@ plotRes <- function(d,predName,yName,title) {
   print(paste('accuracy',acc))
 }
 
+# evaluate model on training
 plotRes(dTrain,'predM1','y','model1 on train')
+
+# evaluate model on test
 dTestTreated <- vtreat::prepare(treatments,dTest,pruneSig=c())
 dTest$predM1 <- predict(m1,newdata=dTestTreated,type='response')
 plotRes(dTest,'predM1','y','model1 on test')
@@ -45,7 +48,8 @@ print(treatments$scoreFrame)
 dCode <- d[d$rgroup<=20,,drop=FALSE]
 dTrain <- d[(d$rgroup>20) & (d$rgroup<=80),,drop=FALSE]
 treatments <- vtreat::designTreatmentsC(dCode,'x','y',TRUE,
-                                        rareCount=0  # Note set this to something larger, like 5
+                                        rareCount=0,  # Note set this to something larger, like 5
+                                        rareSig=c() # Note set this to something like 0.3
 )
 dTrainTreated <- vtreat::prepare(treatments,dTrain,
                                  pruneSig=c() # Note: set this to filter, like 0.05 or 1/nvars
@@ -64,19 +68,4 @@ plotRes(dCode,'predM2','y','model2 on coding set')
 dTestTreated <- vtreat::prepare(treatments,dTest,pruneSig=c())
 dTest$predM2 <- predict(m2,newdata=dTestTreated,type='response')
 plotRes(dTest,'predM2','y','model2 on test set')
-
-## ------------------------------------------------------------------------
-treatmentsBad <- vtreat::designTreatmentsC(d[d$rgroup<=0,,drop=FALSE],'x','y',TRUE,
-                      rareCount=0 # Note set this to something larger, like 5
-)
-print(treatmentsBad$scoreFrame[treatmentsBad$scoreFrame$sig<=0.05,,drop=FALSE])
-
-## ------------------------------------------------------------------------
-dCode <- d[d$rgroup<=20,,drop=FALSE]
-dTrain <- d[(d$rgroup>20) & (d$rgroup<=80),,drop=FALSE]
-tryCatch(
-  { treatments <- vtreat::designTreatmentsC(dCode,'x','y',TRUE)
-  dTrainTreated <- vtreat::prepare(treatments,dTrain,pruneSig=0.01)},
-  error=function(x) print(paste('caught',x))
-)
 

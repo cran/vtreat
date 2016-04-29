@@ -11,19 +11,22 @@ treatmentsC <- designTreatmentsC(dTrainC,colnames(dTrainC),'y',TRUE)
 print(treatmentsC)
 print(treatmentsC$treatments[[1]])
 
+## ---- tidy=FALSE---------------------------------------------------------
+
 dTrainCTreated <- prepare(treatmentsC,dTrainC,pruneSig=c(),scale=TRUE)
 head(dTrainCTreated)
 
 varsC <- setdiff(colnames(dTrainCTreated),'y')
 # all input variables should be mean 0
 sapply(dTrainCTreated[,varsC,drop=FALSE],mean)
-# all slopes should be 1
+# all slopes should be 1 for variables with dTrainCTreated$scoreFrame$sig<1
 sapply(varsC,function(c) { lm(paste('y',c,sep='~'),
    data=dTrainCTreated)$coefficients[[2]]})
 
 dTestCTreated <- prepare(treatmentsC,dTestC,pruneSig=c(),scale=TRUE)
 head(dTestCTreated)
 
+## ---- tidy=FALSE---------------------------------------------------------
 
 # numeric example
 dTrainN <- data.frame(x=c('a','a','a','a','b','b',NA),
@@ -43,7 +46,7 @@ head(dTrainNTreated)
 varsN <- setdiff(colnames(dTrainNTreated),'y')
 # all input variables should be mean 0
 sapply(dTrainNTreated[,varsN,drop=FALSE],mean) 
-# all slopes should be 1
+# all slopes should be 1 for variables with treatmentsN$scoreFrame$sig<1
 sapply(varsN,function(c) { lm(paste('y',c,sep='~'),
    data=dTrainNTreated)$coefficients[[2]]}) 
 

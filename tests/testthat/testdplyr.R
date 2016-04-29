@@ -1,11 +1,11 @@
 library('vtreat')
 
-context("DataTable Example")
+context("dplyr Example")
 
-test_that("testDataTable: DataTable works", {
+test_that("testdplyr: works with dplyr", {
   # load('tests/testthat/uci.car.data.Rdata')
-  if(requireNamespace("data.table",quietly=TRUE)) {
-    library("data.table")
+  if(requireNamespace("dplyr",quietly=TRUE)) {
+    library("dplyr")
     load('uci.car.data.Rdata')
     
     dYName <- "rating"
@@ -13,12 +13,12 @@ test_that("testDataTable: DataTable works", {
     pvars <- setdiff(colnames(uci.car.data),dYName)
     seedVal=946463L
     
-    # run on data.table (P "prime")
+    # run on dplyr tbl
     set.seed(seedVal)
-    dT <- data.table::data.table(uci.car.data)
-    treatmentsCP <- designTreatmentsC(dT,
-                                      pvars,dYName,dYTarget,verbose=FALSE)
-    dTrainCTreatedP <- prepare(treatmentsCP,dT,pruneSig=c())
+    dT <- dplyr::as.tbl(uci.car.data)
+    dT %>%  designTreatmentsC(pvars,dYName,dYTarget,verbose=FALSE) -> 
+      treatmentsCP
+    treatmentsCP %>% prepare(dT,pruneSig=c()) -> dTrainCTreatedP
     
     # re-run on data.frame
     set.seed(seedVal)
