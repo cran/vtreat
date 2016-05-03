@@ -1,7 +1,5 @@
 
 
-# TODO: put correct significance model for out of sample evalution (right now using in-sample,
-# but that is not the right distribution).
 
 
 .vtreatA <- function(vtreat,xcol,scale,doCollar) {
@@ -66,34 +64,6 @@
     return(d)
   }
   as.data.frame(cols,stringsAsFactors=FALSE)
-}
-
-
-
-
-
-# xcol numeric vector of inputs (no NA/NULL/NaN)
-# ycol numeric vector of outcomes (no NA/NULL/NaN)
-# numeric vector of data weights (no NA/NULL/NaN, all>0.0)
-.getScales <- function(xcol,ycol,weights) {
-  lmatx <- matrix(data=0.0,nrow=length(ycol),ncol=2)
-  lmatx[,1] <- 1
-  lmatx[,2] <- xcol
-  lmaty <- matrix(data=0.0,nrow=length(ycol),ncol=1)
-  meany <- .wmean(ycol,weights)
-  lmaty[,1] <- ycol-meany
-  model <- stats::lm.wfit(lmatx,lmaty,weights)
-  a <- 0.0
-  if((!is.na(model$coefficients[[2]]))&&
-     (!is.infinite(model$coefficients[[2]]))) {
-    a <- model$coefficients[[2]]
-    effect <- a*xcol
-    if((max(effect)-min(effect))<1.0e-8) {
-      a <- 0 # give up and suppress
-    }
-  }
-  b <- -.wmean(a*xcol,weights)
-  list(a=a,b=b)
 }
 
 
@@ -279,11 +249,6 @@
 .neatenScoreFrame <- function(sFrame) {
   # clean up sFrame a bit
   if(nrow(sFrame)>0) {
-    for(cname in c('PRESSRsquared','catPRSquared')) {
-      if(cname %in% colnames(sFrame)) {
-        sFrame[[cname]][.is.bad(sFrame[[cname]])] <- 0
-      }
-    }
     for(cname in c('psig','csig','sig')) {
       if(cname %in% colnames(sFrame)) {
         sFrame[[cname]][.is.bad(sFrame[[cname]])] <- 1
@@ -295,28 +260,26 @@
 
 
 .scoreCol <- function(varName,nxcol,zoY,zC,zTarget,weights) {
-  PRESSRsquared=0.0
   psig=1.0
   sig=1.0
-  catPRSquared=0.0
   csig=1.0
   catTarget <- !is.null(zC)
   varMoves <- .has.range.cn(nxcol)
   if(varMoves) {
     yMoves <- .has.range.cn(zoY)
     if(varMoves && yMoves) {
-      pstat <- pressStatOfBestLinearFit(nxcol,
-                                        zoY,
-                                        weights,
-                                        'total')
-      PRESSRsquared <- pstat$rsq
-      psig <- pstat$sig
-      sig <- pstat$sig
+      # TODO: pull this off scale fact
+      lstat <- linScore(varName,
+                        nxcol,
+                        zoY,
+                        weights)
+      psig <- lstat$sig
+      sig <- lstat$sig
       if(catTarget) {
-        cstat <- catScore(nxcol,
+        cstat <- catScore(varName,
+                          nxcol,
                           zC,zTarget,
                           weights)
-        catPRSquared <- cstat$pRsq
         csig <- cstat$sig
         sig <- cstat$sig
       }
@@ -324,12 +287,10 @@
   }
   scoreFrameij <- data.frame(varName=varName,
                              varMoves=varMoves,
-                             PRESSRsquared=PRESSRsquared,
                              psig=psig,
                              sig=psig,
                              stringsAsFactors = FALSE)
   if(catTarget) {
-    scoreFrameij$catPRSquared <- catPRSquared
     scoreFrameij$csig <- csig
     scoreFrameij$sig <- csig
   }
@@ -338,40 +299,29 @@
 
 
 
-
+# used in initial scoring of variables
 .mkScoreVarWorker <- function(dframe,zoY,zC,zTarget,weights) {
   force(dframe)
   force(zoY)
   force(zC)
   force(zTarget)
-  catTarget <- !is.null(zC)
   force(weights)
   nRows <- nrow(dframe)
   function(ti) {
     origName <- vorig(ti)
-    scoreFrame <- NULL
-    if(!ti$needsSplit) {
-      scoreFrame <- ti$scoreFrame
+    xcolClean <- .cleanColumn(dframe[[origName]],nRows)
+    fi <- .vtreatA(ti,xcolClean,FALSE,FALSE)
+    scoreFrame <- lapply(seq_len(length(vnames(ti))),
+                         function(nvi) {
+                           nv <- vnames(ti)[[nvi]]
+                           .scoreCol(nv,fi[[nv]],zoY,zC,zTarget,weights) 
+                          })
+    scoreFrame <- Filter(Negate(is.null),scoreFrame)
+    if(length(scoreFrame)<=0) {
+      return(NULL)
     }
-    if(is.null(scoreFrame)) {
-      scoreFrame <- vector('list',length(vnames(ti)))
-      xcolClean <- .cleanColumn(dframe[[origName]],nRows)
-      fi <- .vtreatA(ti,xcolClean,FALSE,FALSE)
-      for(nvi in seq_len(length(vnames(ti)))) {
-        nv <- vnames(ti)[[nvi]]
-        scoreFrameij <- .scoreCol(nv,fi[[nv]],zoY,zC,zTarget,weights) 
-        scoreFrame[[nvi]] <- scoreFrameij
-      }
-      scoreFrame <- Filter(Negate(is.null),scoreFrame)
-      if(length(scoreFrame)<=0) {
-        return(NULL)
-      }
-      sFrame <- .rbindListOfFrames(scoreFrame)
-      sFrame$needsSplit <- ti$needsSplit
-    } else {
-      sFrame <- scoreFrame
-      sFrame$needsSplit <- FALSE
-    }
+    sFrame <- .rbindListOfFrames(scoreFrame)
+    sFrame$needsSplit <- ti$needsSplit
     sFrame$origName <- origName
     sFrame$code <- ti$treatmentCode
     sFrame
@@ -379,14 +329,14 @@
 }
 
 
+# used in re-scoring needsSplit variables on simulated out of sample
+# (cross) frame
 .mkScoreColWorker <- function(dframe,zoY,zC,zTarget,weights) {
   force(dframe)
   force(zoY)
   force(zC)
   force(zTarget)
-  catTarget <- !is.null(zC)
   force(weights)
-  nRows <- nrow(dframe)
   function(nv) {
     scoreFrameij <- .scoreCol(nv,dframe[[nv]],zoY,zC,zTarget,weights)
     scoreFrameij
@@ -460,6 +410,7 @@
                                minFraction,smFactor,
                                rareCount,rareSig,
                                collarProb,
+                               ncross,
                                verbose,
                                parallelCluster) {
   if(!is.data.frame(dframe)) {
@@ -538,24 +489,25 @@
                                 collarProb,
                                 TRUE,
                                 FALSE,FALSE,
+                                ncross,
                                 parallelCluster)
-      scoreFrame <- crossData$crossFrame
-      scoreWeights <- crossData$crossWeights
+      crossFrame <- crossData$crossFrame
+      crossWeights <- crossData$crossWeights
       # score this frame
       if(is.null(zC)) {
-        zoYS = scoreFrame[[outcomename]]
+        zoYS = crossFrame[[outcomename]]
         zCS = NULL
       } else {
-        zCS = scoreFrame[[outcomename]]==zTarget
+        zCS = crossFrame[[outcomename]]==zTarget
         zoYS = ifelse(zCS,1,0)
       }
-      swkr <- .mkScoreColWorker(scoreFrame,zoYS,zCS,zTarget,scoreWeights)
+      swkr <- .mkScoreColWorker(crossFrame,zoYS,zCS,TRUE,crossWeights)
       sframe <- plapply(newVarsS,swkr,parallelCluster) 
       sframe <- Filter(Negate(is.null),sframe)
       sframe <- .rbindListOfFrames(sframe)
       # overlay these results into treatments$scoreFrame
       nukeCols <- intersect(colnames(treatments$scoreFrame),
-                            c('PRESSRsquared', 'psig', 'sig', 'catPRSquared', 'csig'))
+                            c('psig', 'sig', 'csig'))
       for(v in newVarsS) {
         for(n in nukeCols) {
           if(v %in% sframe$varName) {

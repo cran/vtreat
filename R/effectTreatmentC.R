@@ -50,14 +50,7 @@
     return(NULL)
   }
   class(treatment) <- 'vtreatment'
-  treatment$scales <- .getScales(pred,as.numeric(rescol==resTarget),weights)
-#   jackPred <- .jackknifeCatBayes(origVarName,vcolin,rescol,resTarget,smFactor,levRestriction,weights)
-#   zoY <- ifelse(rescol==resTarget,1.0,0.0)
-#   # trainScore <- .scoreCol(newVarName,pred,zoY,rescol,resTarget,weights)
-#   jackScore <- .scoreCol(newVarName,jackPred,zoY,rescol,resTarget,weights)
-#   treatment$scoreFrame <- jackScore
-#   # turns out the jackknife score isn't strong enough (as it doesn't include pruning facts)
-#   # for when the level pruning is turned on.
+  treatment$scales <- linScore(newVarName,pred,as.numeric(rescol==resTarget),weights)
   treatment
 }
 

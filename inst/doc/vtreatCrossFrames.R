@@ -83,6 +83,7 @@ prep <- vtreat::mkCrossFrameCExperiment(dTrain,
 )
 dTrainTreated <- prep$crossFrame
 treatments <- prep$treatments
+print(treatments$scoreFrame[,c('varName','psig','csig')])
 
 ## ----xframemodel---------------------------------------------------------
 m1 <- glm(y~xBad1_catB + xBad2_catB + xBad3_catB + xGood1_clean + xGood2_clean,

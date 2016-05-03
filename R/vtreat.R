@@ -3,6 +3,7 @@
 # Would be nice to have: Jackknifed GLM significance
 
 #' @importFrom stats aggregate anova as.formula binomial fisher.test glm lm lm.wfit pchisq pf quantile
+#' @importFrom utils packageVersion
 NULL
 
 
@@ -79,6 +80,7 @@ print.vtreatment <- function(x,...) {
 #' @param rareCount optional integer, suppress direct effects of level of this count or less.
 #' @param rareSig optional numeric, suppress direct effects of level of this significance value greater.  Set to one to turn off effect.
 #' @param collarProb what fraction of the data (pseudo-probability) to collar data at (<0.5).
+#' @param ncross optional scalar >=2 number of cross validation splits use in rescoring complex variables.
 #' @param verbose if TRUE print progress.
 #' @param parallelCluster (optional) a cluster object created by package parallel or package snow
 #' @return treatment plan (for use with prepare)
@@ -101,6 +103,7 @@ designTreatmentsC <- function(dframe,varlist,outcomename,outcometarget,
                               minFraction=0.02,smFactor=0.0,
                               rareCount=0,rareSig=1,
                               collarProb=0.00,
+                              ncross=3,
                               verbose=TRUE,
                               parallelCluster=NULL) {
   
@@ -118,10 +121,12 @@ designTreatmentsC <- function(dframe,varlist,outcomename,outcometarget,
                                    minFraction,smFactor,
                                    rareCount,rareSig,
                                    collarProb,
+                                   ncross,
                                    verbose,
                                    parallelCluster)
   treatments$outcomeTarget <- outcometarget
   treatments$outcomeType <- 'Binary'
+  treatments$vtreatVersion <- packageVersion('vtreat')
   treatments
 }
 
@@ -153,6 +158,7 @@ designTreatmentsC <- function(dframe,varlist,outcomename,outcometarget,
 #' @param rareCount optional integer, suppress direct effects of level of this count or less.
 #' @param rareSig optional numeric, suppress direct effects of level of this significance value greater.  Set to one to turn off effect.
 #' @param collarProb what fraction of the data (pseudo-probability) to collar data at (<0.5).
+#' @param ncross optional scalar >=2 number of cross validation splits use in rescoring complex variables.
 #' @param verbose if TRUE print progress.
 #' @param parallelCluster (optional) a cluster object created by package parallel or package snow
 #' @return treatment plan (for use with prepare)
@@ -174,6 +180,7 @@ designTreatmentsN <- function(dframe,varlist,outcomename,
                               minFraction=0.02,smFactor=0.0,
                               rareCount=0,rareSig=1,
                               collarProb=0.00,
+                              ncross=3,
                               verbose=TRUE,
                               parallelCluster=NULL) {
   .checkArgs(dframe=dframe,varlist=varlist,outcomename=outcomename,...)
@@ -190,9 +197,11 @@ designTreatmentsN <- function(dframe,varlist,outcomename,
                      minFraction,smFactor,
                      rareCount,rareSig,
                      collarProb,
+                     ncross,
                      verbose,
                      parallelCluster)
   treatments$outcomeType <- 'Numeric'
+  treatments$vtreatVersion <- packageVersion('vtreat')
   treatments
 }
 
@@ -251,9 +260,11 @@ designTreatmentsZ <- function(dframe,varlist,
                      1.0,smFactor=0,
                      rareCount,rareSig=1,
                      collarProb,
+                     3,
                      verbose,
                      parallelCluster)
   treatments$outcomeType <- 'None'
+  treatments$vtreatVersion <- packageVersion('vtreat')
   treatments
 }
 
@@ -305,6 +316,14 @@ prepare <- function(treatmentplan,dframe,pruneSig,
   .checkArgs1(dframe=dframe,...)
   if(class(treatmentplan)!='treatmentplan') {
     stop("treatmentplan must be of class treatmentplan")
+  }
+  vtreatVersion <- packageVersion('vtreat')
+  if(is.null(treatmentplan$vtreatVersion) ||
+     (treatmentplan$vtreatVersion!=vtreatVersion)) {
+    warning(paste('treatments desined with vtreat version',
+               treatmentplan$vtreatVersion,
+               'and preparing data.frame with vtreat version',
+               vtreatVersion))
   }
   if(!is.data.frame(dframe)) {
     stop("dframe must be a data frame")
@@ -371,6 +390,7 @@ prepare <- function(treatmentplan,dframe,pruneSig,
 #' @param collarProb what fraction of the data (pseudo-probability) to collar data at (<0.5).
 #' @param scale optional if TRUE replace numeric variables with regression ("move to outcome-scale").
 #' @param doCollar optional if TRUE collar numeric variables by cutting off after a tail-probability specified by collarProb during treatment design.
+#' @param ncross optional scalar>=2 number of cross-validation rounds to design.
 #' @param parallelCluster (optional) a cluster object created by package parallel or package snow
 #' @seealso \code{\link{designTreatmentsC}} \code{\link{designTreatmentsN}} \code{\link{prepare}}
 #' @return list with treatments and crossFrame
@@ -402,6 +422,7 @@ mkCrossFrameCExperiment <- function(dframe,varlist,
                                     rareCount=0,rareSig=1,
                                     collarProb=0.00,
                                     scale=FALSE,doCollar=TRUE,
+                                    ncross=3,
                                     parallelCluster=NULL) {
   .checkArgs(dframe=dframe,varlist=varlist,outcomename=outcomename,...)
   if(!is.data.frame(dframe)) {
@@ -437,6 +458,7 @@ mkCrossFrameCExperiment <- function(dframe,varlist,
                             collarProb,
                             FALSE,
                             scale,doCollar,
+                            ncross,
                             parallelCluster)
   list(treatments=treatments,crossFrame=crossDat$crossFrame)
 }
@@ -462,6 +484,7 @@ mkCrossFrameCExperiment <- function(dframe,varlist,
 #' @param collarProb what fraction of the data (pseudo-probability) to collar data at (<0.5).
 #' @param scale optional if TRUE replace numeric variables with regression ("move to outcome-scale").
 #' @param doCollar optional if TRUE collar numeric variables by cutting off after a tail-probability specified by collarProb during treatment design.
+#' @param ncross optional scalar>=2 number of cross-validation rounds to design.
 #' @param parallelCluster (optional) a cluster object created by package parallel or package snow
 #' @return treatment plan (for use with prepare)
 #' @seealso \code{\link{designTreatmentsC}} \code{\link{designTreatmentsN}} \code{\link{prepare}}
@@ -492,6 +515,7 @@ mkCrossFrameNExperiment <- function(dframe,varlist,outcomename,
                                     rareCount=0,rareSig=1,
                                     collarProb=0.00,
                                     scale=FALSE,doCollar=TRUE,
+                                    ncross=3,
                                     parallelCluster=NULL) {
   .checkArgs(dframe=dframe,varlist=varlist,outcomename=outcomename,...)
   if(!is.data.frame(dframe)) {
@@ -527,6 +551,7 @@ mkCrossFrameNExperiment <- function(dframe,varlist,outcomename,
                             collarProb,
                             FALSE,
                             scale,doCollar,
+                            ncross,
                             parallelCluster)
   list(treatments=treatments,crossFrame=crossDat$crossFrame)
 }

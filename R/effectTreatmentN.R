@@ -39,10 +39,7 @@
     return(NULL)
   }
   class(treatment) <- 'vtreatment'
-  treatment$scales <- .getScales(pred,rescol,weights)
-#   jackPred <- .jackknifeCatN(vcolin,rescol,smFactor,levRestriction,weights)
-#   jackScore <- .scoreCol(newVarName,jackPred,rescol,c(),NULL,weights)
-#   treatment$scoreFrame <- jackScore
+  treatment$scales <- linScore(newVarName,pred,rescol,weights)
   treatment
 }
 
