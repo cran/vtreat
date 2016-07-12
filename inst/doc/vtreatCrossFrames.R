@@ -40,7 +40,7 @@ treatments <- vtreat::designTreatmentsC(dTrain,c('xBad1','xBad2','xBad3','xGood1
   rareCount=0 # Note: usually want rareCount>0, setting to zero to illustrate problem
 )
 dTrainTreated <- vtreat::prepare(treatments,dTrain,
-  pruneSig=c() # Note: usually want pruneSig to be a small fraction, setting to null to illustrate problem
+  pruneSig=c() # Note: usually want pruneSig to be a small fraction, setting to null to illustrate problems
 )
 m1 <- glm(y~xBad1_catB + xBad2_catB + xBad3_catB + xGood1_clean + xGood2_clean,
           data=dTrainTreated,family=binomial(link='logit'))
@@ -56,20 +56,26 @@ plotRes(dTest,'predM1','y','model1 on test')
 dCal <- d[d$rgroup=='cal',,drop=FALSE]
 dTrain <- d[d$rgroup=='train',,drop=FALSE]
 dTest <- d[d$rgroup=='test',,drop=FALSE]
-treatments <- vtreat::designTreatmentsC(dCal,c('xBad1','xBad2','xBad3','xGood1','xGood2'),
+
+# a nice heuristic, 
+# expect only a constant number of noise variables to sneak past
+pruneSig <- 1/ncol(dTrain) 
+treatments <- vtreat::designTreatmentsC(dCal,
+                                        c('xBad1','xBad2','xBad3','xGood1','xGood2'),
                                         'y',TRUE,
   rareCount=0 # Note: usually want rareCount>0, setting to zero to illustrate problem
 )
 dTrainTreated <- vtreat::prepare(treatments,dTrain,
-  pruneSig=c() # Note: usually want pruneSig to be a small fraction, setting to null to illustrate problem
-)
-m1 <- glm(y~xBad1_catB + xBad2_catB + xBad3_catB + xGood1_clean + xGood2_clean,
+  pruneSig=pruneSig)
+newvars <- setdiff(colnames(dTrainTreated),'y')
+m1 <- glm(paste('y',paste(newvars,collapse=' + '),sep=' ~ '),
           data=dTrainTreated,family=binomial(link='logit'))
 print(summary(m1))  
 
 dTrain$predM1 <- predict(m1,newdata=dTrainTreated,type='response')
 plotRes(dTrain,'predM1','y','model1 on train')
-dTestTreated <- vtreat::prepare(treatments,dTest,pruneSig=c())
+dTestTreated <- vtreat::prepare(treatments,dTest,
+                                pruneSig=pruneSig)
 dTest$predM1 <- predict(m1,newdata=dTestTreated,type='response')
 plotRes(dTest,'predM1','y','model1 on test')
 
@@ -77,22 +83,31 @@ plotRes(dTest,'predM1','y','model1 on test')
 dTrain <- d[d$rgroup!='test',,drop=FALSE]
 dTest <- d[d$rgroup=='test',,drop=FALSE]
 prep <- vtreat::mkCrossFrameCExperiment(dTrain,
-                                              c('xBad1','xBad2','xBad3','xGood1','xGood2'),
-                                        'y',TRUE,
-  rareCount=0 # Note: usually want rareCount>0, setting to zero to illustrate problem
+           c('xBad1','xBad2','xBad3','xGood1','xGood2'),
+           'y',TRUE,
+           rareCount=0 # Note: usually want rareCount>0, setting to zero to illustrate problems
 )
-dTrainTreated <- prep$crossFrame
 treatments <- prep$treatments
-print(treatments$scoreFrame[,c('varName','psig','csig')])
+print(treatments$scoreFrame[,c('varName','sig')])
+# vtreat::mkCrossFrameCExperiment doesn't take a pruneSig argument, but we can
+# prune on our own.
+print(pruneSig)
+newvars <- treatments$scoreFrame$varName[treatments$scoreFrame$sig<=pruneSig]
+# force in bad variables, to show we "belt and suspenders" deal with them
+# in that things go well in the cross-frame even if they sneak past pruning
+newvars <- sort(union(newvars,c("xBad1_catB","xBad2_catB","xBad3_catB")))
+print(newvars)
+dTrainTreated <- prep$crossFrame
 
 ## ----xframemodel---------------------------------------------------------
-m1 <- glm(y~xBad1_catB + xBad2_catB + xBad3_catB + xGood1_clean + xGood2_clean,
+m1 <- glm(paste('y',paste(newvars,collapse=' + '),sep=' ~ '),
           data=dTrainTreated,family=binomial(link='logit'))
 print(summary(m1))  
 
 dTrain$predM1 <- predict(m1,newdata=dTrainTreated,type='response')
 plotRes(dTrain,'predM1','y','model1 on train')
-dTestTreated <- vtreat::prepare(treatments,dTest,pruneSig=c())
+dTestTreated <- vtreat::prepare(treatments,dTest,
+                                pruneSig=c(),varRestriction=newvars)
 dTest$predM1 <- predict(m1,newdata=dTestTreated,type='response')
 plotRes(dTest,'predM1','y','model1 on test')
 

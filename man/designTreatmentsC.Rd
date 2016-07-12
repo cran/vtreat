@@ -6,8 +6,8 @@
 \usage{
 designTreatmentsC(dframe, varlist, outcomename, outcometarget, ...,
   weights = c(), minFraction = 0.02, smFactor = 0, rareCount = 0,
-  rareSig = 1, collarProb = 0, ncross = 3, verbose = TRUE,
-  parallelCluster = NULL)
+  rareSig = 1, collarProb = 0, splitFunction = NULL, ncross = 3,
+  catScaling = TRUE, verbose = TRUE, parallelCluster = NULL)
 }
 \arguments{
 \item{dframe}{Data frame to learn treatments from (training data), must have at least 1 row.}
@@ -32,7 +32,11 @@ designTreatmentsC(dframe, varlist, outcomename, outcometarget, ...,
 
 \item{collarProb}{what fraction of the data (pseudo-probability) to collar data at (<0.5).}
 
+\item{splitFunction}{(optional) see vtreat::buildEvalSets .}
+
 \item{ncross}{optional scalar >=2 number of cross validation splits use in rescoring complex variables.}
+
+\item{catScaling}{optional, if TRUE use glm() linkspace, if FALSE use lm() for scaling.}
 
 \item{verbose}{if TRUE print progress.}
 

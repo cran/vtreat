@@ -7,7 +7,8 @@
 mkCrossFrameCExperiment(dframe, varlist, outcomename, outcometarget, ...,
   weights = c(), minFraction = 0.02, smFactor = 0, rareCount = 0,
   rareSig = 1, collarProb = 0, scale = FALSE, doCollar = TRUE,
-  ncross = 3, parallelCluster = NULL)
+  splitFunction = NULL, ncross = 3, catScaling = TRUE,
+  parallelCluster = NULL)
 }
 \arguments{
 \item{dframe}{Data frame to learn treatments from (training data), must have at least 1 row.}
@@ -36,7 +37,11 @@ mkCrossFrameCExperiment(dframe, varlist, outcomename, outcometarget, ...,
 
 \item{doCollar}{optional if TRUE collar numeric variables by cutting off after a tail-probability specified by collarProb during treatment design.}
 
+\item{splitFunction}{(optional) see vtreat::buildEvalSets .}
+
 \item{ncross}{optional scalar>=2 number of cross-validation rounds to design.}
+
+\item{catScaling}{optional, if TRUE use glm() linkspace, if FALSE use lm() for scaling.}
 
 \item{parallelCluster}{(optional) a cluster object created by package parallel or package snow}
 }

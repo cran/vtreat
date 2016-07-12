@@ -30,7 +30,7 @@
                    'is not a type/class vtreat can work with (',class(xcolOrig),')'))
     }
     if(!is.null(ti$convertedColClass)) {
-      curColClass <- paste(class(xcolClean),collapse='')
+      curColClass <- paste(class(xcolClean))
       if(curColClass!=ti$convertedColClass) {
         return(paste('column',ti$origvar,'expected to convert to ',
                      ti$convertedColClass,'saw',class(xcolOrig),curColClass))
@@ -149,7 +149,6 @@
 
 # design a treatment for a single variables
 # bind a bunch of variables, so we pass exactly what we need to sub-processes
-# TODO: pivot warnings/print out of here
 .varDesigner <- function(zoY,
                          zC,zTarget,
                          weights,
@@ -157,6 +156,7 @@
                          collarProb,
                          trainRows,origRowCount,
                          impactOnly,
+                         catScaling,
                          verbose) {
   force(zoY)
   force(zC)
@@ -169,6 +169,7 @@
   force(collarProb)
   force(trainRows)
   force(origRowCount)
+  force(catScaling)
   force(verbose)
   nRows = length(zoY)
   yMoves <- .has.range.cn(zoY)
@@ -187,8 +188,8 @@
     acceptTreatment <- function(ti) {
       if(!is.null(ti)) {
         ti$origType <- typeof(vcolOrig)
-        ti$origClass <- paste(class(vcolOrig),collapse='')
-        ti$convertedColClass <- paste(class(vcol),collapse='')
+        ti$origClass <- paste(class(vcolOrig))
+        ti$convertedColClass <- paste(class(vcol))
         treatments[[length(treatments)+1]] <<- ti # Deliberate side-effect
       }
     }
@@ -199,9 +200,9 @@
       if(.has.range(vcol)) {
         if((colclass=='numeric') || (colclass=='integer')) {
           if(!impactOnly) {
-            ti <- .mkPassThrough(v,vcol,zoY,weights,collarProb)
+            ti <- .mkPassThrough(v,vcol,zoY,zC,zTarget,weights,collarProb,catScaling)
             acceptTreatment(ti)
-            ti <- .mkIsBAD(v,vcol,zoY,weights)
+            ti <- .mkIsBAD(v,vcol,zoY,zC,zTarget,weights,catScaling)
             acceptTreatment(ti)
           }
         } else if((colclass=='character') || (colclass=='factor')) {
@@ -214,15 +215,15 @@
           if(length(levRestriction$safeLevs)>0) {
             ti = NULL
             if(!impactOnly) {
-              ti <- .mkCatInd(v,vcol,zoY,minFraction,levRestriction,weights)
+              ti <- .mkCatInd(v,vcol,zoY,zC,zTarget,minFraction,levRestriction,weights,catScaling)
               acceptTreatment(ti)
             }
             if(is.null(ti)||(length(unique(vcol))>2)) {  # make an impactmodel if catInd construction failed or there are more than 2 levels
-              ti <- .mkCatP(v,vcol,zoY,zC,zTarget,levRestriction,weights)
+              ti <- .mkCatP(v,vcol,zoY,zC,zTarget,levRestriction,weights,catScaling)
               acceptTreatment(ti)
               if(yMoves) {
                 if(!is.null(zC)) {  # in categorical mode
-                  ti <- .mkCatBayes(v,vcol,zC,zTarget,smFactor,levRestriction,weights)
+                  ti <- .mkCatBayes(v,vcol,zC,zTarget,smFactor,levRestriction,weights,catScaling)
                   acceptTreatment(ti)      
                 }
                 if(is.null(zC)) { # is numeric mode
@@ -249,7 +250,7 @@
 .neatenScoreFrame <- function(sFrame) {
   # clean up sFrame a bit
   if(nrow(sFrame)>0) {
-    for(cname in c('psig','csig','sig')) {
+    for(cname in c('lsig','csig','sig')) {
       if(cname %in% colnames(sFrame)) {
         sFrame[[cname]][.is.bad(sFrame[[cname]])] <- 1
       }
@@ -259,8 +260,9 @@
 }
 
 
-.scoreCol <- function(varName,nxcol,zoY,zC,zTarget,weights) {
-  psig=1.0
+.scoreCol <- function(varName,nxcol,zoY,zC,zTarget,weights,
+                      extraModelDegrees=0) {
+  lsig=1.0
   sig=1.0
   csig=1.0
   catTarget <- !is.null(zC)
@@ -268,18 +270,19 @@
   if(varMoves) {
     yMoves <- .has.range.cn(zoY)
     if(varMoves && yMoves) {
-      # TODO: pull this off scale fact
       lstat <- linScore(varName,
                         nxcol,
                         zoY,
-                        weights)
-      psig <- lstat$sig
+                        weights,
+                        extraModelDegrees)
+      lsig <- lstat$sig
       sig <- lstat$sig
       if(catTarget) {
         cstat <- catScore(varName,
                           nxcol,
                           zC,zTarget,
-                          weights)
+                          weights,
+                          extraModelDegrees)
         csig <- cstat$sig
         sig <- cstat$sig
       }
@@ -287,8 +290,8 @@
   }
   scoreFrameij <- data.frame(varName=varName,
                              varMoves=varMoves,
-                             psig=psig,
-                             sig=psig,
+                             lsig=lsig,
+                             sig=lsig,
                              stringsAsFactors = FALSE)
   if(catTarget) {
     scoreFrameij$csig <- csig
@@ -314,7 +317,8 @@
     scoreFrame <- lapply(seq_len(length(vnames(ti))),
                          function(nvi) {
                            nv <- vnames(ti)[[nvi]]
-                           .scoreCol(nv,fi[[nv]],zoY,zC,zTarget,weights) 
+                           .scoreCol(nv,fi[[nv]],zoY,zC,zTarget,weights,
+                                     ti$extraModelDegrees) 
                           })
     scoreFrame <- Filter(Negate(is.null),scoreFrame)
     if(length(scoreFrame)<=0) {
@@ -322,6 +326,7 @@
     }
     sFrame <- .rbindListOfFrames(scoreFrame)
     sFrame$needsSplit <- ti$needsSplit
+    sFrame$extraModelDegrees <- ti$extraModelDegrees
     sFrame$origName <- origName
     sFrame$code <- ti$treatmentCode
     sFrame
@@ -356,6 +361,7 @@
                                 rareCount,rareSig,
                                 collarProb,
                                 impactOnly,justWantTreatments,
+                                catScaling,
                                 verbose,
                                 parallelCluster) {
   # In building the workList don't transform any variables (such as making
@@ -370,6 +376,7 @@
                          collarProb,
                          seq_len(nrow(dframe)),nrow(dframe),
                          impactOnly,
+                         catScaling,
                          verbose)
   treatments <- plapply(workList,worker,parallelCluster)
   treatments <- Filter(Negate(is.null),treatments)
@@ -410,7 +417,8 @@
                                minFraction,smFactor,
                                rareCount,rareSig,
                                collarProb,
-                               ncross,
+                               splitFunction,ncross,
+                               catScaling,
                                verbose,
                                parallelCluster) {
   if(!is.data.frame(dframe)) {
@@ -469,10 +477,12 @@
                                     rareCount,rareSig,
                                     collarProb,
                                     FALSE,FALSE,
+                                    catScaling,
                                     verbose,
                                     parallelCluster)
   treatments$scoreFrame <- treatments$scoreFrame[treatments$scoreFrame$varMoves,]
   yMoves <- .has.range.cn(zoY)
+  crossMethod = 'Notcross'
   if(yMoves) {
     splitVars <- unique(treatments$scoreFrame$origName[treatments$scoreFrame$needsSplit])
     if(length(splitVars)>0) {
@@ -489,10 +499,12 @@
                                 collarProb,
                                 TRUE,
                                 FALSE,FALSE,
-                                ncross,
+                                splitFunction,ncross,
+                                catScaling,
                                 parallelCluster)
       crossFrame <- crossData$crossFrame
       crossWeights <- crossData$crossWeights
+      crossMethod <- crossData$method
       # score this frame
       if(is.null(zC)) {
         zoYS = crossFrame[[outcomename]]
@@ -507,7 +519,7 @@
       sframe <- .rbindListOfFrames(sframe)
       # overlay these results into treatments$scoreFrame
       nukeCols <- intersect(colnames(treatments$scoreFrame),
-                            c('psig', 'sig', 'csig'))
+                            c('lsig', 'sig', 'csig'))
       for(v in newVarsS) {
         for(n in nukeCols) {
           if(v %in% sframe$varName) {
@@ -525,6 +537,8 @@
       }
     }
   }
+  treatments$vtreatVersion <- packageVersion('vtreat')
+  treatments$splitmethod <- crossMethod
   treatments
 }
 

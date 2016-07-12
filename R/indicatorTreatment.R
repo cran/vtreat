@@ -12,7 +12,7 @@
 }
 
 # build categorical indicators
-.mkCatInd <- function(origVarName,vcolin,ynumeric,minFraction,levRestriction,weights) {
+.mkCatInd <- function(origVarName,vcolin,ynumeric,zC,zTarget,minFraction,levRestriction,weights,catScaling) {
   vcol <- .preProcCat(vcolin,levRestriction)
   counts <- tapply(weights,vcol,sum)
   totMass <- sum(counts)
@@ -31,13 +31,21 @@
                               levRestriction=levRestriction),
                     treatmentName='Categoric Indicators',
                     treatmentCode='lev',
-                    needsSplit=FALSE)
+                    needsSplit=FALSE,
+                    extraModelDegrees=0)
   class(treatment) <- 'vtreatment'
   pred <- treatment$f(vcolin,treatment$args)
-  scaleList <- lapply(seq_len(length(newVarNames)),
+  if((!catScaling)||(is.null(zC))) {
+    scaleList <- lapply(seq_len(length(newVarNames)),
                       function(j) {
                         linScore(newVarNames[[j]],pred[[j]],ynumeric,weights)
                       })
+  } else {
+    scaleList <- lapply(seq_len(length(newVarNames)),
+                        function(j) {
+                          catScore(newVarNames[[j]],pred[[j]],zC,zTarget,weights)
+                        })
+  }
   treatment$scales <- .rbindListOfFrames(scaleList)
   treatment
 }

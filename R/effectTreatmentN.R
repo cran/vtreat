@@ -33,7 +33,8 @@
                               levRestriction=levRestriction),
                     treatmentName='Scalable Impact Code',
                     treatmentCode='catN',
-                    needsSplit=TRUE)
+                    needsSplit=TRUE,
+                    extraModelDegrees=max(0,length(scores)-1))
   pred <- treatment$f(vcolin,treatment$args)
   if(!.has.range.cn(pred)) {
     return(NULL)
@@ -41,18 +42,4 @@
   class(treatment) <- 'vtreatment'
   treatment$scales <- linScore(newVarName,pred,rescol,weights)
   treatment
-}
-
-.jackknifeCatN <- function(vcolin,rescol,smFactor,levRestriction,weights) {
-  vcol <- .preProcCat(vcolin,levRestriction)
-  baseMean <- .wmean(rescol,weights)
-  num <- tapply(rescol*weights,vcol,sum)
-  den <- tapply(weights,vcol,sum)
-  # vectorize and remove self
-  baseMean <- (sum(rescol*weights)-rescol*weights)/pmax(sum(weights)-weights,1.0e-3)
-  num <- as.numeric(num[vcol]) - weights*rescol
-  den <- pmax(as.numeric(den[vcol]) - weights,1.0e-3)
-  scores <- (num+smFactor*baseMean)/(den+smFactor)-baseMean
-  scores[vcol=='zap'] <- 0.0
-  scores
 }

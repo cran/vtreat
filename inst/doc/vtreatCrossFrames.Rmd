@@ -60,7 +60,7 @@ treatments <- vtreat::designTreatmentsC(dTrain,c('xBad1','xBad2','xBad3','xGood1
   rareCount=0 # Note: usually want rareCount>0, setting to zero to illustrate problem
 )
 dTrainTreated <- vtreat::prepare(treatments,dTrain,
-  pruneSig=c() # Note: usually want pruneSig to be a small fraction, setting to null to illustrate problem
+  pruneSig=c() # Note: usually want pruneSig to be a small fraction, setting to null to illustrate problems
 )
 m1 <- glm(y~xBad1_catB + xBad2_catB + xBad3_catB + xGood1_clean + xGood2_clean,
           data=dTrainTreated,family=binomial(link='logit'))
@@ -73,7 +73,10 @@ dTest$predM1 <- predict(m1,newdata=dTestTreated,type='response')
 plotRes(dTest,'predM1','y','model1 on test')
 ```
 
-Notice above that we see a training accuracy of 98% and a test accuracy of 60%.
+Notice above that we see a training accuracy of 98% and a test accuracy of 60%. Also notice
+the downstream model (the `glm`) erroneously thinks the `xBad?_cat` variables are
+significant (due to the large number of degrees of freedom hidden from the downstream
+model by the [impact/effect coding](http://www.win-vector.com/blog/2012/07/modeling-trick-impact-coding-of-categorical-variables-with-many-levels/)).
 
 ## The Right Way: A Calibration Set
 
@@ -83,20 +86,26 @@ Now try a proper calibration/train/test split:
 dCal <- d[d$rgroup=='cal',,drop=FALSE]
 dTrain <- d[d$rgroup=='train',,drop=FALSE]
 dTest <- d[d$rgroup=='test',,drop=FALSE]
-treatments <- vtreat::designTreatmentsC(dCal,c('xBad1','xBad2','xBad3','xGood1','xGood2'),
+
+# a nice heuristic, 
+# expect only a constant number of noise variables to sneak past
+pruneSig <- 1/ncol(dTrain) 
+treatments <- vtreat::designTreatmentsC(dCal,
+                                        c('xBad1','xBad2','xBad3','xGood1','xGood2'),
                                         'y',TRUE,
   rareCount=0 # Note: usually want rareCount>0, setting to zero to illustrate problem
 )
 dTrainTreated <- vtreat::prepare(treatments,dTrain,
-  pruneSig=c() # Note: usually want pruneSig to be a small fraction, setting to null to illustrate problem
-)
-m1 <- glm(y~xBad1_catB + xBad2_catB + xBad3_catB + xGood1_clean + xGood2_clean,
+  pruneSig=pruneSig)
+newvars <- setdiff(colnames(dTrainTreated),'y')
+m1 <- glm(paste('y',paste(newvars,collapse=' + '),sep=' ~ '),
           data=dTrainTreated,family=binomial(link='logit'))
 print(summary(m1))  
 
 dTrain$predM1 <- predict(m1,newdata=dTrainTreated,type='response')
 plotRes(dTrain,'predM1','y','model1 on train')
-dTestTreated <- vtreat::prepare(treatments,dTest,pruneSig=c())
+dTestTreated <- vtreat::prepare(treatments,dTest,
+                                pruneSig=pruneSig)
 dTest$predM1 <- predict(m1,newdata=dTestTreated,type='response')
 plotRes(dTest,'predM1','y','model1 on test')
 ```
@@ -165,30 +174,51 @@ Below is the example cross-run. The function `mkCrossFrameCExperiment` returns a
 dTrain <- d[d$rgroup!='test',,drop=FALSE]
 dTest <- d[d$rgroup=='test',,drop=FALSE]
 prep <- vtreat::mkCrossFrameCExperiment(dTrain,
-                                              c('xBad1','xBad2','xBad3','xGood1','xGood2'),
-                                        'y',TRUE,
-  rareCount=0 # Note: usually want rareCount>0, setting to zero to illustrate problem
+           c('xBad1','xBad2','xBad3','xGood1','xGood2'),
+           'y',TRUE,
+           rareCount=0 # Note: usually want rareCount>0, setting to zero to illustrate problems
 )
-dTrainTreated <- prep$crossFrame
 treatments <- prep$treatments
-print(treatments$scoreFrame[,c('varName','psig','csig')])
+print(treatments$scoreFrame[,c('varName','sig')])
+# vtreat::mkCrossFrameCExperiment doesn't take a pruneSig argument, but we can
+# prune on our own.
+print(pruneSig)
+newvars <- treatments$scoreFrame$varName[treatments$scoreFrame$sig<=pruneSig]
+# force in bad variables, to show we "belt and suspenders" deal with them
+# in that things go well in the cross-frame even if they sneak past pruning
+newvars <- sort(union(newvars,c("xBad1_catB","xBad2_catB","xBad3_catB")))
+print(newvars)
+dTrainTreated <- prep$crossFrame
 ```
 
-Now fit the model to *the cross-frame* rather than to `prepare(treatments, dTrain)` (the treated training data).
+We ensured the undesirable `xBad*_catB` variables back in to demonstrate that even if they sneak past a lose `pruneSig`, the crosframe
+lets the downstream model deal with them correctly.  To ensure more consistent filtering of the complicated variables one can
+increase the `ncross` argument in `vtreat::mkCrossFrame?Experiment`.
+
+Now we fit the model to *the cross-frame* rather than to `prepare(treatments, dTrain)` (the treated training data).
 
 ```{r xframemodel}
-m1 <- glm(y~xBad1_catB + xBad2_catB + xBad3_catB + xGood1_clean + xGood2_clean,
+m1 <- glm(paste('y',paste(newvars,collapse=' + '),sep=' ~ '),
           data=dTrainTreated,family=binomial(link='logit'))
 print(summary(m1))  
 
 dTrain$predM1 <- predict(m1,newdata=dTrainTreated,type='response')
 plotRes(dTrain,'predM1','y','model1 on train')
-dTestTreated <- vtreat::prepare(treatments,dTest,pruneSig=c())
+dTestTreated <- vtreat::prepare(treatments,dTest,
+                                pruneSig=c(),varRestriction=newvars)
 dTest$predM1 <- predict(m1,newdata=dTestTreated,type='response')
 plotRes(dTest,'predM1','y','model1 on test')
 ```
 
+We again get the better 70% test accuracy.  And this is a more statistically powerful technique as we didn't have to
+restrict some data to calibration.
+
 The model fit to the cross-frame behaves similarly to the model produced via the process _f(CalibrationData, TrainData)_.
+Notice that the  `xBad*_catB` variables fail to achieve significance in the downstream `glm` model, allowing that
+model to give them small coefficients and even (if need be) prune them out.  This is the point of using a cross frame as
+we see in the first example the  `xBad*_catB` are hard to remove if they make it to standard (non-cross) frames as they are 
+hiding a lot of degrees of freedom from downstream modeling procedures.
+
 
 
 
