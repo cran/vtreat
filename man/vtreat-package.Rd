@@ -6,8 +6,9 @@
 vtreat: a package for simple variable treatment
 }
 \description{
-vtreat is a package that treats variables so that models can be used
-in production. Common problems vtreat defends against: NA, too many categorical
+vtreat is a data.frame processor/conditioner that prepares real-world data for predictive modeling in a statistically sound manner.
+
+Common problems vtreat defends against: NA, too many categorical
 values, rare categorical values, new categorical values (levels seen during application,
 but not during training).   \code{\link{prepare}} should be used as you would
 use model.matrix.  \code{\link{prepare}} treated variables are all numeric and never
@@ -25,8 +26,8 @@ where the outcome or y-value is not NA, finite and not nan.
 \tabular{ll}{
 Package: \tab vtreat\cr
 Type: \tab Package\cr
-Version: \tab 0.5.26\cr
-Date: \tab 2016-07-10\cr
+Version: \tab 0.5.27\cr
+Date: \tab 2016-08-16\cr
 License: \tab GNU General Public License version 3\cr
 }
 }
@@ -65,7 +66,7 @@ varsC <- setdiff(colnames(dTrainCTreated),'y')
 # all input variables should be mean 0 for significant variables
 sapply(dTrainCTreated[,varsC,drop=FALSE],mean)
 # all non NA slopes should be 1
-sapply(varsC,function(c) { lm(paste('y',c,sep='~'),
+sapply(varsC,function(c) { glm(paste('y',c,sep='~'),family=binomial,
    data=dTrainCTreated)$coefficients[[2]]})
 dTestCTreated <- prepare(treatmentsC,dTestC,pruneSig=c(),scale=TRUE)
 

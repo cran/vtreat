@@ -14,15 +14,13 @@
   dout
 }
 
-# colNames a subset of treated variable names
-.vtreatList <- function(treatments,dframe,colNames,scale,doCollar,
-                        parallelCluster) {
-  resCounts <- vapply(treatments,function(tij) { 
-    length(intersect(colNames,tij$newvars))
-  },numeric(1))
-  toProcess <- treatments[resCounts>0]
-  procWorker <- function(ti) {
-    xcolOrig <- dframe[[ti$origvar]]
+
+mkVtreatListWorker <- function(scale,doCollar) {
+  force(scale)
+  force(doCollar)
+  function(tpair) {
+    ti <- tpair$ti
+    xcolOrig <- tpair$xcolOrig
     nRows <- length(xcolOrig)
     xcolClean <- .cleanColumn(xcolOrig,nRows)
     if(is.null(xcolClean)) {
@@ -38,7 +36,21 @@
     }
     .vtreatA(ti,xcolClean,scale,doCollar)
   }
-  gs <- plapply(toProcess,procWorker,parallelCluster)
+}
+
+# colNames a subset of treated variable names
+.vtreatList <- function(treatments,dframe,colNames,scale,doCollar,
+                        parallelCluster) {
+  resCounts <- vapply(treatments,function(tij) { 
+    length(intersect(colNames,tij$newvars))
+  },numeric(1))
+  toProcess <- treatments[resCounts>0]
+  toProcessP <- lapply(toProcess,
+                      function(ti) {
+                        list(ti=ti,xcolOrig=dframe[[ti$origvar]])
+                      })
+  procWorker <- mkVtreatListWorker(scale,doCollar)
+  gs <- plapply(toProcessP,procWorker,parallelCluster)
   # pass back first error
   for(gi in gs) {
     if(is.character(gi)) {
@@ -91,9 +103,22 @@
 }
 
 
+
+.mkAOVWorkder <- function(yNumeric,vcol,weights) {
+  force(yNumeric)
+  force(vcol)
+  force(weights)
+  function(level) {
+    # lm call here is okay, as (vcol==level) only has two possible values
+    m <- stats::lm(yNumeric~(vcol==level),weights=weights)
+    stats::anova(m)[1,'Pr(>F)']
+  }
+}
+
 # determine non-rare and significant levels for numeric/regression target
 # regression mode
-.safeLevelsR <- function(vcolin,yNumeric,weights,rareCount,rareSig) {
+.safeLevelsR <- function(vcolin,yNumeric,weights,rareCount,rareSig,
+                         parallelCluster) {
   vcol <- .preProcCat(vcolin,c())
   # first: keep only levels with enough weighted counts
   counts <- tapply(weights,vcol,sum)
@@ -105,20 +130,38 @@
   safeLevs <- names(counts)[(counts>rareCount) & (counts<(sum(weights)-rareCount))]
   if((length(safeLevs)>0)&&(!is.null(rareSig))&&(rareSig<1)) {
     # second: keep only levels that look significantly different than grand mean
-    aovCalc <- function(level) {
-      m <- stats::lm(yNumeric~vcol==level,weights = weights)
-      stats::anova(m)[1,'Pr(>F)']
-    }
-    sigs <- vapply(safeLevs,aovCalc,numeric(1))
+    aovCalc <-.mkAOVWorkder(yNumeric,vcol,weights)
+    sigs <- as.numeric(plapply(safeLevs,aovCalc,parallelCluster))
     supressedLevs <- safeLevs[sigs>rareSig]
   }
   list(safeLevs=safeLevs,supressedLevs=supressedLevs)
 }
 
+
+.mkCSigWorker <- function(zC,zTarget,vcol,weights) {
+  force(zC)
+  force(zTarget)
+  force(vcol)
+  force(weights)
+  function(level) {
+    #tab <- table(vcol==level,zC==zTarget)  # not weighted
+    tab <- .wTable(vcol==level,zC==zTarget,weights)
+    if((nrow(tab)<=1)||(ncol(tab)<=1)) {
+      return(1.0)
+    }
+    # tests not quite interchangable, but roughly give us the sorting we want.
+    if(min(tab)<=10) {
+      stats::fisher.test(tab)$p.value
+    } else {
+      stats::chisq.test(tab)$p.value
+    }
+  }
+}
 
 # determine non-rare and significant levels for numeric/regression target
 # classification mode
-.safeLevelsC <- function(vcolin,zC,zTarget,weights,rareCount,rareSig) {
+.safeLevelsC <- function(vcolin,zC,zTarget,weights,rareCount,rareSig,
+                         parallelCluster) {
   vcol <- .preProcCat(vcolin,c())
   # first: keep only levels with enough weighted counts
   counts <- tapply(weights,vcol,sum)
@@ -130,15 +173,8 @@
   safeLevs <- names(counts)[(counts>rareCount) & (counts<(sum(weights)-rareCount))]
   if((length(safeLevs)>0)&&(!is.null(rareSig))&&(rareSig<1)) {
     # second: keep only levels that look significantly different than grand mean
-    sigCalc <- function(level) {
-      #tab <- table(vcol==level,zC==zTarget)  # not weighted
-      tab <- .wTable(vcol==level,zC==zTarget,weights)
-      if((nrow(tab)<=1)||(ncol(tab)<=1)) {
-        return(1.0)
-      }
-      stats::fisher.test(tab)$p.value
-    }
-    sigs <- vapply(safeLevs,sigCalc,numeric(1))
+    sigCalc <- .mkCSigWorker(zC,zTarget,vcol,weights)
+    sigs <- as.numeric(plapply(safeLevs,sigCalc,parallelCluster))
     supressedLevs <- safeLevs[sigs>rareSig]
   }
   list(safeLevs=safeLevs,supressedLevs=supressedLevs)
@@ -146,15 +182,18 @@
 
 
 
+# For a categorcial variable, compute the level restrictions
+computeLevelRestrictions <- function() {
+  
+}
 
 # design a treatment for a single variables
 # bind a bunch of variables, so we pass exactly what we need to sub-processes
-.varDesigner <- function(zoY,
+.mkVarDesigner <- function(zoY,
                          zC,zTarget,
                          weights,
                          minFraction,smFactor,rareCount,rareSig,
                          collarProb,
-                         trainRows,origRowCount,
                          impactOnly,
                          catScaling,
                          verbose) {
@@ -167,24 +206,20 @@
   force(rareCount)
   force(rareSig)
   force(collarProb)
-  force(trainRows)
-  force(origRowCount)
   force(catScaling)
   force(verbose)
   nRows = length(zoY)
   yMoves <- .has.range.cn(zoY)
-  function(argpair) {
-    v <- argpair$v
-    vcolOrig <- argpair$vcolOrig
+  function(argv) {
+    v <- argv$v
+    vcolOrig <- argv$vcolOrig
+    vcol <- argv$vcol
+    hasRange <- argv$hasRange
+    levRestriction <- argv$levRestriction
     if(verbose) {
       print(paste('design var',v,date()))
     }
     treatments <- list()
-    vcol <- .cleanColumn(vcolOrig,origRowCount)[trainRows]
-    if(length(vcol)!=nRows) {
-      warning("wrong column length")
-      vcol <- NULL
-    }
     acceptTreatment <- function(ti) {
       if(!is.null(ti)) {
         ti$origType <- typeof(vcolOrig)
@@ -194,7 +229,9 @@
       }
     }
     if(is.null(vcol)) {
-      warning(paste('column',v,'is not a type/class/value vtreat can work with (',class(vcolOrig),')'))
+      warning(paste('column',v,
+                    'is not a type/class/value vtreat can work with (',
+                    class(vcolOrig),')'))
     } else {
       colclass <- class(vcol)
       if(.has.range(vcol)) {
@@ -207,11 +244,6 @@
           }
         } else if((colclass=='character') || (colclass=='factor')) {
           # expect character or factor here
-          if(!is.null(zC)) {  # in categorical mode
-            levRestriction <- .safeLevelsC(vcol,zC,zTarget,weights,rareCount,rareSig)
-          } else {
-            levRestriction <- .safeLevelsR(vcol,zoY,weights,rareCount,rareSig)
-          }
           if(length(levRestriction$safeLevs)>0) {
             ti = NULL
             if(!impactOnly) {
@@ -303,16 +335,17 @@
 
 
 # used in initial scoring of variables
-.mkScoreVarWorker <- function(dframe,zoY,zC,zTarget,weights) {
-  force(dframe)
+.mkScoreVarWorker <- function(nRows,zoY,zC,zTarget,weights) {
+  force(nRows)
   force(zoY)
   force(zC)
   force(zTarget)
   force(weights)
-  nRows <- nrow(dframe)
-  function(ti) {
+  function(tpair) {
+    ti <- tpair$ti
+    dfcol <- tpair$dfcol
     origName <- vorig(ti)
-    xcolClean <- .cleanColumn(dframe[[origName]],nRows)
+    xcolClean <- .cleanColumn(dfcol,nRows)
     fi <- .vtreatA(ti,xcolClean,FALSE,FALSE)
     scoreFrame <- lapply(seq_len(length(vnames(ti))),
                          function(nvi) {
@@ -336,14 +369,15 @@
 
 # used in re-scoring needsSplit variables on simulated out of sample
 # (cross) frame
-.mkScoreColWorker <- function(dframe,zoY,zC,zTarget,weights) {
-  force(dframe)
+.mkScoreColWorker <- function(zoY,zC,zTarget,weights) {
   force(zoY)
   force(zC)
   force(zTarget)
   force(weights)
-  function(nv) {
-    scoreFrameij <- .scoreCol(nv,dframe[[nv]],zoY,zC,zTarget,weights)
+  function(nvpair) {
+    nv <- nvpair$nv
+    dfc <- nvpair$dfc
+    scoreFrameij <- .scoreCol(nv,dfc,zoY,zC,zTarget,weights)
     scoreFrameij
   }
 }
@@ -364,17 +398,58 @@
                                 catScaling,
                                 verbose,
                                 parallelCluster) {
+  if(verbose) {
+    print(paste("designing treatments",date()))
+  }
+  nRows = length(zoY)
   # In building the workList don't transform any variables (such as making
   # row selections), only select columns out of frame.  This prevents
   # data growth prior to doing the work.
-  workList <- lapply(varlist,function(v) {list(v=v,vcolOrig=dframe[[v]])})
+  workList <- lapply(varlist,
+                     function(v) {
+                       levRestriction <- c()
+                       hasRange <- FALSE
+                       vcolOrig <- dframe[[v]]
+                       vcol <- NULL
+                       if(length(vcolOrig)!=nRows) {
+                         warning(paste("wrong column length",v))
+                       } else {
+                         vcol <- .cleanColumn(vcolOrig,nRows)
+                         if(.has.range(vcol)) {
+                           hasRange <- TRUE
+                           colclass <- class(vcol)
+                           if((colclass=='character') || (colclass=='factor')) {
+                             # expect character or factor here
+                             if(!is.null(zC)) {  # in categorical mode
+                               levRestriction <- .safeLevelsC(vcol,zC,zTarget,
+                                                              weights,
+                                                              rareCount,rareSig,
+                                                              parallelCluster)
+                             } else {
+                               levRestriction <- .safeLevelsR(vcol,zoY,
+                                                              weights,
+                                                              rareCount,rareSig,
+                                                              parallelCluster)
+                             }
+                           }
+                         }
+                       }
+                       list(v=v,
+                            vcolOrig=vcolOrig,
+                            vcol=vcol,
+                            hasRange=hasRange,
+                            levRestriction=levRestriction
+                       )})
+  workList <- Filter(function(wi) {wi$hasRange}, workList)
+  if(verbose) {
+    print(paste(" have level statistics",date()))
+  }
   # build the treatments we will return to the user
-  worker <- .varDesigner(zoY,
+  worker <- .mkVarDesigner(zoY,
                          zC,zTarget,
                          weights,
                          minFraction,smFactor,rareCount,rareSig,
                          collarProb,
-                         seq_len(nrow(dframe)),nrow(dframe),
                          impactOnly,
                          catScaling,
                          verbose)
@@ -389,10 +464,15 @@
   }
   # score variables
   if(verbose) {
-    print(paste("scoring treatments",date()))
+    print(paste(" scoring treatments",date()))
   }
-  scrW <- .mkScoreVarWorker(dframe,zoY,zC,zTarget,weights)
-  sFrames <- plapply(treatments,scrW,parallelCluster)
+  scrW <- .mkScoreVarWorker(nrow(dframe),zoY,zC,zTarget,weights)
+  tP <- lapply(treatments,
+               function(ti) {
+                 list(ti=ti,
+                      dfcol=dframe[[vorig(ti)]])
+               })
+  sFrames <- plapply(tP,scrW,parallelCluster)
   sFrames <- Filter(Negate(is.null),sFrames)
   sFrame <- .rbindListOfFrames(sFrames)
   plan <- list(treatments=treatments,
@@ -513,8 +593,12 @@
         zCS = crossFrame[[outcomename]]==zTarget
         zoYS = ifelse(zCS,1,0)
       }
-      swkr <- .mkScoreColWorker(crossFrame,zoYS,zCS,TRUE,crossWeights)
-      sframe <- plapply(newVarsS,swkr,parallelCluster) 
+      swkr <- .mkScoreColWorker(zoYS,zCS,TRUE,crossWeights)
+      newVarsSP <- lapply(newVarsS,
+                          function(nv) {
+                            list(nv=nv,dfc=crossFrame[[nv]])
+                          })
+      sframe <- plapply(newVarsSP,swkr,parallelCluster) 
       sframe <- Filter(Negate(is.null),sframe)
       sframe <- .rbindListOfFrames(sframe)
       # overlay these results into treatments$scoreFrame

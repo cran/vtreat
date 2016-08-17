@@ -1,10 +1,11 @@
 Package: vtreat
 Type: Package
 Title: Simple Variable Treatment
-Version: 0.5.26
-Date: 2016-07-10
+Version: 0.5.27
+Date: 2016-08-16
 Author: John Mount, Nina Zumel
 URL: https://github.com/WinVector/vtreat
+BugReports: https://github.com/WinVector/vtreat/issues
 Maintainer: John Mount <jmount@win-vector.com>
 Description: A data.frame processor/conditioner that prepares real-world data for predictive modeling in a statistically sound manner.
     Prepares variables so that data has fewer exceptional cases, making
@@ -18,6 +19,6 @@ LazyData: true
 VignetteBuilder: knitr
 RoxygenNote: 5.0.1
 NeedsCompilation: no
-Packaged: 2016-07-11 17:15:26 UTC; johnmount
+Packaged: 2016-08-17 15:32:36 UTC; johnmount
 Repository: CRAN
-Date/Publication: 2016-07-12 07:49:49
+Date/Publication: 2016-08-17 21:45:05

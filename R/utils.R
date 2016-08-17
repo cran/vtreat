@@ -5,7 +5,7 @@ plapply <- function(workList,worker,parallelCluster) {
   if(is.null(parallelCluster) || (!requireNamespace("parallel",quietly=TRUE))) {
     res <- lapply(workList,worker)
   } else {
-    res <- parallel::parLapply(parallelCluster,workList,worker)
+    res <- parallel::parLapplyLB(parallelCluster,workList,worker)
   }
   res
 }
@@ -165,7 +165,6 @@ linScore <- function(varName,xcol,ycol,weights,numberOfHiddenDegrees=0) {
       if(is.na(a) || is.infinite(a)) {
         a <- 0.0
       } else {
-        smodel <- summary(lmodel)
         smodel <- summary(lmodel)
         n <- sum(weights)
         rss1 <- sum(weights*(d$y-mean(d$y))^2)

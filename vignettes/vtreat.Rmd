@@ -9,8 +9,9 @@ vignette: >
   \usepackage[utf8]{inputenc}
 ---
 
-'vtreat' is a package that prepares arbitrary data frames into
-clean data frames that are ready for analysis.  A clean data
+'vtreat' is a data.frame processor/conditioner that prepares real-world data for predictive modeling in a statistically sound manner.
+
+A 'vtreat' clean data
 frame:
 
 - Only has numeric columns (other than the outcome).
@@ -98,7 +99,7 @@ varsC <- setdiff(colnames(dTrainCTreated),'y')
 # all input variables should be mean 0
 sapply(dTrainCTreated[,varsC,drop=FALSE],mean)
 # all slopes should be 1 for variables with dTrainCTreated$scoreFrame$sig<1
-sapply(varsC,function(c) { lm(paste('y',c,sep='~'),
+sapply(varsC,function(c) { glm(paste('y',c,sep='~'),family=binomial,
    data=dTrainCTreated)$coefficients[[2]]})
 
 dTestCTreated <- prepare(treatmentsC,dTestC,pruneSig=c(),scale=TRUE)

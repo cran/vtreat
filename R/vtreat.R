@@ -1,8 +1,7 @@
 # variable treatments type def: list { origvar, newvars, f(col,args), args, treatmentName, scales } can share orig var
 
-# Would be nice to have: Jackknifed GLM significance
 
-#' @importFrom stats aggregate anova as.formula binomial fisher.test glm lm lm.wfit pchisq pf quantile
+#' @importFrom stats aggregate anova as.formula binomial chisq.test fisher.test glm lm lm.wfit pchisq pf quantile
 #' @importFrom utils packageVersion
 NULL
 
@@ -106,7 +105,7 @@ designTreatmentsC <- function(dframe,varlist,outcomename,outcometarget,
                               rareCount=0,rareSig=1,
                               collarProb=0.00,
                               splitFunction=NULL,ncross=3,
-                              catScaling=TRUE,
+                              catScaling=FALSE,
                               verbose=TRUE,
                               parallelCluster=NULL) {
   
@@ -431,7 +430,7 @@ mkCrossFrameCExperiment <- function(dframe,varlist,
                                     collarProb=0.00,
                                     scale=FALSE,doCollar=TRUE,
                                     splitFunction=NULL,ncross=3,
-                                    catScaling=TRUE,
+                                    catScaling=FALSE,
                                     parallelCluster=NULL) {
   .checkArgs(dframe=dframe,varlist=varlist,outcomename=outcomename,...)
   if(!is.data.frame(dframe)) {
@@ -460,7 +459,8 @@ mkCrossFrameCExperiment <- function(dframe,varlist,
                                   parallelCluster=parallelCluster)
   zC <- dframe[[outcomename]]
   zoY <- ifelse(zC==outcometarget,1,0)
-  newVarsS <- treatments$scoreFrame$varName[treatments$scoreFrame$varMoves]
+  newVarsS <- treatments$scoreFrame$varName[(treatments$scoreFrame$varMoves) &
+                                              (treatments$scoreFrame$sig<1)]
   crossDat <- .mkCrossFrame(dframe,varlist,newVarsS,outcomename,zoY,
                             zC,outcometarget,
                             weights,
@@ -472,9 +472,21 @@ mkCrossFrameCExperiment <- function(dframe,varlist,
                             splitFunction,ncross,
                             catScaling,
                             parallelCluster)
+  crossFrame <- crossDat$crossFrame
+  newVarsS <- intersect(newVarsS,colnames(crossFrame))
+  goodVars <- newVarsS[vapply(newVarsS,
+                              function(v) {
+                                min(crossFrame[[v]])<max(crossFrame[[v]])
+                              },
+                              logical(1))]
+  # Make sure scoreFrame and crossFrame are consistent in variables mentioned
+  treatments$scoreFrame <- treatments$scoreFrame[treatments$scoreFrame$varName %in% goodVars,]
+  crossFrame <- crossFrame[,colnames(crossFrame) %in% c(goodVars,outcomename),drop=FALSE]
   list(treatments=treatments,
-       crossFrame=crossDat$crossFrame,crossWeights=crossDat$crossWeights,
-       method= crossDat$method)
+       crossFrame=crossFrame,
+       crossWeights=crossDat$crossWeights,
+       method=crossDat$method,
+       evalSets=crossDat$evalSets)
 }
 
 
@@ -559,7 +571,8 @@ mkCrossFrameNExperiment <- function(dframe,varlist,outcomename,
                                   parallelCluster=parallelCluster)
   zC <- NULL
   zoY <- dframe[[outcomename]]
-  newVarsS <- treatments$scoreFrame$varName[treatments$scoreFrame$varMoves]
+  newVarsS <- treatments$scoreFrame$varName[(treatments$scoreFrame$varMoves) &
+                                              (treatments$scoreFrame$sig<1)]
   crossDat <- .mkCrossFrame(dframe,varlist,newVarsS,outcomename,zoY,
                             zC,NULL,
                             weights,
@@ -571,9 +584,21 @@ mkCrossFrameNExperiment <- function(dframe,varlist,outcomename,
                             splitFunction,ncross,
                             catScaling,
                             parallelCluster)
+  crossFrame <- crossDat$crossFrame
+  newVarsS <- intersect(newVarsS,colnames(crossFrame))
+  goodVars <- newVarsS[vapply(newVarsS,
+                              function(v) {
+                                min(crossFrame[[v]])<max(crossFrame[[v]])
+                              },
+                              logical(1))]
+  # Make sure scoreFrame and crossFrame are consistent in variables mentioned
+  treatments$scoreFrame <- treatments$scoreFrame[treatments$scoreFrame$varName %in% goodVars,]
+  crossFrame <- crossFrame[,colnames(crossFrame) %in% c(goodVars,outcomename),drop=FALSE]
   list(treatments=treatments,
-       crossFrame=crossDat$crossFrame,crossWeights=crossDat$crossWeights,
-       method=crossDat$method)
+       crossFrame=crossFrame,
+       crossWeights=crossDat$crossWeights,
+       method=crossDat$method,
+       evalSets=crossDat$evalSets)
 }
 
 
