@@ -93,9 +93,10 @@ mkVtreatListWorker <- function(scale,doCollar) {
   col <- paste('x',as.character(col))
   col[origna] <- 'NA'
   if(!is.null(levRestriction)) {
-    # map rare levels to a new special level
+    # map rare and novel levels to a new special level "rare"
     rares <- !(col %in% levRestriction$safeLevs)
     col[rares] <- 'rare'
+    # remove any levels not eligable for the above treatment
     zaps <- col %in% levRestriction$supressedLevs
     col[zaps] <- 'zap'
   }
@@ -153,7 +154,12 @@ mkVtreatListWorker <- function(scale,doCollar) {
     if(min(tab)<=10) {
       stats::fisher.test(tab)$p.value
     } else {
-      stats::chisq.test(tab)$p.value
+      tryCatch(
+        stats::chisq.test(tab)$p.value,
+        warning=function(w) {
+          stats::fisher.test(tab)$p.value
+        }
+      )
     }
   }
 }
@@ -181,11 +187,6 @@ mkVtreatListWorker <- function(scale,doCollar) {
 }
 
 
-
-# For a categorcial variable, compute the level restrictions
-computeLevelRestrictions <- function() {
-  
-}
 
 # design a treatment for a single variables
 # bind a bunch of variables, so we pass exactly what we need to sub-processes
@@ -282,11 +283,7 @@ computeLevelRestrictions <- function() {
 .neatenScoreFrame <- function(sFrame) {
   # clean up sFrame a bit
   if(nrow(sFrame)>0) {
-    for(cname in c('lsig','csig','sig')) {
-      if(cname %in% colnames(sFrame)) {
-        sFrame[[cname]][.is.bad(sFrame[[cname]])] <- 1
-      }
-    }
+     sFrame[['sig']][.is.bad(sFrame[['sig']])] <- 1
   }
   sFrame
 }
@@ -294,9 +291,7 @@ computeLevelRestrictions <- function() {
 
 .scoreCol <- function(varName,nxcol,zoY,zC,zTarget,weights,
                       extraModelDegrees=0) {
-  lsig=1.0
   sig=1.0
-  csig=1.0
   catTarget <- !is.null(zC)
   varMoves <- .has.range.cn(nxcol)
   if(varMoves) {
@@ -307,7 +302,6 @@ computeLevelRestrictions <- function() {
                         zoY,
                         weights,
                         extraModelDegrees)
-      lsig <- lstat$sig
       sig <- lstat$sig
       if(catTarget) {
         cstat <- catScore(varName,
@@ -315,19 +309,16 @@ computeLevelRestrictions <- function() {
                           zC,zTarget,
                           weights,
                           extraModelDegrees)
-        csig <- cstat$sig
         sig <- cstat$sig
       }
     }
   }
   scoreFrameij <- data.frame(varName=varName,
                              varMoves=varMoves,
-                             lsig=lsig,
-                             sig=lsig,
+                             sig=sig,
                              stringsAsFactors = FALSE)
   if(catTarget) {
-    scoreFrameij$csig <- csig
-    scoreFrameij$sig <- csig
+    scoreFrameij$sig <- sig
   }
   .neatenScoreFrame(scoreFrameij)
 }
@@ -513,7 +504,7 @@ computeLevelRestrictions <- function() {
   if(verbose) {
     print(paste("desigining treatments",date()))
   }
-  varlist <- setdiff(varlist,outcomename)
+  varlist <- setdiff(unique(varlist),outcomename)
   varlist <- intersect(varlist,colnames(dframe))
   varlist <- as.character(varlist)
   if(is.null(weights)) {
@@ -561,6 +552,10 @@ computeLevelRestrictions <- function() {
                                     verbose,
                                     parallelCluster)
   treatments$scoreFrame <- treatments$scoreFrame[treatments$scoreFrame$varMoves,]
+  treatments$vtreatVersion <- packageVersion('vtreat')
+  treatments$outcomeType <- 'notmarked'
+  treatments$outcomeTarget <- outcomename
+  treatments$meanY <- NA
   yMoves <- .has.range.cn(zoY)
   crossMethod = 'Notcross'
   if(yMoves) {
@@ -571,7 +566,8 @@ computeLevelRestrictions <- function() {
       if(verbose) {
         print(paste("rescoring complex variables",date()))
       }
-      crossData <- .mkCrossFrame(dframe,splitVars,newVarsS,outcomename,zoY,
+      crossData <- .mkCrossFrame(dframe,treatments,
+                                 splitVars,newVarsS,outcomename,zoY,
                                 zC,zTarget,
                                 weights,
                                 minFraction,smFactor,
@@ -603,7 +599,7 @@ computeLevelRestrictions <- function() {
       sframe <- .rbindListOfFrames(sframe)
       # overlay these results into treatments$scoreFrame
       nukeCols <- intersect(colnames(treatments$scoreFrame),
-                            c('lsig', 'sig', 'csig'))
+                            'sig')
       for(v in newVarsS) {
         for(n in nukeCols) {
           if(v %in% sframe$varName) {
@@ -621,8 +617,8 @@ computeLevelRestrictions <- function() {
       }
     }
   }
-  treatments$vtreatVersion <- packageVersion('vtreat')
   treatments$splitmethod <- crossMethod
+  treatments$meanY <- .wmean(zoY,weights)
   treatments
 }
 
@@ -648,10 +644,19 @@ computeLevelRestrictions <- function() {
   if(missing(dframe)||(!is.data.frame(dframe))||(nrow(dframe)<0)||(ncol(dframe)<=0)) {
     stop("dframe must be a non-empty data frame")
   }
+  if(missing(varlist)) {
+    stop("required argument varlist missing")
+  }
+  if(length(varlist)!=length(unique(varlist))) {
+    stop("duplicate variable name in varlist")
+  }
   varlist <- setdiff(varlist,outcomename)
   varlist <- intersect(varlist,colnames(dframe))
-  if(missing(varlist)||(!is.character(varlist))||(length(varlist)<1)) {
+  if((!is.character(varlist))||(length(varlist)<1)) {
     stop("varlist must be a non-empty character vector")
+  }
+  if(sum(colnames(dframe) %in% varlist)!=length(varlist)) {
+    stop("ambigous (duplicate) column name in data frame")
   }
   if(missing(outcomename)||(!is.character(outcomename))||(length(outcomename)!=1)) {
     stop("outcomename must be a length 1 character vector")

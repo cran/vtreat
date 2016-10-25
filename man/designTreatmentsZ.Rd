@@ -4,8 +4,8 @@
 \alias{designTreatmentsZ}
 \title{Design variable treatments with no outcome variable.}
 \usage{
-designTreatmentsZ(dframe, varlist, ..., weights = c(), rareCount = 0,
-  collarProb = 0, verbose = TRUE, parallelCluster = NULL)
+designTreatmentsZ(dframe, varlist, ..., minFraction = 0.02, weights = c(),
+  rareCount = 0, collarProb = 0, verbose = TRUE, parallelCluster = NULL)
 }
 \arguments{
 \item{dframe}{Data frame to learn treatments from (training data), must have at least 1 row.}
@@ -14,11 +14,13 @@ designTreatmentsZ(dframe, varlist, ..., weights = c(), rareCount = 0,
 
 \item{...}{no additional arguments, declared to forced named binding of later arguments}
 
+\item{minFraction}{optional minimum frequency a categorical level must have to be converted to an indicator column.}
+
 \item{weights}{optional training weights for each row}
 
-\item{rareCount}{optional integer, suppress direct effects of level of this count or less.}
+\item{rareCount}{optional integer, allow levels with this count or below to be pooled into a shared rare-level.  Defaults to 0 or off.}
 
-\item{collarProb}{what fraction of the data (pseudo-probability) to collar data at (<0.5).}
+\item{collarProb}{what fraction of the data (pseudo-probability) to collar data at if doCollar is set during \code{\link{prepare}}.}
 
 \item{verbose}{if TRUE print progress.}
 

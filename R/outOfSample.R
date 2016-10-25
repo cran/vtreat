@@ -5,6 +5,10 @@
 #' @param plan split plan
 #' @return vector of labels
 #' 
+#' @seealso \code{\link{kWayCrossValidation}}, \code{\link{kWayStratifiedY}}, and \code{\link{makekWayCrossValidationGroupedByColumn}}
+#' 
+#' @examples
+#' 
 #' plan <- oneWayHoldout(3,NULL,NULL,NULL)
 #' getSplitPlanAppLabels(3,plan)
 #' 
@@ -17,14 +21,15 @@ getSplitPlanAppLabels <- function(nRow,plan) {
   labels
 }
 
-#' check if appPlan is a good partition of 1:nRows into nSplits groups
+#' check if appPlan is a good carve-up of 1:nRows into nSplits groups
 #'
-#' @param nRows number of rows to partition
-#' @param nSplits number of sets to partition into
-#' @param appPlan partition to critique
-#' @param strictCheck logical, if true expect application data to be a partition and training data to be maximal and to match nSplits.
-#' @return problem with partition (null if good)
+#' @param nRows number of rows to carve-up
+#' @param nSplits number of sets to carve-up into
+#' @param appPlan carve-up to critique
+#' @param strictCheck logical, if true expect application data to be a carve-up and training data to be a maximal partition and to match nSplits.
+#' @return problem with carve-up (null if good)
 #' 
+#' @seealso \code{\link{kWayCrossValidation}}, \code{\link{kWayStratifiedY}}, and \code{\link{makekWayCrossValidationGroupedByColumn}}
 #' 
 #' @examples
 #' 
@@ -39,7 +44,7 @@ problemAppPlan <- function(nRows,nSplits,appPlan,strictCheck) {
   if(!is.list(appPlan)) {
     return("appPlan needs be a list")
   }
-  if((strictCheck)&&(nRows>1)&&(nSplits<=nRows)) {
+  if((strictCheck)&&(nRows>1)&&(!is.null(nSplits))) {
     if(length(appPlan)!=nSplits) {
       return("didn't get requested number of groups in appPlan")
     }
@@ -74,9 +79,9 @@ problemAppPlan <- function(nRows,nSplits,appPlan,strictCheck) {
       if(length(setdiff(fullSeq,union(ai,ti)))>0) {
         return("non-maximal training set")
       }
-    }
-    if(length(intersect(seen,ai))!=0) {
-      return("repeated application row")
+      if(length(intersect(seen,ai))!=0) {
+        return("repeated application row")
+      }
     }
     seen <- union(seen,ai)
   }
@@ -214,8 +219,8 @@ kWayStratifiedY <- function(nRows,nSplits,dframe,y) {
     }
   }
   d$group <- (fullSeq %% nSplits) + 1
-  partition <-  split(d$index,d$group)
-  evalSets <- lapply(partition,
+  carveUp <-  split(d$index,d$group)
+  evalSets <- lapply(carveUp,
                      function(appi) { 
                        list(train=setdiff(fullSeq,appi),app=appi)
                      })
@@ -265,12 +270,12 @@ makekWayCrossValidationGroupedByColumn <- function(groupingColumnName) {
       return(NULL)
     }
     splitmethod <- attr(groupedPlan,'splitmethod')
-    partition <- lapply(groupedPlan,
+    carveUp <- lapply(groupedPlan,
                         function(gi) {
                           d$index[d$group %in% groups[gi$app]]
                         })
     fullSeq <- seq_len(nRows)
-    evalSets <- lapply(partition,
+    evalSets <- lapply(carveUp,
                        function(appi) { 
                          list(train=setdiff(fullSeq,appi),app=appi)
                        })
@@ -280,48 +285,12 @@ makekWayCrossValidationGroupedByColumn <- function(groupingColumnName) {
   }
 }
 
-#' Build a k-fold cross validation splitter, respecting (train always above test) orderColumn
-#' 
-#' @param orderColumnName name of column to order by.
-#' @return splitting function in the sense of vtreat::buildEvalSets.
-#' 
-#' @examples
-#' 
-#' d <- data.frame(y=sin(1:100))
-#' d$order <- seq_len(nrow(d))
-#' splitter <- makekWayCrossValidationOrderedByColumn('order')
-#' split <- splitter(nrow(d),5,d,d$y)
-#' for(si in split) {
-#'    print(paste(max(si$train),min(si$app)))
-#' }
-#' 
-#' @export
-makekWayCrossValidationOrderedByColumn <- function(orderColumnName) {
-  force(orderColumnName) 
-  function(nRows,nSplits,dframe,y) {
-    if((nRows<=1)||(nSplits<=1)||(nSplits>nRows)) {
-      return(NULL)
-    }
-    fullSeq <- seq_len(nRows)
-    partition <- split(fullSeq,floor((fullSeq-1)/(nRows/nSplits)))
-    if(length(partition)<=1) {
-      return(NULL)
-    }
-    partition <- partition[-1]
-    evalSets <- lapply(partition,
-                       function(appi) { 
-                         list(train=fullSeq[fullSeq<min(appi)],app=appi)
-                       })
-    names(evalSets) <- NULL
-    attr(evalSets,'splitmethod') <- 'kwaycrossordered'
-    evalSets
-  }
-}
 
 
-#' Build set partition for out-of sample evaluation.
+
+#' Build set carve-up for out-of sample evaluation.
 #' 
-#' Return a disjoint partition of seq_len(nRows).  Very useful for any sort of
+#' Return a carve-up of seq_len(nRows).  Very useful for any sort of
 #' nested model situation (such as data prep, stacking, or super-learning).
 #' 
 #' Also sets attribute "splitmethod" on return value that describes how the split was performed.
@@ -335,15 +304,16 @@ makekWayCrossValidationOrderedByColumn <- function(orderColumnName) {
 #' 
 #' The intent is the user splitFunction only needs to handle "easy cases" 
 #' and maintain user invariants. If the user splitFunction returns NULL,
-#' throws, or returns an unacceptable partition then vtreat::buildEvalSets
+#' throws, or returns an unacceptable carve-up then vtreat::buildEvalSets
 #' returns its own eval set plan.  The signature of splitFunction should
 #' be splitFunction(nRows,nSplits,dframe,y) where nSplits is the number of 
-#' pieces we want in the partition, nRows is the number of rows to split,
+#' pieces we want in the carve-up, nRows is the number of rows to split,
 #' dframe is the original dataframe (useful for any group control variables),
 #' and y is a numeric vector representing outcome (useful for outcome stratification).
 #' 
-#' Note that buildEvalSets may not always return a partition in exceptional cases (such
-#' as one row dataframes).
+#' Note that buildEvalSets may not always return a partition (such
+#' as one row dataframes), or if the user split function chooses to make rows eligable for
+#' applicaton a different number of times.
 #' 
 #' @param nRows scalar, >=1 number of rows to sample from.
 #' @param ... no additional arguments, declared to forced named binding of later arguments.
@@ -351,7 +321,9 @@ makekWayCrossValidationOrderedByColumn <- function(orderColumnName) {
 #' @param y (optional) numeric vector, outcome variable (possibly to stratify on), passed to user splitFunction.
 #' @param splitFunction (optional) function taking arguments nSplits,nRows,dframe, and y; returning a user desired split.
 #' @param nSplits integer, target number of splits.
-#' @return list of lists where the app portion of the sub-lists is a disjoint partition of seq_len(nRows) and each list as a train portion disjoint from app.
+#' @return list of lists where the app portion of the sub-lists is a disjoint carve-up of seq_len(nRows) and each list as a train portion disjoint from app.
+#' 
+#' @seealso \code{\link{kWayCrossValidation}}, \code{\link{kWayStratifiedY}}, and \code{\link{makekWayCrossValidationGroupedByColumn}}
 #' 
 #' @examples
 #' 
@@ -425,7 +397,7 @@ buildEvalSets <- function(nRows,...,
       stop('must have nrow(dframe)==nRows')
     }
   }
-  # try user partition function
+  # try user carve-up function
   if(!is.null(splitFunction)) {
     tryCatch({
       evalSets <- splitFunction(nRows=nRows,nSplits=nSplits,dframe=dframe,y=y)
@@ -436,7 +408,7 @@ buildEvalSets <- function(nRows,...,
         }
         return(evalSets)
       } else {
-        warning(paste("vtreat::buildEvalSets user partition rejected: ",problem))
+        warning(paste("vtreat::buildEvalSets user carve-up rejected: ",problem))
       }
     },
     error = function(e) warning(paste('vtreat::buildEvalSets caught ',
@@ -445,7 +417,7 @@ buildEvalSets <- function(nRows,...,
   }
   # deal with it ourselves if we have to
   fullSeq <- seq_len(nRows)
-  # okay, we will partition on our own
+  # okay, we will carve-up on our own
   if((nRows<=20)||(2*nSplits>nRows)) {
     # one corner case
     if(nRows<=1) {
@@ -481,7 +453,9 @@ buildEvalSets <- function(nRows,...,
 
 # make a "cross frame" that is a frame where each treated row was treated only 
 # by a treatment plan not involving the given row
-.mkCrossFrame <- function(dframe,varlist,newVarsS,outcomename,zoY,
+.mkCrossFrame <- function(dframe,
+                          referenceTreatments,
+                          varlist,newVarsS,outcomename,zoY,
                           zC,zTarget,
                           weights,
                           minFraction,smFactor,
@@ -494,12 +468,13 @@ buildEvalSets <- function(nRows,...,
                           parallelCluster) {
   verbose <- FALSE
   dsub <- dframe[,c(varlist,outcomename),drop=FALSE]
-  # build a partition plan
+  # build a carve-up plan
   evalSets <- buildEvalSets(length(zoY),dframe=dframe,y=zoY,
                             splitFunction=splitFunction,nSplits=nSplits)
   crossFrameList <- vector('list',length(evalSets))
   wtList <- vector('list',length(evalSets))
   rList <- vector('list',length(evalSets))
+  foundCols <- c() # can include outcome
   for(ei in seq_len(length(evalSets))) {
     evalIndices <- evalSets[[ei]]$app
     buildIndices <- evalSets[[ei]]$train
@@ -523,16 +498,47 @@ buildEvalSets <- function(nRows,...,
                               parallelCluster)
     fi <- .vtreatList(ti,dsubiEval,newVarsS,scale,doCollar,
                       parallelCluster)
-    # make sure each frame has the same column structure
-    for(v in setdiff(newVarsS,colnames(fi))) {
-      fi[[v]] <- 0.0
+    # fill in missing columns (a data leak potential, but a necessary step)
+    droppedColumns <-  setdiff(newVarsS,c(outcomename,colnames(fi)))
+    if(length(droppedColumns)>0) {
+      repFrame <- NULL
+      if(!is.null(referenceTreatments)) {
+        repFrame <- prepare(referenceTreatments,dsubiEval,
+                            pruneSig=NULL,
+                            varRestriction=droppedColumns,
+                            scale=scale,doCollar=doCollar,
+                            parallelCluster=parallelCluster)
+      }
+      for(v in droppedColumns) {
+        fi[[v]] <- 0.0
+        if((!is.null(repFrame)) && (v %in% colnames(repFrame))) {
+          fi[[v]] <- repFrame[[v]]
+        }
+      }
     }
-    fi <- fi[,newVarsS,drop=FALSE]
+    # make sure each frame has the same column structure (again a data leak)
     fi[[outcomename]] <- dsubiEval[[outcomename]]
+    if(ei<=1) {
+      foundCols <- colnames(fi)
+    } else {
+      foundCols <- intersect(foundCols,colnames(fi))
+    }
     crossFrameList[[ei]] <- fi
     wtList[[ei]] <- weights[evalIndices]
     rList[[ei]] <- evalIndices
   }
+  # make sure each frame has the same column structure
+  lostVars <- setdiff(newVarsS,foundCols)
+  if(length(lostVars)>0) {
+    warning(paste('cross frame procedures lost variables: ',
+            paste(lostVars,collapse=', '),
+            '(likely did not vary on one data carve-up)'))
+  }
+  crossFrameList <- lapply(crossFrameList,
+                           function(fi) {
+                             fi[,foundCols,drop=FALSE]
+                           })
+  # assemble frame
   crossFrame <- .rbindListOfFrames(crossFrameList)
   scoreWeights <- unlist(wtList)
   rowList <- unlist(rList)
@@ -545,7 +551,9 @@ buildEvalSets <- function(nRows,...,
   }
   list(crossFrame=crossFrame,crossWeights=scoreWeights,
        method=attr(evalSets,'splitmethod'),
-       evalSets=evalSets)
+       evalSets=evalSets,
+       foundCols=foundCols,
+       lostVars=lostVars)
 }
 
 

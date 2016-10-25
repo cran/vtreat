@@ -6,10 +6,10 @@ test_that("testParallel: Parallel works", {
   # load('tests/testthat/uci.car.data.Rdata')
   load('uci.car.data.Rdata')
   cl <- NULL
-  # This kills build check as I think you are not allowed to spawn.
-  #if(requireNamespace("parallel",quietly=TRUE)) {
-  #   cl <- parallel::makeCluster(4)
-  #}
+  # seems to kill testthat on stop, possibly https://github.com/hadley/testthat/issues/129
+  # if(requireNamespace("parallel",quietly=TRUE)) {
+  #   cl <- parallel::makeCluster(2)
+  # }
   
   dYName <- "rating"
   dYTarget <- 'vgood'

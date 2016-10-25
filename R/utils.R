@@ -167,7 +167,8 @@ linScore <- function(varName,xcol,ycol,weights,numberOfHiddenDegrees=0) {
       } else {
         smodel <- summary(lmodel)
         n <- sum(weights)
-        rss1 <- sum(weights*(d$y-mean(d$y))^2)
+        meany <- .wmean(d$y,weights)
+        rss1 <- sum(weights*(d$y-meany)^2)
         rss2 <- sum(weights*smodel$residuals^2)
         p1 <- 1
         p2 <- 2 + numberOfHiddenDegrees
@@ -230,10 +231,10 @@ catScore <- function(varName,x,yC,yTarget,weights,numberOfHiddenDegrees=0) {
         delta_deviance <- model$null.deviance - model$deviance
         if((model$null.deviance>0)&&(delta_deviance>0)) {
           delta_df <- model$df.null - model$df.residual + numberOfHiddenDegrees
-          pRsq <- 1.0 - model$deviance/model$null.deviance
+          # pRsq <- 1.0 - model$deviance/model$null.deviance
           sig <- stats::pchisq(delta_deviance, delta_df, lower.tail=FALSE)
           a <- model$coefficients[['x']]
-          bg <- model$coefficients[['(Intercept)']]
+          # bg <- model$coefficients[['(Intercept)']]
           # sigmoid <- function(x) { 1/(1+exp(-x)) }
           # max(abs(predict(model,type='response')-sigmoid(a*x+bg))) small
         }

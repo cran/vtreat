@@ -1,8 +1,8 @@
 Package: vtreat
 Type: Package
-Title: Simple Variable Treatment
-Version: 0.5.27
-Date: 2016-08-16
+Title: A Statistically Sound data.frame Processor/Conditioner
+Version: 0.5.28
+Date: 2016-10-24
 Author: John Mount, Nina Zumel
 URL: https://github.com/WinVector/vtreat
 BugReports: https://github.com/WinVector/vtreat/issues
@@ -19,6 +19,6 @@ LazyData: true
 VignetteBuilder: knitr
 RoxygenNote: 5.0.1
 NeedsCompilation: no
-Packaged: 2016-08-17 15:32:36 UTC; johnmount
+Packaged: 2016-10-24 22:00:52 UTC; johnmount
 Repository: CRAN
-Date/Publication: 2016-08-17 21:45:05
+Date/Publication: 2016-10-25 00:18:32

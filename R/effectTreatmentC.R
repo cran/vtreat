@@ -4,14 +4,14 @@
 # replace level with logit(P[y==target|level]) - logit(P[y==target])
 .catBayes <- function(col,args,doCollar) {
   col <- .preProcCat(col,args$levRestriction)
-  novel <- !(col %in% names(args$conditionalScore))
+  unhandledNovel <- !(col %in% names(args$conditionalScore))
   keys <- col
   pred <- numeric(length(col))
   if(length(args$conditionalScore)>0) {
-    keys[novel] <- names(args$conditionalScore)[[1]]  # just to prevent bad lookups
+    keys[unhandledNovel] <- names(args$conditionalScore)[[1]]  # just to prevent bad lookups
     pred <- as.numeric(args$conditionalScore[keys]) 
   }
-  pred[novel] <- 0.0
+  pred[unhandledNovel] <- 0.0
   pred
 }
 
@@ -23,7 +23,7 @@
 # see: http://www.win-vector.com/blog/2012/07/modeling-trick-impact-coding-of-categorical-variables-with-many-levels/
 .mkCatBayes <- function(origVarName,vcolin,rescol,resTarget,smFactor,levRestriction,weights,catScaling) {
   vcol <- .preProcCat(vcolin,levRestriction)
-  extraModelDegrees <- max(0,length(unique(vcolin)))
+  extraModelDegrees <- max(0,length(unique(vcolin))-1)
   epsilon <- 1.0e-6
   smFactor <- max(smFactor,1.0e-4)
   # T/F is true false of the quantity to be predicted
