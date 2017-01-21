@@ -24,7 +24,7 @@ head(d)
 treatmentsC <- vtreat::designTreatmentsC(d,c('catVarNoise','catVarPerfect'),'y',TRUE)
 
 
-# Estimate effect significance (not coeficient significance).
+# Estimate effect significance (not coefficient significance).
 estSigGLM <- function(xVar,yVar,numberOfHiddenDegrees=0) {
   d <- data.frame(x=xVar,y=yVar,stringsAsFactors = FALSE)
   model <- stats::glm(stats::as.formula('y~x'),
@@ -40,7 +40,7 @@ estSigGLM <- function(xVar,yVar,numberOfHiddenDegrees=0) {
 prepD <- vtreat::prepare(treatmentsC,d,pruneSig=c())
 
 ## ----scoreframe----------------------------------------------------------
-print(treatmentsC$scoreFrame[c('varName','origName','sig')])
+print(treatmentsC$scoreFrame[,c('varName','rsq','sig','extraModelDegrees')])
 
 ## ----scoresignal---------------------------------------------------------
 summary(glm(y~d$catVarPerfect=='lev001T',data=d,family=binomial))
