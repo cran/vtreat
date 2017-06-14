@@ -33,7 +33,7 @@ NULL
 #'
 #' Original variable name from a treatmentplan$treatment item.
 #' @param x vtreatment item.
-#' @seealso \code{\link{designTreatmentsC}} \code{\link{designTreatmentsN}} 
+#' @seealso \code{\link{designTreatmentsC}} \code{\link{designTreatmentsN}} \code{\link{designTreatmentsZ}}
 #' @export
 #' 
 vorig <- function(x) { x$origvar }
@@ -42,7 +42,7 @@ vorig <- function(x) { x$origvar }
 #'
 #' New treated variable names from a treatmentplan$treatment item.
 #' @param x vtreatment item
-#' @seealso \code{\link{designTreatmentsC}} \code{\link{designTreatmentsN}} 
+#' @seealso \code{\link{designTreatmentsC}} \code{\link{designTreatmentsN}} \code{\link{designTreatmentsZ}}
 #' @export
 vnames <- function(x) { x$newvars }
 
@@ -62,7 +62,7 @@ format.vtreatment <- function(x,...) { paste(
 #' Print treatmentplan.
 #' @param x treatmentplan
 #' @param ... additional args (to match general signature).
-#' @seealso \code{\link{designTreatmentsC}} \code{\link{designTreatmentsN}} \code{\link{prepare}}
+#' @seealso \code{\link{designTreatmentsC}} \code{\link{designTreatmentsN}} \code{\link{designTreatmentsZ}} \code{\link{prepare}}
 #' @export
 print.vtreatment <- function(x,...) { 
   print(format.vtreatment(x),...) 
@@ -80,7 +80,9 @@ print.vtreatment <- function(x,...) {
 #' 
 #' Function to design variable treatments for binary prediction of a
 #' categorical outcome.  Data frame is assumed to have only atomic columns
-#' except for dates (which are converted to numeric).
+#' except for dates (which are converted to numeric). Note: re-encoding high cardenality
+#' categorical varaibles can introduce undesirable nested model bias, for such data consider
+#' using \code{\link{mkCrossFrameCExperiment}}.
 #' 
 #' The main fields are mostly vectors with names (all with the same names in the same order):
 #' 
@@ -107,7 +109,7 @@ print.vtreatment <- function(x,...) {
 #' @param verbose if TRUE print progress.
 #' @param parallelCluster (optional) a cluster object created by package parallel or package snow
 #' @return treatment plan (for use with prepare)
-#' @seealso \code{\link{prepare}} \code{\link{designTreatmentsN}} 
+#' @seealso \code{\link{prepare}} \code{\link{designTreatmentsN}} \code{\link{designTreatmentsZ}} \code{\link{mkCrossFrameCExperiment}}
 #' @examples
 #' 
 #' dTrainC <- data.frame(x=c('a','a','a','b','b','b'),
@@ -162,7 +164,10 @@ designTreatmentsC <- function(dframe,varlist,outcomename,outcometarget,
 #' Function to design variable treatments for binary prediction of a
 #' numeric outcome.  Data frame is assumed to have only atomic columns
 #' except for dates (which are converted to numeric).
-#' Note: each column is processed independently of all others.
+#' Note: each column is processed independently of all others. 
+#' Note: re-encoding high cardenality
+#' categorical varaibles can introduce undesirable nested model bias, for such data consider
+#' using \code{\link{mkCrossFrameNExperiment}}.
 #' 
 #' The main fields are mostly vectors with names (all with the same names in the same order):
 #' 
@@ -187,7 +192,7 @@ designTreatmentsC <- function(dframe,varlist,outcomename,outcometarget,
 #' @param verbose if TRUE print progress.
 #' @param parallelCluster (optional) a cluster object created by package parallel or package snow
 #' @return treatment plan (for use with prepare)
-#' @seealso \code{\link{prepare}} \code{\link{designTreatmentsC}} 
+#' @seealso \code{\link{prepare}} \code{\link{designTreatmentsC}} \code{\link{designTreatmentsZ}} \code{\link{mkCrossFrameNExperiment}}
 #' @examples
 #' 
 #' dTrainN <- data.frame(x=c('a','a','a','a','b','b','b'),
@@ -264,10 +269,10 @@ designTreatmentsN <- function(dframe,varlist,outcomename,
 #'     z=c(1,2,3,4,5,6,7,NA,9))
 #' dTestZ <- data.frame(x=c('a','x','c',NA),
 #'     z=c(10,20,30,NA))
-#' treatmentsZ = designTreatmentsZ(dTrainZ,colnames(dTrainZ),
+#' treatmentsZ = designTreatmentsZ(dTrainZ, colnames(dTrainZ),
 #'   rareCount=0)
-#' dTrainZTreated <- prepare(treatmentsZ,dTrainZ,pruneSig=1)
-#' dTestZTreated <- prepare(treatmentsZ,dTestZ,pruneSig=1)
+#' dTrainZTreated <- prepare(treatmentsZ, dTrainZ)
+#' dTestZTreated <- prepare(treatmentsZ, dTestZ)
 #' 
 #' @export
 designTreatmentsZ <- function(dframe,varlist,
@@ -317,34 +322,49 @@ designTreatmentsZ <- function(dframe,varlist,
 #' @param scale optional if TRUE replace numeric variables with single variable model regressions ("move to outcome-scale").  These have mean zero and (for varaibles with signficant less than 1) slope 1 when regressed  (lm for regression problems/glm for classificaiton problems) against outcome.
 #' @param doCollar optional if TRUE collar numeric variables by cutting off after a tail-probability specified by collarProb during treatment design.
 #' @param varRestriction optional list of treated variable names to restrict to
-#' @return treated data frame (all columns numeric, without NA,NaN)
+#' @param codeRestriction optional list of treated variable codess to restrict to
 #' @param parallelCluster (optional) a cluster object created by package parallel or package snow
-#' @seealso \code{\link{designTreatmentsC}} \code{\link{designTreatmentsN}}
+#' @return treated data frame (all columns numeric- without NA, NaN)
+#' 
+#' @seealso \code{\link{mkCrossFrameCExperiment}}, \code{\link{mkCrossFrameNExperiment}}, \code{\link{designTreatmentsC}} \code{\link{designTreatmentsN}} \code{\link{designTreatmentsZ}}
 #' @examples
 #' 
-#' dTrainN <- data.frame(x=c('a','a','a','a','b','b','b'),
-#'     z=c(1,2,3,4,5,6,7),y=c(0,0,0,1,0,1,1))
-#' dTestN <- data.frame(x=c('a','b','c',NA),z=c(10,20,30,NA))
-#' treatmentsN = designTreatmentsN(dTrainN,colnames(dTrainN),'y')
-#' dTrainNTreated <- prepare(treatmentsN,dTrainN, pruneSig=1.0)
-#' dTestNTreated <- prepare(treatmentsN,dTestN, pruneSig=1.0)
+#' dTrainN <- data.frame(x= c('a','a','a','a','b','b','b'),
+#'                       z= c(1,2,3,4,5,6,7),
+#'                       y= c(0,0,0,1,0,1,1))
+#' dTestN <- data.frame(x= c('a','b','c',NA),
+#'                      z= c(10,20,30,NA))
+#' treatmentsN = designTreatmentsN(dTrainN,colnames(dTrainN), 'y')
+#' dTrainNTreated <- prepare(treatmentsN, dTrainN, pruneSig= 0.2)
+#' dTestNTreated <- prepare(treatmentsN, dTestN, pruneSig= 0.2)
 #' 
-#' dTrainC <- data.frame(x=c('a','a','a','b','b','b'),
-#'     z=c(1,2,3,4,5,6),y=c(FALSE,FALSE,TRUE,FALSE,TRUE,TRUE))
-#' dTestC <- data.frame(x=c('a','b','c',NA),z=c(10,20,30,NA))
-#' treatmentsC <- designTreatmentsC(dTrainC,colnames(dTrainC),'y',TRUE)
-#' dTrainCTreated <- prepare(treatmentsC,dTrainC, pruneSig=1.0)
-#' dTestCTreated <- prepare(treatmentsC,dTestC, pruneSig=1.0)
+#' dTrainC <- data.frame(x= c('a','a','a','b','b','b'),
+#'                       z= c(1,2,3,4,5,6),
+#'                       y= c(FALSE,FALSE,TRUE,FALSE,TRUE,TRUE))
+#' dTestC <- data.frame(x= c('a','b','c',NA),
+#'                      z= c(10,20,30,NA))
+#' treatmentsC <- designTreatmentsC(dTrainC, colnames(dTrainC),'y',TRUE)
+#' dTrainCTreated <- prepare(treatmentsC, dTrainC, varRestriction= c('z_clean'))
+#' dTestCTreated <- prepare(treatmentsC, dTestC, varRestriction= c('z_clean'))
+#'
+#' dTrainZ <- data.frame(x= c('a','a','a','b','b','b'),
+#'                       z= c(1,2,3,4,5,6))
+#' dTestZ <- data.frame(x= c('a','b','c',NA),
+#'                      z= c(10,20,30,NA))
+#' treatmentsZ <- designTreatmentsZ(dTrainZ, colnames(dTrainZ))
+#' dTrainZTreated <- prepare(treatmentsZ, dTrainZ, codeRestriction= c('lev'))
+#' dTestZTreated <- prepare(treatmentsZ, dTestZ, codeRestriction= c('lev'))
 #' 
 #' 
 #' @export
-prepare <- function(treatmentplan,dframe,
+prepare <- function(treatmentplan, dframe,
                     ...,
                     pruneSig= NULL,
-                    scale=FALSE,
-                    doCollar=FALSE,
-                    varRestriction=c(),
-                    parallelCluster=NULL) {
+                    scale= FALSE,
+                    doCollar= FALSE,
+                    varRestriction= NULL,
+                    codeRestriction= NULL,
+                    parallelCluster= NULL) {
   .checkArgs1(dframe=dframe,...)
   if(class(treatmentplan)!='treatmentplan') {
     stop("treatmentplan must be of class treatmentplan")
@@ -372,7 +392,12 @@ prepare <- function(treatmentplan,dframe,
   }
   usableVars <- treatmentplan$scoreFrame$varName[usable]
   if(!is.null(varRestriction)) {
-     usableVars <- intersect(usableVars,varRestriction)
+    usableVars <- intersect(usableVars,varRestriction)
+  }
+  if(!is.null(codeRestriction)) {
+    hasSelectedCode <- treatmentplan$scoreFrame$code %in% codeRestriction
+    usableVars <- intersect(usableVars, 
+                            treatmentplan$scoreFrame$varName[hasSelectedCode])
   }
   if(length(usableVars)<=0) {
     stop('no usable vars')

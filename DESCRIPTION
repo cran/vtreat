@@ -1,8 +1,8 @@
 Package: vtreat
 Type: Package
 Title: A Statistically Sound 'data.frame' Processor/Conditioner
-Version: 0.5.31
-Date: 2017-04-13
+Version: 0.5.32
+Date: 2017-06-13
 Author: John Mount, Nina Zumel
 URL: https://github.com/WinVector/vtreat
 BugReports: https://github.com/WinVector/vtreat/issues
@@ -19,6 +19,6 @@ LazyData: true
 VignetteBuilder: knitr
 RoxygenNote: 6.0.1
 NeedsCompilation: no
-Packaged: 2017-04-14 00:58:41 UTC; johnmount
+Packaged: 2017-06-14 01:26:46 UTC; johnmount
 Repository: CRAN
-Date/Publication: 2017-04-14 13:59:28 UTC
+Date/Publication: 2017-06-14 01:37:36 UTC
