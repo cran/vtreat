@@ -188,16 +188,16 @@ mkVtreatListWorker <- function(scale,doCollar) {
 
 
 
-# design a treatment for a single variables
+# design a treatment for a single variable
 # bind a bunch of variables, so we pass exactly what we need to sub-processes
 .mkVarDesigner <- function(zoY,
-                         zC,zTarget,
-                         weights,
-                         minFraction,smFactor,rareCount,rareSig,
-                         collarProb,
-                         impactOnly,
-                         catScaling,
-                         verbose) {
+                           zC,zTarget,
+                           weights,
+                           minFraction,smFactor,rareCount,rareSig,
+                           collarProb,
+                           codeRestriction, customCoders,
+                           catScaling,
+                           verbose) {
   force(zoY)
   force(zC)
   force(zTarget)
@@ -207,10 +207,22 @@ mkVtreatListWorker <- function(scale,doCollar) {
   force(rareCount)
   force(rareSig)
   force(collarProb)
+  force(codeRestriction)
+  force(customCoders)
   force(catScaling)
   force(verbose)
   nRows = length(zoY)
   yMoves <- .has.range.cn(zoY)
+  codeRestictionWasNULL <- length(codeRestriction)<=0
+  if(codeRestictionWasNULL) {
+    # NULL is an alias for "don't restrict"
+    codeRestriction <- c('clean', 
+                         'isBAD',
+                         'lev',
+                         'catP', 
+                         'catB',
+                         'catN', 'catD')
+  }
   function(argv) {
     v <- argv$v
     vcolOrig <- argv$vcolOrig
@@ -236,34 +248,62 @@ mkVtreatListWorker <- function(scale,doCollar) {
     } else {
       colclass <- class(vcol)
       if(.has.range(vcol)) {
+        ti <- NULL
         if((colclass=='numeric') || (colclass=='integer')) {
-          if(!impactOnly) {
+          if('clean' %in% codeRestriction) {
             ti <- .mkPassThrough(v,vcol,zoY,zC,zTarget,weights,collarProb,catScaling)
             acceptTreatment(ti)
+          }
+          if('isBAD' %in% codeRestriction) {
             ti <- .mkIsBAD(v,vcol,zoY,zC,zTarget,weights,catScaling)
             acceptTreatment(ti)
           }
         } else if((colclass=='character') || (colclass=='factor')) {
           # expect character or factor here
+          for(customCode in names(customCoders)) {
+            coder <- customCoders[[customCode]]
+            customeCodeV <- base::strsplit(customCode, '.', fixed=TRUE)[[1]]
+            codeType <- customeCodeV[[1]]
+            codeName <- customeCodeV[[2]]
+            if(codeRestictionWasNULL || (codeName %in% codeRestriction)) {
+              codeSeq <- NULL
+              if(length(customeCodeV)>2) {
+                codeSeq <- customeCodeV[seq(3, length(customeCodeV))]
+              }
+              if((codeType=='n')==is.null(zC)) {
+                ti <- makeCustomCoder(codeName, coder, codeSeq, 
+                                      v,vcol,zoY,zC,zTarget,weights,catScaling)
+                acceptTreatment(ti)
+              }
+            }
+          }
+          ti = NULL
           if(length(levRestriction$safeLevs)>0) {
-            ti = NULL
-            if(!impactOnly) {
+            if('lev' %in% codeRestriction) {
               ti <- .mkCatInd(v,vcol,zoY,zC,zTarget,minFraction,levRestriction,weights,catScaling)
               acceptTreatment(ti)
             }
             if(is.null(ti)||(length(unique(vcol))>2)) {  # make an impactmodel if catInd construction failed or there are more than 2 levels
-              ti <- .mkCatP(v,vcol,zoY,zC,zTarget,levRestriction,weights,catScaling)
-              acceptTreatment(ti)
+              if('catP' %in% codeRestriction) {
+                ti <- .mkCatP(v,vcol,zoY,zC,zTarget,levRestriction,weights,catScaling)
+                acceptTreatment(ti)
+              }
               if(yMoves) {
                 if(!is.null(zC)) {  # in categorical mode
-                  ti <- .mkCatBayes(v,vcol,zC,zTarget,smFactor,levRestriction,weights,catScaling)
-                  acceptTreatment(ti)      
+                  if('catB' %in% codeRestriction) {
+                    ti <- .mkCatBayes(v,vcol,zC,zTarget,smFactor,levRestriction,weights,catScaling)
+                    acceptTreatment(ti)
+                  }
                 }
                 if(is.null(zC)) { # is numeric mode
-                  ti <- .mkCatNum(v,vcol,zoY,smFactor,levRestriction,weights)
-                  acceptTreatment(ti)
-                  ti <- .mkCatD(v,vcol,zoY,smFactor,levRestriction,weights)
-                  acceptTreatment(ti)
+                  if('catN' %in% codeRestriction) {
+                    ti <- .mkCatNum(v,vcol,zoY,smFactor,levRestriction,weights)
+                    acceptTreatment(ti)
+                  }
+                  if('catD' %in% codeRestriction) {
+                    ti <- .mkCatD(v,vcol,zoY,smFactor,levRestriction,weights)
+                    acceptTreatment(ti)
+                  }
                 }
               }
             }
@@ -380,13 +420,14 @@ mkVtreatListWorker <- function(scale,doCollar) {
 
 
 # build all treatments for a data frame to predict a given outcome
-.designTreatmentsXS <- function(dframe,varlist,outcomename,zoY,
+.designTreatmentsXS <- function(dframe, varlist, outcomename, zoY,
                                 zC,zTarget,
                                 weights,
                                 minFraction,smFactor,
                                 rareCount,rareSig,
                                 collarProb,
-                                impactOnly,justWantTreatments,
+                                codeRestriction, customCoders,
+                                justWantTreatments,
                                 catScaling,
                                 verbose,
                                 parallelCluster) {
@@ -442,7 +483,7 @@ mkVtreatListWorker <- function(scale,doCollar) {
                          weights,
                          minFraction,smFactor,rareCount,rareSig,
                          collarProb,
-                         impactOnly,
+                         codeRestriction, customCoders,
                          catScaling,
                          verbose)
   treatments <- plapply(workList,worker,parallelCluster)
@@ -489,7 +530,8 @@ mkVtreatListWorker <- function(scale,doCollar) {
                                minFraction,smFactor,
                                rareCount,rareSig,
                                collarProb,
-                               splitFunction,ncross,
+                               codeRestriction, customCoders,
+                               splitFunction, ncross, forceSplit,
                                catScaling,
                                verbose,
                                parallelCluster) {
@@ -548,11 +590,15 @@ mkVtreatListWorker <- function(scale,doCollar) {
                                     minFraction,smFactor,
                                     rareCount,rareSig,
                                     collarProb,
-                                    FALSE,FALSE,
+                                    codeRestriction, customCoders,
+                                    FALSE,
                                     catScaling,
                                     verbose,
                                     parallelCluster)
   treatments$scoreFrame <- treatments$scoreFrame[treatments$scoreFrame$varMoves,]
+  if(forceSplit) {
+    treatments$scoreFrame$needsSplit <- TRUE
+  }
   treatments$vtreatVersion <- packageVersion('vtreat')
   treatments$outcomeType <- 'notmarked'
   treatments$outcomeTarget <- outcomename
@@ -574,8 +620,9 @@ mkVtreatListWorker <- function(scale,doCollar) {
                                 minFraction,smFactor,
                                 rareCount,rareSig,
                                 collarProb,
-                                TRUE,
-                                FALSE,FALSE,
+                                codeRestriction,
+                                customCoders,
+                                FALSE, FALSE,
                                 splitFunction,ncross,
                                 catScaling,
                                 parallelCluster)
@@ -635,32 +682,38 @@ mkVtreatListWorker <- function(scale,doCollar) {
   }
 }
 
-.checkArgs <- function(dframe,varlist,outcomename,...) {
+.checkArgs <- function(dframe, varlist, outcomename, ...) {
   args <- list(...)
   if(length(args)!=0) {
     nm <- setdiff(paste(names(args),collapse=", "),'')
     nv <- length(args)-length(nm)
     stop(paste("unexpected arguments",nm,"(and",nv,"unexpected values)"))
   }
-  if(missing(dframe)||(!is.data.frame(dframe))||(nrow(dframe)<0)||(ncol(dframe)<=0)) {
+  if(missing(dframe)||(!is.data.frame(dframe))||
+     (nrow(dframe)<0)||(ncol(dframe)<=0)) {
     stop("dframe must be a non-empty data frame")
   }
   if(missing(varlist)) {
     stop("required argument varlist missing")
   }
-  if(length(varlist)!=length(unique(varlist))) {
-    stop("duplicate variable name in varlist")
-  }
-  varlist <- setdiff(varlist,outcomename)
-  varlist <- intersect(varlist,colnames(dframe))
   if((!is.character(varlist))||(length(varlist)<1)) {
     stop("varlist must be a non-empty character vector")
   }
+  if(length(varlist)!=length(unique(varlist))) {
+    stop("duplicate variable name in varlist")
+  }
+  # designTreatmentsZ calls this, so outcomename may not be in dframe
+  if(missing(outcomename)||
+     (!is.character(outcomename))||(length(outcomename)!=1)) {
+    stop("outcomename must be a length 1 character vector")
+  }
+  varlist <- setdiff(varlist, outcomename)
+  varlist <- intersect(varlist, colnames(dframe))
+  if(length(varlist)<1) {
+    stop("varlist must include non-outcome column names")
+  }
   if(sum(colnames(dframe) %in% varlist)!=length(varlist)) {
     stop("ambigous (duplicate) column name in data frame")
-  }
-  if(missing(outcomename)||(!is.character(outcomename))||(length(outcomename)!=1)) {
-    stop("outcomename must be a length 1 character vector")
   }
 }
 

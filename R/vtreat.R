@@ -103,8 +103,11 @@ print.vtreatment <- function(x,...) {
 #' @param rareCount optional integer, allow levels with this count or below to be pooled into a shared rare-level.  Defaults to 0 or off.
 #' @param rareSig optional numeric, suppress levels from pooling at this significance value greater.  Defaults to NULL or off.
 #' @param collarProb what fraction of the data (pseudo-probability) to collar data at if doCollar is set during \code{\link{prepare}}.
+#' @param codeRestriction what types of variables to produce (character array of level codes, NULL means no restiction).
+#' @param customCoders map from code names to custom categorical variable encoding functions (please see vignette('CustomLevelCoders', package='vtreat')).
 #' @param splitFunction (optional) see vtreat::buildEvalSets .
 #' @param ncross optional scalar >=2 number of cross validation splits use in rescoring complex variables.
+#' @param forceSplit logical, if TRUE force cross-validated significance calculatons on all variables.
 #' @param catScaling optional, if TRUE use glm() linkspace, if FALSE use lm() for scaling.
 #' @param verbose if TRUE print progress.
 #' @param parallelCluster (optional) a cluster object created by package parallel or package snow
@@ -128,7 +131,10 @@ designTreatmentsC <- function(dframe,varlist,outcomename,outcometarget,
                               minFraction=0.02,smFactor=0.0,
                               rareCount=0,rareSig=NULL,
                               collarProb=0.00,
+                              codeRestriction=NULL,
+                              customCoders=NULL, 
                               splitFunction=NULL,ncross=3,
+                              forceSplit=FALSE,
                               catScaling=FALSE,
                               verbose=TRUE,
                               parallelCluster=NULL) {
@@ -136,6 +142,9 @@ designTreatmentsC <- function(dframe,varlist,outcomename,outcometarget,
   .checkArgs(dframe=dframe,varlist=varlist,outcomename=outcomename,...)
   if(!(outcomename %in% colnames(dframe))) {
     stop("outcomename must be a column name of dframe")
+  }
+  if(any(is.na(dframe[[outcomename]]))) {
+    stop("There are missing values in the outcome column, can not apply designTreatmentsC.")
   }
   zoY <- ifelse(dframe[[outcomename]]==outcometarget,1.0,0.0)
   if(min(zoY)>=max(zoY)) {
@@ -147,7 +156,9 @@ designTreatmentsC <- function(dframe,varlist,outcomename,outcometarget,
                                    minFraction,smFactor,
                                    rareCount,rareSig,
                                    collarProb,
-                                   splitFunction,ncross,
+                                   codeRestriction,
+                                   customCoders,
+                                   splitFunction,ncross,forceSplit,
                                    catScaling,
                                    verbose,
                                    parallelCluster)
@@ -187,8 +198,11 @@ designTreatmentsC <- function(dframe,varlist,outcomename,outcometarget,
 #' @param rareCount optional integer, allow levels with this count or below to be pooled into a shared rare-level.  Defaults to 0 or off.
 #' @param rareSig optional numeric, suppress levels from pooling at this significance value greater.  Defaults to NULL or off.
 #' @param collarProb what fraction of the data (pseudo-probability) to collar data at if doCollar is set during \code{\link{prepare}}.
+#' @param codeRestriction what types of variables to produce (character array of level codes, NULL means no restiction).
+#' @param customCoders map from code names to custom categorical variable encoding functions (please see vignette('CustomLevelCoders', package='vtreat')).
 #' @param splitFunction (optional) see vtreat::buildEvalSets .
 #' @param ncross optional scalar >=2 number of cross validation splits use in rescoring complex variables.
+#' @param forceSplit logical, if TRUE force cross-validated significance calculatons on all variables.
 #' @param verbose if TRUE print progress.
 #' @param parallelCluster (optional) a cluster object created by package parallel or package snow
 #' @return treatment plan (for use with prepare)
@@ -210,12 +224,18 @@ designTreatmentsN <- function(dframe,varlist,outcomename,
                               minFraction=0.02,smFactor=0.0,
                               rareCount=0,rareSig=NULL,
                               collarProb=0.00,
+                              codeRestriction=NULL,
+                              customCoders=NULL,
                               splitFunction=NULL,ncross=3,
+                              forceSplit=FALSE,
                               verbose=TRUE,
                               parallelCluster=NULL) {
   .checkArgs(dframe=dframe,varlist=varlist,outcomename=outcomename,...)
   if(!(outcomename %in% colnames(dframe))) {
     stop("outcomename must be a column name of dframe")
+  }
+  if(any(is.na(dframe[[outcomename]]))) {
+    stop("There are missing values in the outcome column, can not apply designTreatmentsN.")
   }
   ycol <- dframe[[outcomename]]
   if(min(ycol)>=max(ycol)) {
@@ -228,7 +248,8 @@ designTreatmentsN <- function(dframe,varlist,outcomename,
                      minFraction,smFactor,
                      rareCount,rareSig,
                      collarProb,
-                     splitFunction,ncross,
+                     codeRestriction, customCoders,
+                     splitFunction,ncross,forceSplit,
                      catScaling,
                      verbose,
                      parallelCluster)
@@ -259,6 +280,8 @@ designTreatmentsN <- function(dframe,varlist,outcomename,
 #' @param minFraction optional minimum frequency a categorical level must have to be converted to an indicator column.
 #' @param rareCount optional integer, allow levels with this count or below to be pooled into a shared rare-level.  Defaults to 0 or off.
 #' @param collarProb what fraction of the data (pseudo-probability) to collar data at if doCollar is set during \code{\link{prepare}}.
+#' @param codeRestriction what types of variables to produce (character array of level codes, NULL means no restiction).
+#' @param customCoders map from code names to custom categorical variable encoding functions (please see vignette('CustomLevelCoders', package='vtreat')).
 #' @param verbose if TRUE print progress.
 #' @param parallelCluster (optional) a cluster object created by package parallel or package snow
 #' @return treatment plan (for use with prepare)
@@ -281,9 +304,15 @@ designTreatmentsZ <- function(dframe,varlist,
                               weights=c(),
                               rareCount=0,
                               collarProb=0.00,
+                              codeRestriction=NULL,
+                              customCoders=NULL,
                               verbose=TRUE,
                               parallelCluster=NULL) {
-  outcomename='ZZZZNonCol'
+  # build a name disjoint from column names
+  outcomename <- setdiff(paste('VTREATTEMPCOL',
+                               seq_len(ncol(dframe) + length(varlist) + 1), 
+                               sep='_'),
+                         c(colnames(dframe),varlist))[[1]]
   catScaling <- FALSE
   dframe[[outcomename]] <- 0
   .checkArgs(dframe=dframe,varlist=varlist,outcomename=outcomename,...)
@@ -294,6 +323,7 @@ designTreatmentsZ <- function(dframe,varlist,
                      minFraction,smFactor=0,
                      rareCount,rareSig=1,
                      collarProb,
+                     codeRestriction, customCoders, FALSE,
                      NULL,3,
                      catScaling,
                      verbose,
@@ -322,7 +352,7 @@ designTreatmentsZ <- function(dframe,varlist,
 #' @param scale optional if TRUE replace numeric variables with single variable model regressions ("move to outcome-scale").  These have mean zero and (for varaibles with signficant less than 1) slope 1 when regressed  (lm for regression problems/glm for classificaiton problems) against outcome.
 #' @param doCollar optional if TRUE collar numeric variables by cutting off after a tail-probability specified by collarProb during treatment design.
 #' @param varRestriction optional list of treated variable names to restrict to
-#' @param codeRestriction optional list of treated variable codess to restrict to
+#' @param codeRestriction optional list of treated variable codes to restrict to
 #' @param parallelCluster (optional) a cluster object created by package parallel or package snow
 #' @return treated data frame (all columns numeric- without NA, NaN)
 #' 
@@ -386,24 +416,24 @@ prepare <- function(treatmentplan, dframe,
   if(treatmentplan$outcomeType=='None') {
     pruneSig <- NULL
   }
-  usable <- treatmentplan$scoreFrame$varMoves
+  useable <- treatmentplan$scoreFrame$varMoves
   if(!is.null(pruneSig)) {
-    usable <- usable & (treatmentplan$scoreFrame$sig<=pruneSig)
+    useable <- useable & (treatmentplan$scoreFrame$sig<=pruneSig)
   }
-  usableVars <- treatmentplan$scoreFrame$varName[usable]
+  useableVars <- treatmentplan$scoreFrame$varName[useable]
   if(!is.null(varRestriction)) {
-    usableVars <- intersect(usableVars,varRestriction)
+    useableVars <- intersect(useableVars,varRestriction)
   }
   if(!is.null(codeRestriction)) {
     hasSelectedCode <- treatmentplan$scoreFrame$code %in% codeRestriction
-    usableVars <- intersect(usableVars, 
+    useableVars <- intersect(useableVars, 
                             treatmentplan$scoreFrame$varName[hasSelectedCode])
   }
-  if(length(usableVars)<=0) {
-    stop('no usable vars')
+  if(length(useableVars)<=0) {
+    stop('no useable vars')
   }
   for(ti in treatmentplan$treatments) {
-    if(length(intersect(ti$newvars,usableVars))>0) {
+    if(length(intersect(ti$newvars,useableVars))>0) {
       newType <- typeof(dframe[[ti$origvar]])
       newClass <- paste(class(dframe[[ti$origvar]]))
       if((ti$origType!=newType) || (ti$origClass!=newClass)) {
@@ -414,7 +444,7 @@ prepare <- function(treatmentplan, dframe,
       }
     }
   }
-  treated <- .vtreatList(treatmentplan$treatments,dframe,usableVars,scale,doCollar,
+  treated <- .vtreatList(treatmentplan$treatments,dframe,useableVars,scale,doCollar,
                          parallelCluster)
   # copy outcome over if it is present
   if(treatmentplan$outcomename %in% colnames(dframe)) {
@@ -445,10 +475,13 @@ prepare <- function(treatmentplan, dframe,
 #' @param rareCount optional integer, allow levels with this count or below to be pooled into a shared rare-level.  Defaults to 0 or off.
 #' @param rareSig optional numeric, suppress levels from pooling at this significance value greater.  Defaults to NULL or off.
 #' @param collarProb what fraction of the data (pseudo-probability) to collar data at if doCollar is set during \code{\link{prepare}}.
+#' @param codeRestriction what types of variables to produce (character array of level codes, NULL means no restiction).
+#' @param customCoders map from code names to custom categorical variable encoding functions (please see vignette('CustomLevelCoders', package='vtreat')).
 #' @param scale optional if TRUE replace numeric variables with regression ("move to outcome-scale").
 #' @param doCollar optional if TRUE collar numeric variables by cutting off after a tail-probability specified by collarProb during treatment design.
 #' @param splitFunction (optional) see vtreat::buildEvalSets .
 #' @param ncross optional scalar>=2 number of cross-validation rounds to design.
+#' @param forceSplit logical, if TRUE force cross-validated significance calculatons on all variables.
 #' @param catScaling optional, if TRUE use glm() linkspace, if FALSE use lm() for scaling.
 #' @param parallelCluster (optional) a cluster object created by package parallel or package snow
 #' @seealso \code{\link{designTreatmentsC}} \code{\link{designTreatmentsN}} \code{\link{prepare}}
@@ -480,8 +513,11 @@ mkCrossFrameCExperiment <- function(dframe,varlist,
                                     minFraction=0.02,smFactor=0.0,
                                     rareCount=0,rareSig=1,
                                     collarProb=0.00,
+                                    codeRestriction=NULL,
+                                    customCoders=NULL,
                                     scale=FALSE,doCollar=FALSE,
                                     splitFunction=NULL,ncross=3,
+                                    forceSplit = FALSE,
                                     catScaling=FALSE,
                                     parallelCluster=NULL) {
   .checkArgs(dframe=dframe,varlist=varlist,outcomename=outcomename,...)
@@ -497,6 +533,9 @@ mkCrossFrameCExperiment <- function(dframe,varlist,
   if(!(outcomename %in% colnames(dframe))) {
     stop("outcomename must be a column name of dframe")
   }
+  if(any(is.na(dframe[[outcomename]]))) {
+    stop("There are missing values in the outcome column, can not run mkCrossFrameCExperiment.")
+  }
   if(is.null(weights)) {
     weights <- rep(1.0,nrow(dframe))
   }
@@ -505,7 +544,10 @@ mkCrossFrameCExperiment <- function(dframe,varlist,
                                   minFraction=minFraction,smFactor=smFactor,
                                   rareCount=rareCount,rareSig=rareSig,
                                   collarProb=collarProb,
+                                  codeRestriction=codeRestriction,
+                                  customCoders=customCoders,
                                   splitFunction=splitFunction,ncross=ncross,
+                                  forceSplit = forceSplit,
                                   catScaling=catScaling,
                                   verbose=FALSE,
                                   parallelCluster=parallelCluster)
@@ -520,7 +562,8 @@ mkCrossFrameCExperiment <- function(dframe,varlist,
                             minFraction,smFactor,
                             rareCount,rareSig,
                             collarProb,
-                            FALSE,
+                            codeRestriction,
+                            customCoders,
                             scale,doCollar,
                             splitFunction,ncross,
                             catScaling,
@@ -561,10 +604,13 @@ mkCrossFrameCExperiment <- function(dframe,varlist,
 #' @param rareCount optional integer, allow levels with this count or below to be pooled into a shared rare-level.  Defaults to 0 or off.
 #' @param rareSig optional numeric, suppress levels from pooling at this significance value greater.  Defaults to NULL or off.
 #' @param collarProb what fraction of the data (pseudo-probability) to collar data at if doCollar is set during \code{\link{prepare}}.
+#' @param codeRestriction what types of variables to produce (character array of level codes, NULL means no restiction).
+#' @param customCoders map from code names to custom categorical variable encoding functions (please see vignette('CustomLevelCoders', package='vtreat')).
 #' @param scale optional if TRUE replace numeric variables with regression ("move to outcome-scale").
 #' @param doCollar optional if TRUE collar numeric variables by cutting off after a tail-probability specified by collarProb during treatment design.
 #' @param splitFunction (optional) see vtreat::buildEvalSets .
 #' @param ncross optional scalar>=2 number of cross-validation rounds to design.
+#' @param forceSplit logical, if TRUE force cross-validated significance calculatons on all variables.
 #' @param parallelCluster (optional) a cluster object created by package parallel or package snow
 #' @return treatment plan (for use with prepare)
 #' @seealso \code{\link{designTreatmentsC}} \code{\link{designTreatmentsN}} \code{\link{prepare}}
@@ -594,8 +640,11 @@ mkCrossFrameNExperiment <- function(dframe,varlist,outcomename,
                                     minFraction=0.02,smFactor=0.0,
                                     rareCount=0,rareSig=1,
                                     collarProb=0.00,
+                                    codeRestriction=NULL,
+                                    customCoders=NULL,
                                     scale=FALSE,doCollar=FALSE,
                                     splitFunction=NULL,ncross=3,
+                                    forceSplit=FALSE,
                                     parallelCluster=NULL) {
   .checkArgs(dframe=dframe,varlist=varlist,outcomename=outcomename,...)
   if(!is.data.frame(dframe)) {
@@ -610,6 +659,9 @@ mkCrossFrameNExperiment <- function(dframe,varlist,outcomename,
   if(!(outcomename %in% colnames(dframe))) {
     stop("outcomename must be a column name of dframe")
   }
+  if(any(is.na(dframe[[outcomename]]))) {
+    stop("There are missing values in the outcome column, can not run mkCrossFrameNExperiment.")
+  }
   catScaling=FALSE
   if(is.null(weights)) {
     weights <- rep(1.0,nrow(dframe))
@@ -619,7 +671,10 @@ mkCrossFrameNExperiment <- function(dframe,varlist,outcomename,
                                   minFraction=minFraction,smFactor=smFactor,
                                   rareCount=rareCount,rareSig=rareSig,
                                   collarProb=collarProb,
+                                  codeRestriction = codeRestriction,
+                                  customCoders = customCoders,
                                   splitFunction=splitFunction,ncross=ncross,
+                                  forceSplit = forceSplit,
                                   verbose=FALSE,
                                   parallelCluster=parallelCluster)
   zC <- NULL
@@ -633,7 +688,7 @@ mkCrossFrameNExperiment <- function(dframe,varlist,outcomename,
                             minFraction,smFactor,
                             rareCount,rareSig,
                             collarProb,
-                            FALSE,
+                            codeRestriction, customCoders,
                             scale,doCollar,
                             splitFunction,ncross,
                             catScaling,
