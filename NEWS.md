@@ -1,4 +1,12 @@
 
+
+# vtreat 1.0.0 2017/10/04
+
+- Minor documentation fixes.
+- More work on novel values for non-centered custom coders.
+- Numeric custom coders.
+- Isotone examples.
+
 # vtreat 0.6.0 2017/09/20
 
 - Add codeRestriction option to design steps.
