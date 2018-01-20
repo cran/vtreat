@@ -344,6 +344,8 @@ designTreatmentsZ <- function(dframe,varlist,
 #' The intent is that these frames are compatible with more machine learning
 #' techniques, and avoid a lot of corner cases (NA,NaN, novel levels, too many levels).
 #' Note: each column is processed independently of all others.  Also copies over outcome if present.
+#' Note: treatmentplan's are not meant for long-term storage, a warning is issued if the version of
+#' vtreat that produced the plan differs from the version running \code{prepare()}.
 #' 
 #' @param treatmentplan Plan built by designTreantmentsC() or designTreatmentsN()
 #' @param dframe Data frame to be treated
@@ -402,7 +404,7 @@ prepare <- function(treatmentplan, dframe,
   vtreatVersion <- packageVersion('vtreat')
   if(is.null(treatmentplan$vtreatVersion) ||
      (treatmentplan$vtreatVersion!=vtreatVersion)) {
-    warning(paste('treatments desined with vtreat version',
+    warning(paste('treatments designed with vtreat version',
                treatmentplan$vtreatVersion,
                'and preparing data.frame with vtreat version',
                vtreatVersion))

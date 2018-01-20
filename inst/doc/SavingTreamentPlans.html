@@ -12,7 +12,7 @@
 
 <meta name="author" content="John Mount" />
 
-<meta name="date" content="2017-10-16" />
+<meta name="date" content="2018-01-20" />
 
 <title>Saving Treatment Plans</title>
 
@@ -70,10 +70,11 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">Saving Treatment Plans</h1>
 <h4 class="author"><em>John Mount</em></h4>
-<h4 class="date"><em>2017-10-16</em></h4>
+<h4 class="date"><em>2018-01-20</em></h4>
 
 
 
+<p>You can save and load treatment plans. Note: treatments plans are intended to be used with the version of <code>vtreat</code> they were constructed with (though we try to make plans forward-compatible). So it is good idea to have procedures to re-build treatment plans.</p>
 <p>The easiest way to save <code>vtreat</code> treatment plans is to use <code>R</code>’s built in <code>saveRDS</code> function.</p>
 <p>To save in a file:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(<span class="st">&quot;vtreat&quot;</span>)
@@ -98,7 +99,7 @@ dTestCTreated &lt;-<span class="st"> </span><span class="kw">prepare</span>(trea
 <span class="kw">unlink</span>(fileName)</code></pre></div>
 <p>Treatment plans can also be stored as binary blobs in databases. Using ideas from <a href="http://jfaganuk.github.io/2015/01/12/storing-r-objects-in-sqlite-tables/">here</a> gives us the following through the <code>DBI</code> interface.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">con &lt;-<span class="st"> </span><span class="ot">NULL</span>
-if (<span class="kw">requireNamespace</span>(<span class="st">'RSQLite'</span>, <span class="dt">quietly =</span> <span class="ot">TRUE</span>)) {
+<span class="cf">if</span> (<span class="kw">requireNamespace</span>(<span class="st">'RSQLite'</span>, <span class="dt">quietly =</span> <span class="ot">TRUE</span>)) {
   <span class="kw">library</span>(<span class="st">&quot;RSQLite&quot;</span>)
   con &lt;-<span class="st"> </span><span class="kw">dbConnect</span>(<span class="dt">drv=</span><span class="kw">SQLite</span>(), <span class="dt">dbname=</span><span class="st">&quot;:memory:&quot;</span>)
   <span class="co"># create table</span>
@@ -134,10 +135,10 @@ if (<span class="kw">requireNamespace</span>(<span class="st">'RSQLite'</span>, 
 <pre><code>## [1] &quot;saved to db:  &lt;SQLiteConnection&gt;\n  Path: :memory:\n  Extensions: TRUE&quot;</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">rm</span>(<span class="dt">list=</span> <span class="kw">c</span>(<span class="st">'treatmentsC'</span>, <span class="st">'dTestCTreated'</span>))</code></pre></div>
 <p>And we can read the treatment back in as follows.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">if(!<span class="kw">is.null</span>(con)) {
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="cf">if</span>(<span class="op">!</span><span class="kw">is.null</span>(con)) {
   treatmentsList &lt;-<span class="st"> </span><span class="kw">lapply</span>(
     <span class="kw">dbGetQuery</span>(con, 
-               <span class="st">&quot;select * from treatments where key='treatmentsC'&quot;</span>)$treatment,
+               <span class="st">&quot;select * from treatments where key='treatmentsC'&quot;</span>)<span class="op">$</span>treatment,
     unserialize)
   treatmentsC &lt;-<span class="st"> </span>treatmentsList[[<span class="dv">1</span>]]
   <span class="kw">dbDisconnect</span>(con)
