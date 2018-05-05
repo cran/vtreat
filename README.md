@@ -1,6 +1,10 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
-[vtreat](http://winvector.github.io/vtreat/) is an [R](https://cran.r-project.org) data.frame processor/conditioner that prepares real-world data for predictive modeling in a statistically sound manner. For more detail please see here: [arXiv:1611.09477 stat.AP](https://arxiv.org/abs/1611.09477) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1173314.svg)](https://doi.org/10.5281/zenodo.1173314). There is also a series of articles recording the evolution of `vtreat` including some tutorials [here](http://www.win-vector.com/blog/tag/vtreat/).
+[![DOI](http://joss.theoj.org/papers/10.21105/joss.00584/status.svg)](https://doi.org/10.21105/joss.00584) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1173314.svg)](https://doi.org/10.5281/zenodo.1173314)
+
+[vtreat](http://winvector.github.io/vtreat/) is an [R](https://cran.r-project.org) data.frame processor/conditioner that prepares real-world data for predictive modeling in a statistically sound manner.
+
+For more detail please see here: [arXiv:1611.09477 stat.AP](https://arxiv.org/abs/1611.09477) . There is also a series of articles recording the evolution of `vtreat` including some tutorials [here](http://www.win-vector.com/blog/tag/vtreat/).
 
 ![](https://github.com/WinVector/vtreat/raw/master/tools/vtreat.png)
 
@@ -114,7 +118,7 @@ Trivial example:
 ``` r
 library("vtreat")
 packageVersion("vtreat")
- #  [1] '1.0.3'
+ #  [1] '1.0.4'
 citation('vtreat')
  #  
  #  To cite package 'vtreat' in publications use:
@@ -132,6 +136,7 @@ citation('vtreat')
  #      year = {2018},
  #      note = {https://github.com/WinVector/vtreat/, https://winvector.github.io/vtreat/},
  #    }
+options(list(vtreat.use_data.table_binding = TRUE))
 
 # categorical example
 dTrainC <- data.frame(x=c('a','a','a','b','b',NA,NA),
@@ -145,8 +150,8 @@ treatmentsC <- designTreatmentsC(dTrainC,colnames(dTrainC),'y',TRUE,
                                  verbose=FALSE)
 print(treatmentsC$scoreFrame[,c('origName', 'varName', 'code', 'rsq', 'sig', 'extraModelDegrees')])
  #    origName   varName  code         rsq        sig extraModelDegrees
- #  1        x    x_catP  catP 0.285095342 0.09874390                 2
- #  2        x    x_catB  catB 0.117443640 0.28930668                 2
+ #  1        x    x_catP  catP 0.111456141 0.30194137                 2
+ #  2        x    x_catB  catB 0.115273608 0.29380616                 2
  #  3        z   z_clean clean 0.237601767 0.13176020                 0
  #  4        z   z_isBAD isBAD 0.296065432 0.09248399                 0
  #  5        x  x_lev_NA   lev 0.296065432 0.09248399                 0
@@ -192,9 +197,9 @@ treatmentsN = designTreatmentsN(dTrainN,colnames(dTrainN),'y',
                                 verbose=FALSE)
 print(treatmentsN$scoreFrame[,c('origName', 'varName', 'code', 'rsq', 'sig', 'extraModelDegrees')])
  #    origName   varName  code          rsq       sig extraModelDegrees
- #  1        x    x_catP  catP 1.304740e-01 0.3793327                 2
- #  2        x    x_catN  catN 2.616674e-01 0.1950536                 2
- #  3        x    x_catD  catD 9.705853e-02 0.4525551                 2
+ #  1        x    x_catP  catP 2.105263e-01 0.2528101                 2
+ #  2        x    x_catN  catN 3.205128e-03 0.8940756                 2
+ #  3        x    x_catD  catD 6.666667e-02 0.5369633                 2
  #  4        z   z_clean clean 2.880952e-01 0.1701892                 0
  #  5        z   z_isBAD isBAD 3.333333e-01 0.1339746                 0
  #  6        x  x_lev_NA   lev 3.333333e-01 0.1339746                 0

@@ -12,7 +12,7 @@
 
 <meta name="author" content="John Mount" />
 
-<meta name="date" content="2018-03-10" />
+<meta name="date" content="2018-05-05" />
 
 <title>Saving Treatment Plans</title>
 
@@ -70,7 +70,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">Saving Treatment Plans</h1>
 <h4 class="author"><em>John Mount</em></h4>
-<h4 class="date"><em>2018-03-10</em></h4>
+<h4 class="date"><em>2018-05-05</em></h4>
 
 
 
@@ -99,7 +99,8 @@ dTestCTreated &lt;-<span class="st"> </span><span class="kw">prepare</span>(trea
 <span class="kw">unlink</span>(fileName)</code></pre></div>
 <p>Treatment plans can also be stored as binary blobs in databases. Using ideas from <a href="http://jfaganuk.github.io/2015/01/12/storing-r-objects-in-sqlite-tables/">here</a> gives us the following through the <code>DBI</code> interface.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">con &lt;-<span class="st"> </span><span class="ot">NULL</span>
-<span class="cf">if</span> (<span class="kw">requireNamespace</span>(<span class="st">'RSQLite'</span>, <span class="dt">quietly =</span> <span class="ot">TRUE</span>)) {
+<span class="cf">if</span> (<span class="kw">requireNamespace</span>(<span class="st">'RSQLite'</span>, <span class="dt">quietly =</span> <span class="ot">TRUE</span>) <span class="op">&amp;&amp;</span>
+<span class="st">    </span><span class="kw">requireNamespace</span>(<span class="st">'DBI'</span>, <span class="dt">quietly =</span> <span class="ot">TRUE</span>)) {
   <span class="kw">library</span>(<span class="st">&quot;RSQLite&quot;</span>)
   con &lt;-<span class="st"> </span><span class="kw">dbConnect</span>(<span class="dt">drv=</span><span class="kw">SQLite</span>(), <span class="dt">dbname=</span><span class="st">&quot;:memory:&quot;</span>)
   <span class="co"># create table</span>
@@ -124,13 +125,13 @@ dTestCTreated &lt;-<span class="st"> </span><span class="kw">prepare</span>(trea
   constr &lt;-<span class="st"> </span><span class="kw">paste</span>(<span class="kw">capture.output</span>(<span class="kw">print</span>(con)),<span class="dt">collapse=</span><span class="st">'</span><span class="ch">\n</span><span class="st">'</span>)
   <span class="kw">paste</span>(<span class="st">'saved to db: '</span>, constr)
 }</code></pre></div>
-<pre><code>## Warning in rsqlite_fetch(res@ptr, n = n): Don't need to call dbFetch() for
+<pre><code>## Warning in result_fetch(res@ptr, n = n): Don't need to call dbFetch() for
 ## statements, only for queries
 
-## Warning in rsqlite_fetch(res@ptr, n = n): Don't need to call dbFetch() for
+## Warning in result_fetch(res@ptr, n = n): Don't need to call dbFetch() for
 ## statements, only for queries</code></pre>
 <pre><code>## Warning: Factors converted to character</code></pre>
-<pre><code>## Warning in rsqlite_fetch(res@ptr, n = n): Don't need to call dbFetch() for
+<pre><code>## Warning in result_fetch(res@ptr, n = n): Don't need to call dbFetch() for
 ## statements, only for queries</code></pre>
 <pre><code>## [1] &quot;saved to db:  &lt;SQLiteConnection&gt;\n  Path: :memory:\n  Extensions: TRUE&quot;</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">rm</span>(<span class="dt">list=</span> <span class="kw">c</span>(<span class="st">'treatmentsC'</span>, <span class="st">'dTestCTreated'</span>))</code></pre></div>

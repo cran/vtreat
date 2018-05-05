@@ -23,7 +23,8 @@ unlink(fileName)
 
 ## ----dbsave--------------------------------------------------------------
 con <- NULL
-if (requireNamespace('RSQLite', quietly = TRUE)) {
+if (requireNamespace('RSQLite', quietly = TRUE) &&
+    requireNamespace('DBI', quietly = TRUE)) {
   library("RSQLite")
   con <- dbConnect(drv=SQLite(), dbname=":memory:")
   # create table
