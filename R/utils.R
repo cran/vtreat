@@ -32,12 +32,6 @@ plapply <- function(workList,worker,parallelCluster) {
                            stringsAsFactor=FALSE))
     }
   }
-  if(isTRUE(getOption('vtreat.use_dplyr_binding', TRUE))) {
-    if(requireNamespace("dplyr", quietly = TRUE)) {
-      return(as.data.frame(dplyr::bind_rows(frame_list),
-                           stringsAsFactor=FALSE))
-    }
-  }
   # fall back to base R
   do.call(rbind,frame_list)
 }
@@ -162,6 +156,8 @@ plapply <- function(workList,worker,parallelCluster) {
 #' @param weights numeric vector of data weights (no NA/NULL/NaN, all>0.0)
 #' @param numberOfHiddenDegrees optional scalar >= 0 number of additional modeling degrees of freedom to account for.
 #' @return significance estiamte and scaling.
+#' 
+#' @noRd
 linScore <- function(varName,xcol,ycol,weights,numberOfHiddenDegrees=0) {
   if(is.null(weights)) {
     weights <- 1.0+numeric(length(xcol))
@@ -223,10 +219,11 @@ linScore <- function(varName,xcol,ycol,weights,numberOfHiddenDegrees=0) {
 #' 
 #' @examples
 #' 
-#' d <- data.frame(y=c(1,1,0,0,1,1,0,0,1,1,1,1))
-#' d$x <- seq_len((nrow(d)))
-#' vtreat:::catScore('x',d$x,d$y,1,NULL)
+#' # d <- data.frame(y=c(1,1,0,0,1,1,0,0,1,1,1,1))
+#' # d$x <- seq_len((nrow(d)))
+#' # vtreat:::catScore('x',d$x,d$y,1,NULL)
 #' 
+#' @noRd
 catScore <- function(varName,x,yC,yTarget,weights,numberOfHiddenDegrees=0) {
   if(is.null(weights)) {
     weights <- rep(1.0, length(x))
@@ -280,5 +277,10 @@ catScore <- function(varName,x,yC,yTarget,weights,numberOfHiddenDegrees=0) {
              stringsAsFactors=FALSE)
 }
 
-
+vtreat_make_names <- function(nms_in) {
+  nms <- gsub("[^A-Za-z0-9]+", "_", nms_in)
+  nms <- make.names(nms, unique = TRUE, allow_ = TRUE)
+  nms <- gsub("[^A-Za-z0-9]+", "_", nms)
+  nms
+}
 

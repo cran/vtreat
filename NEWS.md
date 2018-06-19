@@ -1,15 +1,23 @@
 
-# vtreat 1.0.4 2017/05/05
+# vtreat 1.2.0 2018/06/19
+
+  * Translate treatment plans to rquery.
+  * Minor documentation improvements.
+  * Improve error messages on argument checking.
+  * Improve name generation (remove dots).
+  * Remove dplyr dependence.
+ 
+# vtreat 1.0.4 2018/05/05
 
   * Add data.table as an optional row-binder.
   * Declare an R version.
 
-# vtreat 1.0.3 2017/03/10
+# vtreat 1.0.3 2018/03/10
 
   * parallel indicator calculation.
   * add optional warning on encountering novel levels in prepare.
 
-# vtreat 1.0.2 2017/01/20
+# vtreat 1.0.2 2018/01/20
 
   * bind options.
   * fix deps.

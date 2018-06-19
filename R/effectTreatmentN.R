@@ -16,6 +16,26 @@
   pred
 }
 
+as_rquery.vtreat_can_num <- function(tstep, 
+                                       ...,
+                                       var_restriction) {
+  if(!requireNamespace("rquery", quietly = TRUE)) {
+    stop("vtreat::as_rquery.vtreat_can_num treatmentplan requires the rquery package")
+  }
+  wrapr::stop_if_dot_args(substitute(list(...)), "vtreat::as_rquery.vtreat_can_num")
+  if((!is.null(var_restriction)) && (!(tstep$newvars %in% var_restriction))) {
+    return(NULL)
+  }
+  args <- tstep$args
+  rquery_code_categorical(colname = tstep$origvar, 
+                          resname = tstep$newvars,
+                          coding_levels = names(args$scores),
+                          effect_values = args$scores,
+                          levRestriction = args$levRestriction,
+                          default_value = 0.0)
+}
+
+
 # build a numeric impact model
 # see: http://www.win-vector.com/blog/2012/07/modeling-trick-impact-coding-of-categorical-variables-with-many-levels/
 .mkCatNum <- function(origVarName,vcolin,rescol,smFactor,levRestriction,weights) {
@@ -26,7 +46,7 @@
   den <- tapply(weights,vcol,sum)
   scores <- as.list((num+smFactor*baseMean)/(den+smFactor)-baseMean)
   scores <- scores[names(scores)!='zap'] # don't let zap code
-  newVarName <- make.names(paste(origVarName,'catN',sep='_'))
+  newVarName <- vtreat_make_names(paste(origVarName,'catN',sep='_'))
   treatment <- list(origvar=origVarName,
                     newvars=newVarName,
                     f=.catNum,
@@ -40,7 +60,7 @@
   if(!.has.range.cn(pred)) {
     return(NULL)
   }
-  class(treatment) <- 'vtreatment'
+  class(treatment) <- c('vtreat_can_num', 'vtreatment')
   treatment$scales <- linScore(newVarName,pred,rescol,weights)
   if(treatment$scales$a <= 0) {
     return(NULL) # fitting a noise effect

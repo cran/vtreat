@@ -11,6 +11,25 @@
   treated
 }
 
+as_rquery.vtreat_pass_through <- function(tstep, 
+                                          ...,
+                                          var_restriction = NULL) {
+  if(!requireNamespace("rquery", quietly = TRUE)) {
+    stop("vtreat::as_rquery.vtreat_pass_through treatmentplan requires the rquery package")
+  }
+  wrapr::stop_if_dot_args(substitute(list(...)), "vtreat::as_rquery.vtreat_pass_through")
+  if((!is.null(var_restriction)) && (!(tstep$newvars %in% var_restriction))) {
+    return(NULL)
+  }
+  args <- tstep$args
+  list(
+    exprs = tstep$newvars %:=% paste0("ifelse(is.na(", tstep$origvar, "), ", args$nadist, ", ", tstep$origvar, ")"),
+    optree_generators = list(),
+    tables = list()
+  )
+}
+
+
 .mkPassThrough <- function(origVarName,xcol,ycol,zC,zTarget,weights,collarProb,catScaling) {
   xcol <- as.numeric(xcol)
   napositions <- .is.bad(xcol)
@@ -32,7 +51,7 @@
   if(max(xcol)<=min(xcol)) {
     return(c())
   }
-  newVarName <- make.names(paste(origVarName,'clean',sep='_'))
+  newVarName <- vtreat_make_names(paste(origVarName,'clean',sep='_'))
   treatment <- list(origvar=origVarName,
                     newvars=newVarName,
                     f=.passThrough,
@@ -41,7 +60,7 @@
                     treatmentCode='clean',
                     needsSplit=FALSE,
                     extraModelDegrees=0)
-  class(treatment) <- 'vtreatment'
+  class(treatment) <- c('vtreat_pass_through', 'vtreatment')
   if((!catScaling)||(is.null(zC))) {
     treatment$scales <- linScore(newVarName,xcol,ycol,weights)
   } else {

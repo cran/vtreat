@@ -15,6 +15,25 @@
   pred
 }
 
+as_rquery.vtreat_cat_Bayes <- function(tstep, 
+                                       ...,
+                                       var_restriction) {
+  if(!requireNamespace("rquery", quietly = TRUE)) {
+    stop("vtreat::as_rquery.vtreat_cat_Bayes treatmentplan requires the rquery package")
+  }
+  wrapr::stop_if_dot_args(substitute(list(...)), "vtreat::as_rquery.vtreat_cat_Bayes")
+  if((!is.null(var_restriction)) && (!(tstep$newvars %in% var_restriction))) {
+    return(NULL)
+  }
+  args <- tstep$args
+  rquery_code_categorical(colname = tstep$origvar, 
+                          resname = tstep$newvars,
+                          coding_levels = names(args$conditionalScore),
+                          effect_values = args$conditionalScore,
+                          levRestriction = args$levRestriction,
+                          default_value = 0.0)
+}
+
 .logit <- function(x) {
   log(x/(1-x))
 }
@@ -43,7 +62,7 @@
   conditionalScore <- as.list(conditionalScore)
   conditionalScore <- conditionalScore[names(conditionalScore)!='zap']  # don't let zap group code
   # fall back for novel levels, use zero impact
-  newVarName <- make.names(paste(origVarName,'catB',sep='_'))
+  newVarName <- vtreat_make_names(paste(origVarName,'catB',sep='_'))
   treatment <- list(origvar=origVarName,
                     newvars=newVarName,
                     f=.catBayes,
@@ -57,7 +76,7 @@
   if(!.has.range.cn(pred)) {
     return(NULL)
   }
-  class(treatment) <- 'vtreatment'
+  class(treatment) <- c('vtreat_cat_Bayes', 'vtreatment')
   if(!catScaling) {
     treatment$scales <- linScore(newVarName,pred,as.numeric(rescol==resTarget),weights)
   } else {
