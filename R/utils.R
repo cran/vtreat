@@ -26,7 +26,7 @@ plapply <- function(workList,worker,parallelCluster) {
     return(frame_list[[1]])
   }
   # see if a package can supply a fast method
-  if(isTRUE(getOption('vtreat.use_data.table_binding', FALSE))) {
+  if(isTRUE(getOption('vtreat.use_data.table_binding', TRUE))) {
     if(requireNamespace("data.table", quietly = TRUE)) {
       return(as.data.frame(data.table::rbindlist(frame_list),
                            stringsAsFactor=FALSE))
@@ -278,9 +278,9 @@ catScore <- function(varName,x,yC,yTarget,weights,numberOfHiddenDegrees=0) {
 }
 
 vtreat_make_names <- function(nms_in) {
-  nms <- gsub("[^A-Za-z0-9]+", "_", nms_in)
+  nms <- gsub("[^[:alnum:]]+", "_", nms_in)
   nms <- make.names(nms, unique = TRUE, allow_ = TRUE)
-  nms <- gsub("[^A-Za-z0-9]+", "_", nms)
+  nms <- gsub("[^[:alnum:]]+", "_", nms)
   nms
 }
 
