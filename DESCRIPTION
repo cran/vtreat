@@ -1,8 +1,8 @@
 Package: vtreat
 Type: Package
 Title: A Statistically Sound 'data.frame' Processor/Conditioner
-Version: 1.2.1
-Date: 2018-06-26
+Version: 1.2.2
+Date: 2018-07-04
 Authors@R: c(
     person("John", "Mount", email = "jmount@win-vector.com", role = c("aut", "cre")),
     person("Nina", "Zumel", email = "nzumel@win-vector.com", role = c("aut")),
@@ -28,9 +28,9 @@ VignetteBuilder: knitr
 RoxygenNote: 6.0.1
 ByteCompile: true
 NeedsCompilation: no
-Packaged: 2018-06-27 03:15:02 UTC; johnmount
+Packaged: 2018-07-04 14:45:19 UTC; johnmount
 Author: John Mount [aut, cre],
   Nina Zumel [aut],
   Win-Vector LLC [cph]
 Repository: CRAN
-Date/Publication: 2018-06-27 04:36:23 UTC
+Date/Publication: 2018-07-04 15:30:03 UTC
