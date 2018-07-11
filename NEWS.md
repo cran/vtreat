@@ -1,4 +1,9 @@
 
+# vtreat 1.2.3 2018/07/11
+
+  * Smooth catP novel levels scoring a bit.
+  * Fix check error on parallel::getDefaultCluster()
+  
 # vtreat 1.2.2 2018/07/04
 
   * Fix issue 19.
