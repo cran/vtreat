@@ -380,8 +380,8 @@ makekWayCrossValidationGroupedByColumn <- function(groupingColumnName) {
 #' and y is a numeric vector representing outcome (useful for outcome stratification).
 #' 
 #' Note that buildEvalSets may not always return a partition (such
-#' as one row dataframes), or if the user split function chooses to make rows eligable for
-#' applicaton a different number of times.
+#' as one row dataframes), or if the user split function chooses to make rows eligible for
+#' application a different number of times.
 #' 
 #' @param nRows scalar, >=1 number of rows to sample from.
 #' @param ... no additional arguments, declared to forced named binding of later arguments.
@@ -515,23 +515,24 @@ buildEvalSets <- function(nRows,...,
 
 # make a "cross frame" that is a frame where each treated row was treated only 
 # by a treatment plan not involving the given row
-.mkCrossFrame <- function(dframe,
-                          referenceTreatments,
-                          varlist,newVarsS,outcomename,zoY,
-                          zC,zTarget,
-                          weights,
-                          minFraction,smFactor,
-                          rareCount,rareSig,
-                          collarProb,
-                          codeRestriction,
-                          customCoders,
-                          scale,doCollar,
-                          splitFunction,nSplits,
-                          catScaling,
-                          ...,
-                          parallelCluster = NULL,
-                          use_parallel = TRUE,
-                          verbose = FALSE) {
+.mkCrossFrame <- function(
+  ...,
+  dframe,
+  referenceTreatments,
+  varlist, newVarsS, outcomename, zoY,
+  zC, zTarget,
+  weights,
+  minFraction, smFactor,
+  rareCount, rareSig,
+  collarProb,
+  codeRestriction,
+  customCoders,
+  scale, doCollar,
+  splitFunction, nSplits,
+  catScaling,
+  parallelCluster = NULL,
+  use_parallel = TRUE,
+  verbose = FALSE) {
   wrapr::stop_if_dot_args(substitute(list(...)), "vtreat::.mkCrossFrame")
   dsub <- dframe[,c(varlist,outcomename),drop=FALSE]
   # build a carve-up plan
@@ -552,18 +553,26 @@ buildEvalSets <- function(nRows,...,
       zCBuild <- zC[buildIndices]
     }
     wBuild <- weights[buildIndices]
-    ti <- .designTreatmentsXS(dsubiBuild,varlist,outcomename,zoYBuild,
-                              zCBuild,zTarget,
-                              wBuild,
-                              minFraction,smFactor,
-                              rareCount,rareSig,
-                              collarProb,
-                              codeRestriction, customCoders,
-                              TRUE,
-                              catScaling,
-                              verbose = verbose,
-                              parallelCluster = parallelCluster,
-                              use_parallel = use_parallel)
+    ti <- .designTreatmentsXS(
+      dframe = dsubiBuild,
+      varlist = varlist,
+      outcomename = outcomename,
+      zoY = zoYBuild,
+      zC = zCBuild,
+      zTarget = zTarget,
+      weights = wBuild,
+      minFraction = minFraction,
+      smFactor = smFactor,
+      rareCount = rareCount,
+      rareSig = rareSig,
+      collarProb = collarProb,
+      codeRestriction = codeRestriction, 
+      customCoders = customCoders,
+      justWantTreatments = TRUE,
+      catScaling = catScaling,
+      verbose = verbose,
+      parallelCluster = parallelCluster,
+      use_parallel = use_parallel)
     fi <- .vtreatList(ti,dsubiEval,newVarsS,
                       scale = scale,
                       doCollar = doCollar,

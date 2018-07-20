@@ -33,9 +33,9 @@ mkCrossFrameCExperiment(dframe, varlist, outcomename, outcometarget, ...,
 
 \item{rareSig}{optional numeric, suppress levels from pooling at this significance value greater.  Defaults to NULL or off.}
 
-\item{collarProb}{what fraction of the data (pseudo-probability) to collar data at if doCollar is set during \code{\link{prepare}}.}
+\item{collarProb}{what fraction of the data (pseudo-probability) to collar data at if doCollar is set during \code{\link{prepare.treatmentplan}}.}
 
-\item{codeRestriction}{what types of variables to produce (character array of level codes, NULL means no restiction).}
+\item{codeRestriction}{what types of variables to produce (character array of level codes, NULL means no restriction).}
 
 \item{customCoders}{map from code names to custom categorical variable encoding functions (please see \url{https://github.com/WinVector/vtreat/blob/master/extras/CustomLevelCoders.md}).}
 
@@ -47,7 +47,7 @@ mkCrossFrameCExperiment(dframe, varlist, outcomename, outcometarget, ...,
 
 \item{ncross}{optional scalar>=2 number of cross-validation rounds to design.}
 
-\item{forceSplit}{logical, if TRUE force cross-validated significance calculatons on all variables.}
+\item{forceSplit}{logical, if TRUE force cross-validated significance calculations on all variables.}
 
 \item{catScaling}{optional, if TRUE use glm() linkspace, if FALSE use lm() for scaling.}
 
@@ -88,5 +88,5 @@ dTrainV <- cC$crossFrame
 
 }
 \seealso{
-\code{\link{designTreatmentsC}} \code{\link{designTreatmentsN}} \code{\link{prepare}}
+\code{\link{designTreatmentsC}}, \code{\link{designTreatmentsN}}, \code{\link{prepare.treatmentplan}}
 }

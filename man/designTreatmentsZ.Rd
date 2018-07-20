@@ -4,7 +4,7 @@
 \alias{designTreatmentsZ}
 \title{Design variable treatments with no outcome variable.}
 \usage{
-designTreatmentsZ(dframe, varlist, ..., minFraction = 0.02, weights = c(),
+designTreatmentsZ(dframe, varlist, ..., minFraction = 0, weights = c(),
   rareCount = 0, collarProb = 0, codeRestriction = NULL,
   customCoders = NULL, verbose = TRUE, parallelCluster = NULL,
   use_parallel = TRUE)
@@ -22,9 +22,9 @@ designTreatmentsZ(dframe, varlist, ..., minFraction = 0.02, weights = c(),
 
 \item{rareCount}{optional integer, allow levels with this count or below to be pooled into a shared rare-level.  Defaults to 0 or off.}
 
-\item{collarProb}{what fraction of the data (pseudo-probability) to collar data at if doCollar is set during \code{\link{prepare}}.}
+\item{collarProb}{what fraction of the data (pseudo-probability) to collar data at if doCollar is set during \code{\link{prepare.treatmentplan}}.}
 
-\item{codeRestriction}{what types of variables to produce (character array of level codes, NULL means no restiction).}
+\item{codeRestriction}{what types of variables to produce (character array of level codes, NULL means no restriction).}
 
 \item{customCoders}{map from code names to custom categorical variable encoding functions (please see \url{https://github.com/WinVector/vtreat/blob/master/extras/CustomLevelCoders.md}).}
 
@@ -63,5 +63,5 @@ dTestZTreated <- prepare(treatmentsZ, dTestZ)
 
 }
 \seealso{
-\code{\link{prepare}} \code{\link{designTreatmentsC}} \code{\link{designTreatmentsN}}
+\code{\link{prepare.treatmentplan}}, \code{\link{designTreatmentsC}}, \code{\link{designTreatmentsN}}
 }
