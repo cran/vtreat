@@ -1,10 +1,17 @@
 
+# vtreat 1.3.1 2018/09/10
+
+ * Fix variable naming in multi class case.
+ * Some doc fixes.
+ * Start on NaN and Infinity on databases.
+ * More tests.
+
 # vtreat 1.3.0 2018/07/20
 
  * Fix z-split annotation issue.
  * Change designTreatmentsZ() defaults.
  * Documentation fixes.
- * Multiclass treatmetns vignette.
+ * Multiclass treatments.
  * Simple treatments.
  * Fix CRAN Note on pre 3.5.0 R parallel usage.
 

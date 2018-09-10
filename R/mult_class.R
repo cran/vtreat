@@ -22,10 +22,10 @@
 #' @param ncross optional scalar>=2 number of cross-validation rounds to design.
 #' @param forceSplit logical, if TRUE force cross-validated significance calculations on all variables.
 #' @param catScaling optional, if TRUE use glm() linkspace, if FALSE use lm() for scaling.
+#' @param y_dependent_treatments character what treatment types to build per-outcome level.
 #' @param verbose if TRUE print progress.
 #' @param parallelCluster (optional) a cluster object created by package parallel or package snow.
 #' @param use_parallel logical, if TRUE use parallel methods.
-#' @param y_dependent_treatments character what treatment types to build per-outcome level.
 #' @return list(cross_frame, treatments_0, treatments_m)
 #' 
 #' @seealso \code{\link{prepare.multinomial_plan}}
@@ -34,7 +34,6 @@
 #'
 mkCrossFrameMExperiment <- function(d, vars, y_name, 
                                     ...,
-                                    y_dependent_treatments = c("catB"),
                                     weights=c(),
                                     minFraction=0.02,smFactor=0.0,
                                     rareCount=0,rareSig=1,
@@ -45,6 +44,7 @@ mkCrossFrameMExperiment <- function(d, vars, y_name,
                                     splitFunction=NULL,ncross=3,
                                     forceSplit = FALSE,
                                     catScaling=FALSE,
+                                    y_dependent_treatments = c("catB"),
                                     verbose=FALSE,
                                     parallelCluster=NULL,
                                     use_parallel = TRUE) {
@@ -136,17 +136,17 @@ mkCrossFrameMExperiment <- function(d, vars, y_name,
            cross_frame_i = cross_frame_i,
            score_frame_i = score_frame_i)
     })
-  names(cfe_list) <- y_levels
+  names(cfe_list) <- NULL # make sure no names
   
   # build an overall cross-frame for training
   dy <- data.frame(y = as.character(d[[y_name]]),
                    stringsAsFactors = FALSE)
+  cbind_args <- c(list(prepare(treatments_0, d)),
+                  lapply(cfe_list, function(cfei) cfei$cross_frame_i),
+                  list(dy),
+                  stringsAsFactors = FALSE)
   cross_frame <- do.call(
-    cbind,
-    c(prepare(treatments_0, d),
-      lapply(cfe_list, function(cfei) cfei$cross_frame_i),
-      dy,
-      stringsAsFactors = FALSE))
+    cbind, cbind_args) 
   score_frame <- do.call(
     rbind, 
     lapply(cfe_list, function(cfei) cfei$score_frame_i))

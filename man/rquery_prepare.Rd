@@ -7,11 +7,13 @@
 \usage{
 rquery_prepare(db, rqplan, data_source, result_table_name, ...,
   extracols = NULL, temporary = FALSE, overwrite = TRUE,
-  print_rquery = FALSE, print_sql = FALSE)
+  attempt_nan_inf_mapping = FALSE, col_sample = NULL,
+  return_ops = FALSE)
 
 materialize_treated(db, rqplan, data_source, result_table_name, ...,
   extracols = NULL, temporary = FALSE, overwrite = TRUE,
-  print_rquery = FALSE, print_sql = FALSE)
+  attempt_nan_inf_mapping = FALSE, col_sample = NULL,
+  return_ops = FALSE)
 }
 \arguments{
 \item{db}{a db handle.}
@@ -30,9 +32,11 @@ materialize_treated(db, rqplan, data_source, result_table_name, ...,
 
 \item{overwrite}{logical, if TRUE try to overwrite result.}
 
-\item{print_rquery}{logical, if TRUE print the rquery ops.}
+\item{attempt_nan_inf_mapping}{logical, if TRUE attempt to map NaN and Infnity to NA/NULL (goot on PostgreSQL, not on Spark).}
 
-\item{print_sql}{logical, if TRUE print the SQL.}
+\item{col_sample}{sample of data to determine column types.}
+
+\item{return_ops}{logical, if TRUE return operator tree instead of materializing.}
 }
 \value{
 description of treated table.

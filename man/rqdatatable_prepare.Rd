@@ -5,8 +5,9 @@
 \title{Apply a treatment plan using rqdatatable.}
 \usage{
 rqdatatable_prepare(rqplan, data_source, ..., partition_column = NULL,
-  parallelCluster = NULL, use_parallel = use_parallel, extracols = NULL,
-  non_join_mapping = FALSE, print_rquery = FALSE, env = parent.frame())
+  parallelCluster = NULL, use_parallel = use_parallel,
+  extracols = NULL, non_join_mapping = FALSE, print_rquery = FALSE,
+  env = parent.frame())
 }
 \arguments{
 \item{rqplan}{an query plan produced by as_rquery_plan().}
@@ -33,8 +34,10 @@ rqdatatable_prepare(rqplan, data_source, ..., partition_column = NULL,
 treated data.
 }
 \description{
-Apply a treatment plan using rqdatatable.
+Note: does not treat map NaN or +-Infinity.  
+This function is only for timings and demonstration, not for production use.
 }
 \seealso{
 \code{\link{as_rquery_plan}}, \code{\link{rquery_prepare}}
 }
+\keyword{internal}
