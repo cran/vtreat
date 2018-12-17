@@ -125,7 +125,7 @@ makeCustomCoderNum <- function(customCode, coder, codeSeq,
   napositions <- .is.bad(xcol)
   nna <- sum(napositions)
   if(nna>=length(xcol)) {
-    return(c())
+    return(NULL)
   }
   if(is.null(weights)) {
     weights <- rep(1.0, length(vcolin))
@@ -133,8 +133,8 @@ makeCustomCoderNum <- function(customCode, coder, codeSeq,
   xNotNA <- xcol[!napositions]
   yNotNa <- zoY[!napositions]
   wNotNa <- weights[!napositions]
-  if(max(xcol)<=min(xcol)) {
-    return(c())
+  if(max(xNotNA)<=min(xNotNA)) {
+    return(NULL)
   }
   cuts <- c(min(xNotNA), max(xNotNA))
   if(sum(napositions)>0) {
@@ -164,7 +164,7 @@ makeCustomCoderNum <- function(customCode, coder, codeSeq,
   }
   d <- data.frame(x = xcol,
                   pred = scores)
-  # TODO: weighted version
+  # TODO: weighted version 
   agg <- aggregate(pred~x, data=d, mean)
   predXs <- agg$x
   if(length(predXs)<=1) {
@@ -174,6 +174,12 @@ makeCustomCoderNum <- function(customCode, coder, codeSeq,
   ord <- order(agg$x)
   predXs <- predXs[ord]
   predYs <- predYs[ord]
+  # sample down
+  if(length(predXs)>10000) {
+    idxs <- seq(1, length(predXs)) 
+    predXs <- predXs[idxs]
+    predYs <- predYs[idxs]
+  }
   newVarName <- vtreat_make_names(paste(v, customCode, sep='_'))
   treatment <- list(origvar=v,
                     newvars=newVarName,

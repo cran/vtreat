@@ -12,7 +12,7 @@
 
 <meta name="author" content="John Mount, Nina Zumel" />
 
-<meta name="date" content="2018-11-05" />
+<meta name="date" content="2018-12-17" />
 
 <title>vtreat cross frames</title>
 
@@ -70,7 +70,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">vtreat cross frames</h1>
 <h4 class="author"><em>John Mount, Nina Zumel</em></h4>
-<h4 class="date"><em>2018-11-05</em></h4>
+<h4 class="date"><em>2018-12-17</em></h4>
 
 
 
@@ -117,45 +117,53 @@ treatments &lt;-<span class="st"> </span>vtreat<span class="op">::</span><span c
                                         <span class="st">'y'</span>,<span class="ot">TRUE</span>,
   <span class="dt">rareCount=</span><span class="dv">0</span> <span class="co"># Note: usually want rareCount&gt;0, setting to zero to illustrate problem</span>
 )</code></pre></div>
-<pre><code>## [1] &quot;vtreat 1.3.2 inspecting inputs Mon Nov  5 09:26:32 2018&quot;
-## [1] &quot;designing treatments Mon Nov  5 09:26:32 2018&quot;
-## [1] &quot; have initial level statistics Mon Nov  5 09:26:32 2018&quot;
-## [1] &quot; scoring treatments Mon Nov  5 09:26:32 2018&quot;
-## [1] &quot;have treatment plan Mon Nov  5 09:26:33 2018&quot;
-## [1] &quot;rescoring complex variables Mon Nov  5 09:26:33 2018&quot;
-## [1] &quot;done rescoring complex variables Mon Nov  5 09:26:33 2018&quot;</code></pre>
+<pre><code>## [1] &quot;vtreat 1.3.3 inspecting inputs Mon Dec 17 09:53:18 2018&quot;
+## [1] &quot;designing treatments Mon Dec 17 09:53:18 2018&quot;
+## [1] &quot; have initial level statistics Mon Dec 17 09:53:18 2018&quot;
+## [1] &quot; scoring treatments Mon Dec 17 09:53:18 2018&quot;
+## [1] &quot;have treatment plan Mon Dec 17 09:53:18 2018&quot;
+## [1] &quot;rescoring complex variables Mon Dec 17 09:53:18 2018&quot;
+## [1] &quot;done rescoring complex variables Mon Dec 17 09:53:18 2018&quot;</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dTrainTreated &lt;-<span class="st"> </span>vtreat<span class="op">::</span><span class="kw">prepare</span>(treatments,dTrain,
   <span class="dt">pruneSig=</span><span class="kw">c</span>() <span class="co"># Note: usually want pruneSig to be a small fraction, setting to null to illustrate problems</span>
 )
-m1 &lt;-<span class="st"> </span><span class="kw">glm</span>(y<span class="op">~</span>xBad1_catB <span class="op">+</span><span class="st"> </span>xBad2_catB <span class="op">+</span><span class="st"> </span>xBad3_catB <span class="op">+</span><span class="st"> </span>xGood1_clean <span class="op">+</span><span class="st"> </span>xGood2_clean,
+
+f &lt;-<span class="st"> </span>wrapr<span class="op">::</span><span class="kw">mk_formula</span>(<span class="st">&quot;y&quot;</span>, treatments<span class="op">$</span>scoreFrame<span class="op">$</span>varName)
+<span class="kw">print</span>(f)</code></pre></div>
+<pre><code>## y ~ xBad1_catP + xBad1_catB + xBad2_catP + xBad2_catB + xBad3_catP + 
+##     xBad3_catB + xGood1 + xGood2
+## &lt;environment: base&gt;</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">m1 &lt;-<span class="st"> </span><span class="kw">glm</span>(f,
           <span class="dt">data=</span>dTrainTreated,<span class="dt">family=</span><span class="kw">binomial</span>(<span class="dt">link=</span><span class="st">'logit'</span>))</code></pre></div>
 <pre><code>## Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">print</span>(<span class="kw">summary</span>(m1))  <span class="co"># notice low residual deviance</span></code></pre></div>
 <pre><code>## 
 ## Call:
-## glm(formula = y ~ xBad1_catB + xBad2_catB + xBad3_catB + xGood1_clean + 
-##     xGood2_clean, family = binomial(link = &quot;logit&quot;), data = dTrainTreated)
+## glm(formula = f, family = binomial(link = &quot;logit&quot;), data = dTrainTreated)
 ## 
 ## Deviance Residuals: 
 ##      Min        1Q    Median        3Q       Max  
-## -2.32190  -0.00014   0.00000   0.00001   2.32399  
+## -2.40374  -0.00038  -0.00001   0.00002   2.47736  
 ## 
 ## Coefficients:
-##              Estimate Std. Error z value Pr(&gt;|z|)    
-## (Intercept)   -0.5794     0.3284  -1.764 0.077698 .  
-## xBad1_catB     1.0987     0.3627   3.029 0.002454 ** 
-## xBad2_catB     0.9302     0.3058   3.042 0.002349 ** 
-## xBad3_catB     1.5057     0.4468   3.370 0.000752 ***
-## xGood1_clean   0.8404     0.2619   3.209 0.001334 ** 
-## xGood2_clean   0.8254     0.2854   2.892 0.003823 ** 
+##              Estimate Std. Error z value Pr(&gt;|z|)   
+## (Intercept)    2.0555     1.6233   1.266  0.20543   
+## xBad1_catP  -134.1696   398.7304  -0.336  0.73650   
+## xBad1_catB     0.9509     0.3034   3.134  0.00173 **
+## xBad2_catP  -310.2310   386.8597  -0.802  0.42260   
+## xBad2_catB     0.9663     0.3178   3.041  0.00236 **
+## xBad3_catP  -635.5629   341.6498  -1.860  0.06285 . 
+## xBad3_catB     1.2120     0.4255   2.849  0.00439 **
+## xGood1         0.8381     0.2702   3.102  0.00192 **
+## xGood2         0.9379     0.3017   3.109  0.00188 **
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
 ## (Dispersion parameter for binomial family taken to be 1)
 ## 
 ##     Null deviance: 1724.55  on 1331  degrees of freedom
-## Residual deviance:  114.93  on 1326  degrees of freedom
-## AIC: 126.93
+## Residual deviance:  110.93  on 1323  degrees of freedom
+## AIC: 128.93
 ## 
 ## Number of Fisher Scoring iterations: 12</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dTrain<span class="op">$</span>predM1 &lt;-<span class="st"> </span><span class="kw">predict</span>(m1,<span class="dt">newdata=</span>dTrainTreated,<span class="dt">type=</span><span class="st">'response'</span>)
@@ -163,18 +171,18 @@ m1 &lt;-<span class="st"> </span><span class="kw">glm</span>(y<span class="op">~
 <pre><code>## [1] &quot;model1 on train&quot;
 ##        pred
 ## truth   FALSE TRUE
-##   FALSE   850   16
+##   FALSE   849   17
 ##   TRUE      7  459
-## [1] &quot;accuracy 0.982732732732733&quot;</code></pre>
+## [1] &quot;accuracy 0.981981981981982&quot;</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dTestTreated &lt;-<span class="st"> </span>vtreat<span class="op">::</span><span class="kw">prepare</span>(treatments,dTest,<span class="dt">pruneSig=</span><span class="kw">c</span>())
 dTest<span class="op">$</span>predM1 &lt;-<span class="st"> </span><span class="kw">predict</span>(m1,<span class="dt">newdata=</span>dTestTreated,<span class="dt">type=</span><span class="st">'response'</span>)
 <span class="kw">plotRes</span>(dTest,<span class="st">'predM1'</span>,<span class="st">'y'</span>,<span class="st">'model1 on test'</span>)</code></pre></div>
 <pre><code>## [1] &quot;model1 on test&quot;
 ##        pred
 ## truth   FALSE TRUE
-##   FALSE   316  158
-##   TRUE    134   60
-## [1] &quot;accuracy 0.562874251497006&quot;</code></pre>
+##   FALSE   281  193
+##   TRUE    119   75
+## [1] &quot;accuracy 0.532934131736527&quot;</code></pre>
 <p>Notice above that we see a training accuracy of 98% and a test accuracy of 60%. Also notice the downstream model (the <code>glm</code>) erroneously thinks the <code>xBad?_cat</code> variables are significant (due to the large number of degrees of freedom hidden from the downstream model by the <a href="http://www.win-vector.com/blog/2012/07/modeling-trick-impact-coding-of-categorical-variables-with-many-levels/">impact/effect coding</a>).</p>
 </div>
 <div id="the-right-way-a-calibration-set" class="section level2">
@@ -192,13 +200,13 @@ treatments &lt;-<span class="st"> </span>vtreat<span class="op">::</span><span c
                                         <span class="st">'y'</span>,<span class="ot">TRUE</span>,
   <span class="dt">rareCount=</span><span class="dv">0</span> <span class="co"># Note: usually want rareCount&gt;0, setting to zero to illustrate problem</span>
 )</code></pre></div>
-<pre><code>## [1] &quot;vtreat 1.3.2 inspecting inputs Mon Nov  5 09:26:33 2018&quot;
-## [1] &quot;designing treatments Mon Nov  5 09:26:33 2018&quot;
-## [1] &quot; have initial level statistics Mon Nov  5 09:26:33 2018&quot;
-## [1] &quot; scoring treatments Mon Nov  5 09:26:33 2018&quot;
-## [1] &quot;have treatment plan Mon Nov  5 09:26:33 2018&quot;
-## [1] &quot;rescoring complex variables Mon Nov  5 09:26:33 2018&quot;
-## [1] &quot;done rescoring complex variables Mon Nov  5 09:26:33 2018&quot;</code></pre>
+<pre><code>## [1] &quot;vtreat 1.3.3 inspecting inputs Mon Dec 17 09:53:18 2018&quot;
+## [1] &quot;designing treatments Mon Dec 17 09:53:18 2018&quot;
+## [1] &quot; have initial level statistics Mon Dec 17 09:53:18 2018&quot;
+## [1] &quot; scoring treatments Mon Dec 17 09:53:18 2018&quot;
+## [1] &quot;have treatment plan Mon Dec 17 09:53:18 2018&quot;
+## [1] &quot;rescoring complex variables Mon Dec 17 09:53:18 2018&quot;
+## [1] &quot;done rescoring complex variables Mon Dec 17 09:53:18 2018&quot;</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dTrainTreated &lt;-<span class="st"> </span>vtreat<span class="op">::</span><span class="kw">prepare</span>(treatments,dTrain,
   <span class="dt">pruneSig=</span>pruneSig)
 newvars &lt;-<span class="st"> </span><span class="kw">setdiff</span>(<span class="kw">colnames</span>(dTrainTreated),<span class="st">'y'</span>)
@@ -215,10 +223,10 @@ m1 &lt;-<span class="st"> </span><span class="kw">glm</span>(<span class="kw">pa
 ## -1.5225  -0.9198  -0.6951   1.1703   2.2995  
 ## 
 ## Coefficients:
-##              Estimate Std. Error z value Pr(&gt;|z|)    
-## (Intercept)  -0.69527    0.08873  -7.836 4.65e-15 ***
-## xGood1_clean  0.39514    0.08537   4.629 3.68e-06 ***
-## xGood2_clean  0.55134    0.09580   5.755 8.66e-09 ***
+##             Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept) -0.69527    0.08873  -7.836 4.65e-15 ***
+## xGood1       0.39514    0.08537   4.629 3.68e-06 ***
+## xGood2       0.55134    0.09580   5.755 8.66e-09 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
@@ -297,9 +305,9 @@ prep &lt;-<span class="st"> </span>vtreat<span class="op">::</span><span class="
            <span class="st">'y'</span>,<span class="ot">TRUE</span>,
            <span class="dt">rareCount=</span><span class="dv">0</span> <span class="co"># Note: usually want rareCount&gt;0, setting to zero to illustrate problems</span>
 )</code></pre></div>
-<pre><code>## [1] &quot;vtreat 1.3.2 start initial treatment design Mon Nov  5 09:26:33 2018&quot;
-## [1] &quot; start cross frame work Mon Nov  5 09:26:34 2018&quot;
-## [1] &quot; vtreat::mkCrossFrameCExperiment done Mon Nov  5 09:26:34 2018&quot;</code></pre>
+<pre><code>## [1] &quot;vtreat 1.3.3 start initial treatment design Mon Dec 17 09:53:18 2018&quot;
+## [1] &quot; start cross frame work Mon Dec 17 09:53:19 2018&quot;
+## [1] &quot; vtreat::mkCrossFrameCExperiment done Mon Dec 17 09:53:19 2018&quot;</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">treatments &lt;-<span class="st"> </span>prep<span class="op">$</span>treatments
 
 knitr<span class="op">::</span><span class="kw">kable</span>(treatments<span class="op">$</span>scoreFrame[,<span class="kw">c</span>(<span class="st">'varName'</span>,<span class="st">'sig'</span>)])</code></pre></div>
@@ -336,19 +344,18 @@ knitr<span class="op">::</span><span class="kw">kable</span>(treatments<span cla
 <td align="right">0.1103321</td>
 </tr>
 <tr class="odd">
-<td align="left">xGood1_clean</td>
+<td align="left">xGood1</td>
 <td align="right">0.0000000</td>
 </tr>
 <tr class="even">
-<td align="left">xGood2_clean</td>
+<td align="left">xGood2</td>
 <td align="right">0.0000000</td>
 </tr>
 </tbody>
 </table>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">colnames</span>(prep<span class="op">$</span>crossFrame)</code></pre></div>
-<pre><code>## [1] &quot;xBad1_catP&quot;   &quot;xBad1_catB&quot;   &quot;xBad2_catP&quot;   &quot;xBad2_catB&quot;  
-## [5] &quot;xBad3_catP&quot;   &quot;xBad3_catB&quot;   &quot;xGood1_clean&quot; &quot;xGood2_clean&quot;
-## [9] &quot;y&quot;</code></pre>
+<pre><code>## [1] &quot;xBad1_catP&quot; &quot;xBad1_catB&quot; &quot;xBad2_catP&quot; &quot;xBad2_catB&quot; &quot;xBad3_catP&quot;
+## [6] &quot;xBad3_catB&quot; &quot;xGood1&quot;     &quot;xGood2&quot;     &quot;y&quot;</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># vtreat::mkCrossFrameCExperiment doesn't take a pruneSig argument, but we can</span>
 <span class="co"># prune on our own.</span>
 <span class="kw">print</span>(pruneSig)</code></pre></div>
@@ -358,8 +365,7 @@ knitr<span class="op">::</span><span class="kw">kable</span>(treatments<span cla
 <span class="co"># in that things go well in the cross-frame even if they sneak past pruning</span>
 newvars &lt;-<span class="st"> </span><span class="kw">sort</span>(<span class="kw">union</span>(newvars,<span class="kw">c</span>(<span class="st">&quot;xBad1_catB&quot;</span>,<span class="st">&quot;xBad2_catB&quot;</span>,<span class="st">&quot;xBad3_catB&quot;</span>)))
 <span class="kw">print</span>(newvars)</code></pre></div>
-<pre><code>## [1] &quot;xBad1_catB&quot;   &quot;xBad2_catB&quot;   &quot;xBad3_catB&quot;   &quot;xGood1_clean&quot;
-## [5] &quot;xGood2_clean&quot;</code></pre>
+<pre><code>## [1] &quot;xBad1_catB&quot; &quot;xBad2_catB&quot; &quot;xBad3_catB&quot; &quot;xGood1&quot;     &quot;xGood2&quot;</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dTrainTreated &lt;-<span class="st"> </span>prep<span class="op">$</span>crossFrame</code></pre></div>
 <p>We ensured the undesirable <code>xBad*_catB</code> variables back in to demonstrate that even if they sneak past a lose <code>pruneSig</code>, the crossframe lets the downstream model deal with them correctly. To ensure more consistent filtering of the complicated variables one can increase the <code>ncross</code> argument in <code>vtreat::mkCrossFrameCExperiment</code>/<code>vtreat::mkCrossFrameNExperiment</code>.</p>
 <p>Now we fit the model to <em>the cross-frame</em> rather than to <code>prepare(treatments, dTrain)</code> (the treated training data).</p>
@@ -376,13 +382,13 @@ newvars &lt;-<span class="st"> </span><span class="kw">sort</span>(<span class="
 ## -1.6624  -0.9170  -0.6663   1.1747   2.2971  
 ## 
 ## Coefficients:
-##               Estimate Std. Error z value Pr(&gt;|z|)    
-## (Intercept)  -0.687112   0.065340 -10.516  &lt; 2e-16 ***
-## xBad1_catB    0.007962   0.009466   0.841    0.400    
-## xBad2_catB   -0.014104   0.009579  -1.472    0.141    
-## xBad3_catB    0.014359   0.009331   1.539    0.124    
-## xGood1_clean  0.405918   0.061888   6.559 5.42e-11 ***
-## xGood2_clean  0.570827   0.064946   8.789  &lt; 2e-16 ***
+##              Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept) -0.687112   0.065340 -10.516  &lt; 2e-16 ***
+## xBad1_catB   0.007962   0.009466   0.841    0.400    
+## xBad2_catB  -0.014104   0.009579  -1.472    0.141    
+## xBad3_catB   0.014359   0.009331   1.539    0.124    
+## xGood1       0.405918   0.061888   6.559 5.42e-11 ***
+## xGood2       0.570827   0.064946   8.789  &lt; 2e-16 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
@@ -410,8 +416,8 @@ knitr<span class="op">::</span><span class="kw">kable</span>(<span class="kw">he
 <th align="right">xBad1_catB</th>
 <th align="right">xBad2_catB</th>
 <th align="right">xBad3_catB</th>
-<th align="right">xGood1_clean</th>
-<th align="right">xGood2_clean</th>
+<th align="right">xGood1</th>
+<th align="right">xGood2</th>
 <th align="left">y</th>
 </tr>
 </thead>

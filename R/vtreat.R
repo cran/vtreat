@@ -548,8 +548,8 @@ prepare <- function(treatmentplan, dframe,
 #' dTestC <- data.frame(x= c('a','b','c',NA),
 #'                      z= c(10,20,30,NA))
 #' treatmentsC <- designTreatmentsC(dTrainC, colnames(dTrainC),'y',TRUE)
-#' dTrainCTreated <- prepare(treatmentsC, dTrainC, varRestriction= c('z_clean'))
-#' dTestCTreated <- prepare(treatmentsC, dTestC, varRestriction= c('z_clean'))
+#' dTrainCTreated <- prepare(treatmentsC, dTrainC)
+#' dTestCTreated <- prepare(treatmentsC, dTestC)
 #'
 #' dTrainZ <- data.frame(x= c('a','a','a','b','b','b'),
 #'                       z= c(1,2,3,4,5,6))
@@ -573,7 +573,7 @@ prepare.treatmentplan <- function(treatmentplan, dframe,
                                   use_parallel= TRUE) {
   wrapr::stop_if_dot_args(substitute(list(...)), "vtreat::prepare")
   .checkArgs1(dframe=dframe)
-  if(class(treatmentplan)!='treatmentplan') {
+  if(!('treatmentplan' %in% class(treatmentplan))) {
     stop("treatmentplan must be of class treatmentplan")
   }
   vtreatVersion <- packageVersion('vtreat')
@@ -628,15 +628,18 @@ prepare.treatmentplan <- function(treatmentplan, dframe,
   if(length(useableVars)<=0) {
     stop('no useable vars')
   }
+  vars_we_warned_on <- list()
   for(ti in treatmentplan$treatments) {
     if(length(intersect(ti$newvars,useableVars))>0) {
-      newType <- typeof(dframe[[ti$origvar]])
-      newClass <- paste(class(dframe[[ti$origvar]]))
+      newType <- paste(typeof(dframe[[ti$origvar]]), collapse = " ")
+      newClass <- paste(class(dframe[[ti$origvar]]), collapse = " ")
       if((ti$origType!=newType) || (ti$origClass!=newClass)) {
-        warning(paste('variable',ti$origvar,'expected type/class',
-                      ti$origType,ti$origClass,
-                      'saw ',newType,newClass))
-        
+        if(is.null(vars_we_warned_on[[ti$origvar]])) {
+          warning(paste('variable',ti$origvar,'expected type/class',
+                        ti$origType,ti$origClass,
+                        'saw ',newType,newClass))
+          vars_we_warned_on[ti$origvar] <- 1
+        }
       }
     }
   }
