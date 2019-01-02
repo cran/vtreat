@@ -44,7 +44,10 @@ makeCustomCoder <- function(customCode, coder, codeSeq,
     },
     error = function(e) { warning(e) }
   )
-  if(is.null(scores) || (!is.numeric(scores)) || (length(scores)!=length(vcol))) {
+  if(is.null(scores)) {
+    return(NULL)
+  }
+  if((!is.numeric(scores)) || (length(scores)!=length(vcol))) {
     scores <- rep(0.0, length(vcol))
   } else {
     if('center' %in% codeSeq) {
@@ -94,13 +97,26 @@ makeCustomCoder <- function(customCode, coder, codeSeq,
   naposns <- .is.bad(treated)
   treated[naposns] <- args$missingValueCode
   if(sum(!naposns)>0) {
-    xg <- pmax(min(args$predXs), pmin(max(args$predXs), col[!naposns]))
+    xg <- pmax(args$minX, pmin(args$maxX, col[!naposns]))
     if(doCollar) {
       xg <- pmax(min(args$cuts), pmin(max(args$cuts), xg))
     }
-    treated[!naposns]  <- stats::approx(x=args$predXs, y=args$predYs, 
-                                        xout= xg)$y
+    eval_fn <- args$eval_fn
+    if(!is.null(eval_fn)) {
+      treated[!naposns] <- eval_fn(xg)
+    } else {
+      method <- args$method
+      if(is.null(method)) {
+        method <- "linear"
+      }
+      treated[!naposns] <- stats::approx(x = args$predXs, 
+                                         y = args$predYs, 
+                                         xout = xg,
+                                         method = method, 
+                                         rule = 2)$y
+    }
   }
+  treated <- as.numeric(treated) # strip any attributes
   fails <- .is.bad(treated)
   if(any(fails)) {
     treated[fails] <- args$missingValueCode
@@ -131,6 +147,8 @@ makeCustomCoderNum <- function(customCode, coder, codeSeq,
     weights <- rep(1.0, length(vcolin))
   }
   xNotNA <- xcol[!napositions]
+  minX <- min(xNotNA)
+  maxX <- max(xNotNA)
   yNotNa <- zoY[!napositions]
   wNotNa <- weights[!napositions]
   if(max(xNotNA)<=min(xNotNA)) {
@@ -154,40 +172,58 @@ makeCustomCoderNum <- function(customCode, coder, codeSeq,
     },
     error = function(e) { warning(e) }
   )
-  if(is.null(scores) || (!is.numeric(scores)) || (length(scores)!=length(xcol))) {
-    scores <- rep(0.0, length(xcol))
-  } else {
-    if('center' %in% codeSeq) {
-      # shift scores to be mean zero with respect to weights
-      scores <- scores -  sum(scores*wNotNa)/sum(wNotNa)
-    }
-  }
-  d <- data.frame(x = xcol,
-                  pred = scores)
-  # TODO: weighted version 
-  agg <- aggregate(pred~x, data=d, mean)
-  predXs <- agg$x
-  if(length(predXs)<=1) {
+  if(is.null(scores)) {
     return(NULL)
   }
-  predYs <- as.numeric(agg$pred)
-  ord <- order(agg$x)
-  predXs <- predXs[ord]
-  predYs <- predYs[ord]
-  # sample down
-  if(length(predXs)>10000) {
-    idxs <- seq(1, length(predXs)) 
-    predXs <- predXs[idxs]
-    predYs <- predYs[idxs]
+  method <- attr(scores, "method")
+  if(is.null(method)) {
+    method <- "linear"
+  }
+  approx_table <- NULL
+  predXs <- NULL
+  predYs <- NULL
+  eval_fn <- attr(scores, "eval_fn")
+  if(is.null(eval_fn)) {
+    approx_table <- attr(scores, "approx_table")
+    if(!is.null(approx_table)) {
+      predXs <- approx_table$predXs
+      predYs <- approx_table$predYs
+    } else {
+      if((!is.numeric(scores)) || (length(scores)!=length(xcol))) {
+        return(NULL)
+      }
+      d <- data.frame(x = xcol,
+                      pred = scores)
+      # TODO: weighted version 
+      agg <- aggregate(pred~x, data=d, mean)
+      predXs <- agg$x
+      if(length(predXs)<=1) {
+        return(NULL)
+      }
+      predYs <- as.numeric(agg$pred)
+      ord <- order(agg$x)
+      predXs <- predXs[ord]
+      predYs <- predYs[ord]
+      # sample down
+      if(length(predXs)>10000) {
+        idxs <- sort(unique(c(1, round(seq(1, length(predXs), length.out=10000)), length(predXs))))
+        predXs <- predXs[idxs]
+        predYs <- predYs[idxs]
+      }
+    }
   }
   newVarName <- vtreat_make_names(paste(v, customCode, sep='_'))
   treatment <- list(origvar=v,
                     newvars=newVarName,
                     f=.customCodeNum,
-                    args=list(predXs=predXs,
-                              predYs=predYs,
-                              cuts=cuts,
-                              missingValueCode=missingValueCode),
+                    args=list(minX = minX,
+                              maxX = maxX,
+                              predXs = predXs,
+                              predYs = predYs,
+                              eval_fn = eval_fn,
+                              method = method,
+                              cuts = cuts,
+                              missingValueCode = missingValueCode),
                     treatmentName=paste('Custom Code:', customCode),
                     treatmentCode=customCode,
                     needsSplit=TRUE,
