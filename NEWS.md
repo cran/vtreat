@@ -1,4 +1,13 @@
 
+# vtreat 1.3.5 2019/01/27
+
+ * Make categorical scoring default TRUE.
+ * logit-ize custom coders.
+ * spline custom coder.
+ * Get stricter about row ordering in building custom coders.
+ * neaten up printing a bit.
+ * Collar spline and lower its complexity.
+ 
 # vtreat 1.3.4 2019/01/02
 
  * Accept pre-built approximation tables from numeric custom coders.

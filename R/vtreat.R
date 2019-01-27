@@ -81,7 +81,9 @@ print.vtreatment <- function(x, ...) {
 
 #' @export
 format.treatmentplan <- function(x, ...) { 
-  format(x$scoreFrame)
+  format(x$scoreFrame[ , 
+                       c('origName', 'code', 'rsq', 'sig', 'extraModelDegrees'), 
+                       drop = FALSE])
 }
 
 #' @export
@@ -156,7 +158,8 @@ print.treatmentplan <- function(x, ...) {
 #' dTestCTreated <- prepare(treatmentsC,dTestC,pruneSig=0.99)
 #' 
 #' @export
-designTreatmentsC <- function(dframe,varlist,outcomename,outcometarget,
+designTreatmentsC <- function(dframe,varlist,
+                              outcomename,outcometarget,
                               ...,
                               weights=c(),
                               minFraction=0.02,smFactor=0.0,
@@ -166,7 +169,7 @@ designTreatmentsC <- function(dframe,varlist,outcomename,outcometarget,
                               customCoders=NULL, 
                               splitFunction=NULL,ncross=3,
                               forceSplit=FALSE,
-                              catScaling=FALSE,
+                              catScaling=TRUE,
                               verbose=TRUE,
                               parallelCluster=NULL,
                               use_parallel= TRUE) {
@@ -724,7 +727,7 @@ mkCrossFrameCExperiment <- function(dframe,varlist,
                                     scale=FALSE,doCollar=FALSE,
                                     splitFunction=NULL,ncross=3,
                                     forceSplit = FALSE,
-                                    catScaling=FALSE,
+                                    catScaling=TRUE,
                                     verbose= TRUE,
                                     parallelCluster=NULL,
                                     use_parallel = TRUE) {

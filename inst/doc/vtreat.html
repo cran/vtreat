@@ -12,7 +12,7 @@
 
 <meta name="author" content="John Mount, Nina Zumel" />
 
-<meta name="date" content="2019-01-02" />
+<meta name="date" content="2019-01-27" />
 
 <title>vtreat package</title>
 
@@ -70,7 +70,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">vtreat package</h1>
 <h4 class="author"><em>John Mount, Nina Zumel</em></h4>
-<h4 class="date"><em>2019-01-02</em></h4>
+<h4 class="date"><em>2019-01-27</em></h4>
 
 
 
@@ -137,43 +137,35 @@ dTrainC &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span c
 ## 3    c 30
 ## 4 &lt;NA&gt; NA</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">treatmentsC &lt;-<span class="st"> </span><span class="kw">designTreatmentsC</span>(dTrainC,<span class="kw">colnames</span>(dTrainC),<span class="st">'y'</span>,<span class="ot">TRUE</span>)</code></pre></div>
-<pre><code>## [1] &quot;vtreat 1.3.4 inspecting inputs Wed Jan  2 08:32:36 2019&quot;
-## [1] &quot;designing treatments Wed Jan  2 08:32:36 2019&quot;
-## [1] &quot; have initial level statistics Wed Jan  2 08:32:36 2019&quot;
-## [1] &quot; scoring treatments Wed Jan  2 08:32:36 2019&quot;
-## [1] &quot;have treatment plan Wed Jan  2 08:32:36 2019&quot;
-## [1] &quot;rescoring complex variables Wed Jan  2 08:32:36 2019&quot;
-## [1] &quot;done rescoring complex variables Wed Jan  2 08:32:36 2019&quot;</code></pre>
+<pre><code>## [1] &quot;vtreat 1.3.5 inspecting inputs Sun Jan 27 09:51:59 2019&quot;
+## [1] &quot;designing treatments Sun Jan 27 09:51:59 2019&quot;
+## [1] &quot; have initial level statistics Sun Jan 27 09:51:59 2019&quot;
+## [1] &quot; scoring treatments Sun Jan 27 09:51:59 2019&quot;
+## [1] &quot;have treatment plan Sun Jan 27 09:51:59 2019&quot;
+## [1] &quot;rescoring complex variables Sun Jan 27 09:51:59 2019&quot;
+## [1] &quot;done rescoring complex variables Sun Jan 27 09:51:59 2019&quot;</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">print</span>(treatmentsC)</code></pre></div>
-<pre><code>##     varName varMoves        rsq        sig needsSplit extraModelDegrees
-## 1    x_catP     TRUE 0.54085208 0.03392101       TRUE                 2
-## 2    x_catB     TRUE 0.00000000 1.00000000       TRUE                 2
-## 3         z     TRUE 0.25792985 0.14299775      FALSE                 0
-## 4   z_isBAD     TRUE 0.19087450 0.20766228      FALSE                 0
-## 5  x_lev_NA     TRUE 0.19087450 0.20766228      FALSE                 0
-## 6 x_lev_x_a     TRUE 0.08170417 0.40972582      FALSE                 0
-## 7 x_lev_x_b     TRUE 0.00000000 1.00000000      FALSE                 0
-##   origName  code
-## 1        x  catP
-## 2        x  catB
-## 3        z clean
-## 4        z isBAD
-## 5        x   lev
-## 6        x   lev
-## 7        x   lev</code></pre>
+<pre><code>##   origName  code        rsq       sig extraModelDegrees
+## 1        x  catP 0.24340634 0.1547700                 2
+## 2        x  catB 0.05070201 0.5160763                 2
+## 3        z clean 0.25792985 0.1429977                 0
+## 4        z isBAD 0.19087450 0.2076623                 0
+## 5        x   lev 0.19087450 0.2076623                 0
+## 6        x   lev 0.08170417 0.4097258                 0
+## 7        x   lev 0.00000000 1.0000000                 0</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">print</span>(treatmentsC<span class="op">$</span>treatments[[<span class="dv">1</span>]])</code></pre></div>
 <pre><code>## [1] &quot;vtreat 'Categoric Indicators'('x'(integer,factor)-&gt;character-&gt;'x_lev_NA','x_lev_x_a','x_lev_x_b')&quot;</code></pre>
 <p>Here we demonstrate the optional scaling feature of <code>prepare()</code>, which scales and centers all significant variables to mean 0, and slope 1 with respect to y: In other words, it re-scales the variables to “y-units”. This is useful for downstream principal components analysis. Note: variables perfectly uncorrelated with y necessarily have slope 0 and can’t be “scaled” to slope 1, however for the same reason these variables will be insignificant and can be pruned by pruneSig.</p>
 <p><code>scale=FALSE</code> by default.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dTrainCTreated &lt;-<span class="st"> </span><span class="kw">prepare</span>(treatmentsC,dTrainC,<span class="dt">pruneSig=</span><span class="kw">c</span>(),<span class="dt">scale=</span><span class="ot">TRUE</span>)
 <span class="kw">head</span>(dTrainCTreated)</code></pre></div>
-<pre><code>##   x_catP      x_catB           z z_isBAD x_lev_NA  x_lev_x_a x_lev_x_b
-## 1   -0.2 -0.11976374 -0.38648649    -0.1     -0.1 -0.1666667         0
-## 2   -0.2 -0.11976374 -0.21081081    -0.1     -0.1 -0.1666667         0
-## 3   -0.2 -0.11976374 -0.03513514    -0.1     -0.1 -0.1666667         0
-## 4    0.1 -0.07564865  0.14054054    -0.1     -0.1  0.1666667         0
-## 5    0.1 -0.07564865  0.00000000     0.5     -0.1  0.1666667         0
-## 6    0.4  0.51058851  0.49189189    -0.1      0.5  0.1666667         0
+<pre><code>##       x_catP    x_catB          z   z_isBAD  x_lev_NA  x_lev_x_a x_lev_x_b
+## 1 -0.9396225 -1.894112 -2.2158976 -3.161922 -3.161922 -0.6931472         0
+## 2 -0.9396225 -1.894112 -1.2086714 -3.161922 -3.161922 -0.6931472         0
+## 3 -0.9396225 -1.894112 -0.2014452 -3.161922 -3.161922 -0.6931472         0
+## 4  0.4698112 -1.196414  0.8057809 -3.161922 -3.161922  0.6931472         0
+## 5  0.4698112 -1.196414  0.0000000 15.809611 -3.161922  0.6931472         0
+## 6  1.8792449  8.075166  2.8202333 -3.161922 15.809611  0.6931472         0
 ##       y
 ## 1 FALSE
 ## 2 FALSE
@@ -184,22 +176,22 @@ dTrainC &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span c
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">varsC &lt;-<span class="st"> </span><span class="kw">setdiff</span>(<span class="kw">colnames</span>(dTrainCTreated),<span class="st">'y'</span>)
 <span class="co"># all input variables should be mean 0</span>
 <span class="kw">sapply</span>(dTrainCTreated[,varsC,<span class="dt">drop=</span><span class="ot">FALSE</span>],mean)</code></pre></div>
-<pre><code>##        x_catP        x_catB             z       z_isBAD      x_lev_NA 
-##  1.850372e-17  1.387779e-17  9.251859e-18 -6.938894e-18 -6.938894e-18 
-##     x_lev_x_a     x_lev_x_b 
-##  0.000000e+00  0.000000e+00</code></pre>
+<pre><code>##       x_catP       x_catB            z      z_isBAD     x_lev_NA 
+## 3.700743e-16 7.401487e-17 7.408715e-17 2.220446e-16 0.000000e+00 
+##    x_lev_x_a    x_lev_x_b 
+## 0.000000e+00 0.000000e+00</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># all slopes should be 1 for variables with dTrainCTreated$scoreFrame$sig&lt;1</span>
 <span class="kw">sapply</span>(varsC,<span class="cf">function</span>(c) { <span class="kw">glm</span>(<span class="kw">paste</span>(<span class="st">'y'</span>,c,<span class="dt">sep=</span><span class="st">'~'</span>),<span class="dt">family=</span>binomial,
    <span class="dt">data=</span>dTrainCTreated)<span class="op">$</span>coefficients[[<span class="dv">2</span>]]})</code></pre></div>
 <pre><code>##    x_catP    x_catB         z   z_isBAD  x_lev_NA x_lev_x_a x_lev_x_b 
-##  4.698112 15.815409  5.733441 31.619223 31.619223  4.158883        NA</code></pre>
+##         1         1         1         1         1         1        NA</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dTestCTreated &lt;-<span class="st"> </span><span class="kw">prepare</span>(treatmentsC,dTestC,<span class="dt">pruneSig=</span><span class="kw">c</span>(),<span class="dt">scale=</span><span class="ot">TRUE</span>)
 <span class="kw">head</span>(dTestCTreated)</code></pre></div>
-<pre><code>##   x_catP      x_catB        z z_isBAD x_lev_NA  x_lev_x_a x_lev_x_b
-## 1  -0.20 -0.11976374 1.194595    -0.1     -0.1 -0.1666667         0
-## 2   0.10 -0.07564865 2.951351    -0.1     -0.1  0.1666667         0
-## 3   0.55 -0.07564865 4.708108    -0.1     -0.1  0.1666667         0
-## 4   0.40  0.51058851 0.000000     0.5      0.5  0.1666667         0</code></pre>
+<pre><code>##       x_catP    x_catB         z   z_isBAD  x_lev_NA  x_lev_x_a x_lev_x_b
+## 1 -0.9396225 -1.894112  6.849138 -3.161922 -3.161922 -0.6931472         0
+## 2  0.4698112 -1.196414 16.921400 -3.161922 -3.161922  0.6931472         0
+## 3  2.5839618 -1.196414 26.993662 -3.161922 -3.161922  0.6931472         0
+## 4  1.8792449  8.075166  0.000000 15.809611 15.809611  0.6931472         0</code></pre>
 <hr />
 </div>
 <div id="a-numeric-outcome-example" class="section level2">
@@ -223,32 +215,23 @@ dTrainN &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span c
 ## 3    c 30
 ## 4 &lt;NA&gt; NA</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">treatmentsN =<span class="st"> </span><span class="kw">designTreatmentsN</span>(dTrainN,<span class="kw">colnames</span>(dTrainN),<span class="st">'y'</span>)</code></pre></div>
-<pre><code>## [1] &quot;vtreat 1.3.4 inspecting inputs Wed Jan  2 08:32:36 2019&quot;
-## [1] &quot;designing treatments Wed Jan  2 08:32:36 2019&quot;
-## [1] &quot; have initial level statistics Wed Jan  2 08:32:36 2019&quot;
-## [1] &quot; scoring treatments Wed Jan  2 08:32:36 2019&quot;
-## [1] &quot;have treatment plan Wed Jan  2 08:32:36 2019&quot;
-## [1] &quot;rescoring complex variables Wed Jan  2 08:32:36 2019&quot;
-## [1] &quot;done rescoring complex variables Wed Jan  2 08:32:36 2019&quot;</code></pre>
+<pre><code>## [1] &quot;vtreat 1.3.5 inspecting inputs Sun Jan 27 09:51:59 2019&quot;
+## [1] &quot;designing treatments Sun Jan 27 09:51:59 2019&quot;
+## [1] &quot; have initial level statistics Sun Jan 27 09:51:59 2019&quot;
+## [1] &quot; scoring treatments Sun Jan 27 09:51:59 2019&quot;
+## [1] &quot;have treatment plan Sun Jan 27 09:51:59 2019&quot;
+## [1] &quot;rescoring complex variables Sun Jan 27 09:51:59 2019&quot;
+## [1] &quot;done rescoring complex variables Sun Jan 27 09:51:59 2019&quot;</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">print</span>(treatmentsN)</code></pre></div>
-<pre><code>##     varName varMoves         rsq       sig needsSplit extraModelDegrees
-## 1    x_catP     TRUE 0.127604167 0.4315084       TRUE                 2
-## 2    x_catN     TRUE 0.006816532 0.8603151       TRUE                 2
-## 3    x_catD     TRUE 0.173611111 0.3524132       TRUE                 2
-## 4         z     TRUE 0.336111111 0.1724763      FALSE                 0
-## 5   z_isBAD     TRUE 0.222222222 0.2855909      FALSE                 0
-## 6  x_lev_NA     TRUE 0.222222222 0.2855909      FALSE                 0
-## 7 x_lev_x_a     TRUE 0.173611111 0.3524132      FALSE                 0
-## 8 x_lev_x_b     TRUE 0.008333333 0.8456711      FALSE                 0
-##   origName  code
-## 1        x  catP
-## 2        x  catN
-## 3        x  catD
-## 4        z clean
-## 5        z isBAD
-## 6        x   lev
-## 7        x   lev
-## 8        x   lev</code></pre>
+<pre><code>##   origName  code         rsq       sig extraModelDegrees
+## 1        x  catP 0.207471264 0.3043889                 2
+## 2        x  catN 0.183009858 0.3383392                 2
+## 3        x  catD 0.173611111 0.3524132                 2
+## 4        z clean 0.336111111 0.1724763                 0
+## 5        z isBAD 0.222222222 0.2855909                 0
+## 6        x   lev 0.222222222 0.2855909                 0
+## 7        x   lev 0.173611111 0.3524132                 0
+## 8        x   lev 0.008333333 0.8456711                 0</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dTrainNTreated &lt;-<span class="st"> </span><span class="kw">prepare</span>(treatmentsN,dTrainN,
                           <span class="dt">pruneSig=</span><span class="kw">c</span>(),<span class="dt">scale=</span><span class="ot">TRUE</span>)
 <span class="kw">head</span>(dTrainNTreated)</code></pre></div>
