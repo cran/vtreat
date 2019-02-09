@@ -1,4 +1,10 @@
 
+# vtreat 1.3.6 2019/02/09
+
+ * Add patch_columns_into_frame().
+ * Fix column name munging.
+ * Start switching to RUnit tests.
+
 # vtreat 1.3.5 2019/01/27
 
  * Make categorical scoring default TRUE.
