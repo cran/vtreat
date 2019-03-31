@@ -1,4 +1,10 @@
 
+# vtreat 1.3.8 2019/03/31
+
+ * Remove spline from default value variables.
+ * Fix ggplot2 vignette dependence issue.
+ * Make treatment plans pipeable targets.
+
 # vtreat 1.3.7 2019/02/20
 
  * Fix design_missingness_treatment() prepare.

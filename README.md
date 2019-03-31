@@ -98,7 +98,7 @@ Trivial example:
 ``` r
 library("vtreat")
 packageVersion("vtreat")
- #  [1] '1.3.6'
+ #  [1] '1.3.8'
 citation('vtreat')
  #  
  #  To cite package 'vtreat' in publications use:
@@ -118,19 +118,19 @@ citation('vtreat')
  #    }
 
 # categorical example
-dTrainC <- data.frame(x=c('a','a','a','b','b',NA,NA),
-   z=c(1,2,3,4,NA,6,NA),
-   y=c(FALSE,FALSE,TRUE,FALSE,TRUE,TRUE,TRUE))
-dTestC <- data.frame(x=c('a','b','c',NA),z=c(10,20,30,NA))
+dTrainC <- data.frame(x=c('a', 'a', 'a', 'b', 'b', NA, NA),
+   z=c(1, 2, 3, 4, NA, 6, NA),
+   y=c(FALSE, FALSE, TRUE, FALSE, TRUE, TRUE, TRUE))
+dTestC <- data.frame(x=c('a', 'b', 'c', NA), z=c(10, 20, 30, NA))
 
 # help("designTreatmentsC")
 
-treatmentsC <- designTreatmentsC(dTrainC,colnames(dTrainC),'y',TRUE,
+treatmentsC <- designTreatmentsC(dTrainC, colnames(dTrainC), 'y', TRUE,
                                  verbose=FALSE)
-print(treatmentsC$scoreFrame[,c('origName', 'varName', 'code', 'rsq', 'sig', 'extraModelDegrees')])
+print(treatmentsC$scoreFrame[, c('origName', 'varName', 'code', 'rsq', 'sig', 'extraModelDegrees')])
  #    origName   varName  code         rsq        sig extraModelDegrees
- #  1        x    x_catP  catP 0.059315943 0.45141252                 2
- #  2        x    x_catB  catB 0.029824903 0.59334713                 2
+ #  1        x    x_catP  catP 0.130498074 0.26400089                 2
+ #  2        x    x_catB  catB 0.030345745 0.59013918                 2
  #  3        z         z clean 0.237601767 0.13176020                 0
  #  4        z   z_isBAD isBAD 0.296065432 0.09248399                 0
  #  5        x  x_lev_NA   lev 0.296065432 0.09248399                 0
@@ -139,22 +139,22 @@ print(treatmentsC$scoreFrame[,c('origName', 'varName', 'code', 'rsq', 'sig', 'ex
 
 # help("prepare")
 
-dTrainCTreated <- prepare(treatmentsC,dTrainC,pruneSig=1.0,scale=TRUE)
-varsC <- setdiff(colnames(dTrainCTreated),'y')
+dTrainCTreated <- prepare(treatmentsC, dTrainC, pruneSig=1.0, scale=TRUE)
+varsC <- setdiff(colnames(dTrainCTreated), 'y')
 # all input variables should be mean 0
-sapply(dTrainCTreated[,varsC,drop=FALSE],mean)
+sapply(dTrainCTreated[, varsC, drop=FALSE], mean)
  #         x_catP        x_catB             z       z_isBAD      x_lev_NA 
  #   2.537498e-16 -1.268826e-16  6.336166e-17  2.536414e-16 -2.537653e-16 
  #      x_lev_x_a     x_lev_x_b 
  #  -6.345680e-17  1.189718e-17
 # all non NA slopes should be 1
-sapply(varsC,function(c) { lm(paste('y',c,sep='~'),
+sapply(varsC, function(c) { lm(paste('y', c, sep='~'),
    data=dTrainCTreated)$coefficients[[2]]})
  #      x_catP     x_catB          z    z_isBAD   x_lev_NA  x_lev_x_a 
  #  0.23254609 0.05841932 0.16062145 0.03162633 0.03162633 0.23254609 
  #   x_lev_x_b 
  #  0.24663035
-dTestCTreated <- prepare(treatmentsC,dTestC,pruneSig=c(),scale=TRUE)
+dTestCTreated <- prepare(treatmentsC, dTestC, pruneSig=c(), scale=TRUE)
 print(dTestCTreated)
  #        x_catP    x_catB         z   z_isBAD  x_lev_NA  x_lev_x_a  x_lev_x_b
  #  1 -1.0238626 -3.248380  7.437329 -5.420438 -5.420438 -1.0238626  0.1158472
@@ -165,38 +165,38 @@ print(dTestCTreated)
 
 ``` r
 # numeric example
-dTrainN <- data.frame(x=c('a','a','a','a','b','b',NA,NA),
-   z=c(1,2,3,4,5,NA,7,NA),y=c(0,0,0,1,0,1,1,1))
-dTestN <- data.frame(x=c('a','b','c',NA),z=c(10,20,30,NA))
+dTrainN <- data.frame(x=c('a', 'a', 'a', 'a', 'b', 'b', NA, NA),
+   z=c(1, 2, 3, 4, 5, NA, 7, NA), y=c(0, 0, 0, 1, 0, 1, 1, 1))
+dTestN <- data.frame(x=c('a', 'b', 'c', NA), z=c(10, 20, 30, NA))
 # help("designTreatmentsN")
-treatmentsN = designTreatmentsN(dTrainN,colnames(dTrainN),'y',
+treatmentsN = designTreatmentsN(dTrainN, colnames(dTrainN), 'y',
                                 verbose=FALSE)
-print(treatmentsN$scoreFrame[,c('origName', 'varName', 'code', 'rsq', 'sig', 'extraModelDegrees')])
+print(treatmentsN$scoreFrame[, c('origName', 'varName', 'code', 'rsq', 'sig', 'extraModelDegrees')])
  #    origName   varName  code          rsq       sig extraModelDegrees
- #  1        x    x_catP  catP 7.352941e-02 0.5159425                 2
- #  2        x    x_catN  catN 1.678556e-03 0.9232668                 2
- #  3        x    x_catD  catD 3.614228e-01 0.1149323                 2
+ #  1        x    x_catP  catP 3.558824e-01 0.1184999                 2
+ #  2        x    x_catN  catN 3.132648e-02 0.6750039                 2
+ #  3        x    x_catD  catD 4.512437e-02 0.6135229                 2
  #  4        z         z clean 2.880952e-01 0.1701892                 0
  #  5        z   z_isBAD isBAD 3.333333e-01 0.1339746                 0
  #  6        x  x_lev_NA   lev 3.333333e-01 0.1339746                 0
  #  7        x x_lev_x_a   lev 2.500000e-01 0.2070312                 0
  #  8        x x_lev_x_b   lev 1.110223e-16 1.0000000                 0
-dTrainNTreated <- prepare(treatmentsN,dTrainN,pruneSig=1.0,scale=TRUE)
-varsN <- setdiff(colnames(dTrainNTreated),'y')
+dTrainNTreated <- prepare(treatmentsN, dTrainN, pruneSig=1.0, scale=TRUE)
+varsN <- setdiff(colnames(dTrainNTreated), 'y')
 # all input variables should be mean 0
-sapply(dTrainNTreated[,varsN,drop=FALSE],mean) 
+sapply(dTrainNTreated[, varsN, drop=FALSE], mean) 
  #         x_catP        x_catN        x_catD             z       z_isBAD 
  #   2.775558e-17  0.000000e+00 -2.775558e-17  4.857226e-17  6.938894e-18 
  #       x_lev_NA     x_lev_x_a     x_lev_x_b 
  #   6.938894e-18  0.000000e+00  7.703720e-34
 # all non NA slopes should be 1
-sapply(varsN,function(c) { lm(paste('y',c,sep='~'),
+sapply(varsN, function(c) { lm(paste('y', c, sep='~'),
    data=dTrainNTreated)$coefficients[[2]]}) 
  #     x_catP    x_catN    x_catD         z   z_isBAD  x_lev_NA x_lev_x_a 
  #          1         1         1         1         1         1         1 
  #  x_lev_x_b 
  #          1
-dTestNTreated <- prepare(treatmentsN,dTestN,pruneSig=c(),scale=TRUE)
+dTestNTreated <- prepare(treatmentsN, dTestN, pruneSig=c(), scale=TRUE)
 print(dTestNTreated)
  #    x_catP x_catN      x_catD         z    z_isBAD   x_lev_NA x_lev_x_a
  #  1 -0.250  -0.25 -0.06743804 0.9952381 -0.1666667 -0.1666667     -0.25
@@ -210,15 +210,31 @@ print(dTestNTreated)
  #  4 -2.266233e-17
 
 # for large data sets you can consider designing the treatments on 
-# a subset like: d[sample(1:dim(d)[[1]],1000),]
+# a subset like: d[sample(1:dim(d)[[1]], 1000), ]
+
+# One can also use treatment plans as pipe targets.
+dTrainN %.>% 
+  treatmentsN %.>% 
+  knitr::kable(.)
 ```
+
+|  x\_catP|  x\_catN|    x\_catD|         z|  z\_isBAD|  x\_lev\_NA|  x\_lev\_x\_a|  x\_lev\_x\_b|    y|
+|--------:|--------:|----------:|---------:|---------:|-----------:|-------------:|-------------:|----:|
+|     0.50|    -0.25|  0.5000000|  1.000000|         0|           0|             1|             0|    0|
+|     0.50|    -0.25|  0.5000000|  2.000000|         0|           0|             1|             0|    0|
+|     0.50|    -0.25|  0.5000000|  3.000000|         0|           0|             1|             0|    0|
+|     0.50|    -0.25|  0.5000000|  4.000000|         0|           0|             1|             0|    1|
+|     0.25|     0.00|  0.7071068|  5.000000|         0|           0|             0|             1|    0|
+|     0.25|     0.00|  0.7071068|  3.666667|         1|           0|             0|             1|    1|
+|     0.25|     0.50|  0.0000000|  7.000000|         0|           1|             0|             0|    1|
+|     0.25|     0.50|  0.0000000|  3.666667|         1|           1|             0|             0|    1|
 
 Related work:
 
 -   *Applied Multiple Regression/Correlation Analysis for the Behavioral Sciences*, 2nd edition, 1983, Jacob Cohen, Patricia Cohen (called the concept “effects coded variables”).
 -   ["A preprocessing scheme for high-cardinality categorical attributes in classification and prediction problems"](http://dl.acm.org/citation.cfm?id=507538) Daniele Micci-Barreca, ACM SIGKDD Explorations, Volume 3 Issue 1, July 2001 Pages 27-32.
 -   ["Modeling Trick: Impact Coding of Categorical Variables with Many Levels"](http://www.win-vector.com/blog/2012/07/modeling-trick-impact-coding-of-categorical-variables-with-many-levels/) Nina Zumel, Win-Vector blog, 2012.
--   ["Big Learning Made Easy – with Counts!"](https://blogs.technet.microsoft.com/machinelearning/2015/02/17/big-learning-made-easy-with-counts/), Misha Bilenko, Cortana Intelligence and Machine Learning Blog, 2015.
+-   "Big Learning Made Easy – with Counts!", Misha Bilenko, Cortana Intelligence and Machine Learning Blog, 2015.
 
 Installation
 ------------

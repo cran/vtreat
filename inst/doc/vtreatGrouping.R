@@ -5,14 +5,11 @@ knitr::opts_chunk$set(fig.width = 7)
 library(vtreat)
 set.seed(23255)
 
-have_ggplot = requireNamespace("ggplot2", quietly=TRUE)
 have_rqdatatable = requireNamespace("rqdatatable", quietly=TRUE)
-if(have_ggplot) {
-  library(ggplot2)
-}
 if(have_rqdatatable) {
   library(rqdatatable)
 }
+
 
 ## ----echo=FALSE, message=FALSE, warning=FALSE----------------------------
 #
@@ -27,33 +24,6 @@ showGroupingBehavior = function(groupcol, title) {
   means = tapply(d$conc, d[[groupcol]], mean)
   print(means)
   print(paste("Standard deviation of group means:", sd(means)))
-  
-  if(have_ggplot && have_rqdatatable) {
-    # unify the time indices
-    ops_1 <- local_td(d) %.>%
-      extend_nse(., 
-                 timeIndex := row_number(),
-                 partitionby = "Subject",
-                 orderby = "Time")
-    dtmp <- rqdatatable::ex_data_table(ops_1)
-    
-    # I want the time indices to have the same spacing as the original time points
-    # dtmp$timeFrac = with(dtmp, round(100*Time/25)/100) # round to nearest 1/100th
-    ops_2 <- local_td(dtmp) %.>% 
-      project_nse(.,
-                  approxTime = mean(Time),
-                  groupby = "timeIndex")
-    atimef <- rqdatatable::ex_data_table(ops_2)
-    dtmp$approxTime = atimef$approxTime[dtmp$timeIndex]
-    
-    dtmp[[groupcol]] = as.factor(dtmp[[groupcol]])
-    
-    plt = ggplot(data=dtmp, aes_string(x="approxTime", y="conc", color=groupcol)) + 
-      stat_summary(fun.y="mean", geom="line") +  stat_summary(fun.y="mean", geom="point") + 
-      ggtitle(paste("Mean concentration over time:\n", title)) + 
-      theme(legend.position="none")
-    print(plt)
-  }
 }
 
 ## ----data----------------------------------------------------------------
@@ -61,15 +31,6 @@ showGroupingBehavior = function(groupcol, title) {
 d <- datasets::Theoph
 head(d)
 summary(d)
-
-## ------------------------------------------------------------------------
-
-if(have_ggplot) {
-  ggplot(d, aes(x=Time, y=conc, color=Subject)) + 
-  geom_point() + geom_line() + 
-    theme(legend.position="none") + 
-    ggtitle("Theophylline concentrations over time")
-}
 
 ## ------------------------------------------------------------------------
 # a somewhat arbitrary split of patients

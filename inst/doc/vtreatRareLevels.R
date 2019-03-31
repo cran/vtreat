@@ -1,6 +1,5 @@
 ## ------------------------------------------------------------------------
 library('vtreat')
-library('ggplot2')
 
 set.seed(2325)
 populationFrame <- data.frame(
@@ -63,15 +62,10 @@ table(newCode=testSetTreated$newCode,
 ## ---- fig.width=6--------------------------------------------------------
 # Show code_catP's behavior on rare and novel levels.
 summary(testSetTreated$code_catP)
-ggplot(data=testSetTreated,aes(x=code_catP)) + geom_density()
 
 summary(testSetTreated$code_catP[testSetTreated$code_lev_rare==1])
-ggplot(data=testSetTreated,aes(x=code_catP,color=as.factor(testSetTreated$code_lev_rare))) + 
-  geom_density() + theme(legend.position="bottom")
 
 summary(testSetTreated$code_catP[testSetTreated$newCode])
 
 summary(testSetTreated$code_catP[testSetTreated$generatedAsRareCode])
-ggplot(data=testSetTreated,aes(x=code_catP,color=as.factor(testSetTreated$generatedAsRareCode))) + 
-  geom_density() + theme(legend.position="bottom")
 
