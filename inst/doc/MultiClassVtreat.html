@@ -12,7 +12,7 @@
 
 <meta name="author" content="John Mount" />
 
-<meta name="date" content="2019-03-31" />
+<meta name="date" content="2019-05-05" />
 
 <title>Multi Class vtreat</title>
 
@@ -20,41 +20,67 @@
 
 <style type="text/css">code{white-space: pre;}</style>
 <style type="text/css" data-origin="pandoc">
-div.sourceCode { overflow-x: auto; }
-table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
-  margin: 0; padding: 0; vertical-align: baseline; border: none; }
-table.sourceCode { width: 100%; line-height: 100%; }
-td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
-td.sourceCode { padding-left: 5px; }
-code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code > span.dt { color: #902000; } /* DataType */
-code > span.dv { color: #40a070; } /* DecVal */
-code > span.bn { color: #40a070; } /* BaseN */
-code > span.fl { color: #40a070; } /* Float */
-code > span.ch { color: #4070a0; } /* Char */
-code > span.st { color: #4070a0; } /* String */
-code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code > span.ot { color: #007020; } /* Other */
-code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code > span.fu { color: #06287e; } /* Function */
-code > span.er { color: #ff0000; font-weight: bold; } /* Error */
-code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
-code > span.cn { color: #880000; } /* Constant */
-code > span.sc { color: #4070a0; } /* SpecialChar */
-code > span.vs { color: #4070a0; } /* VerbatimString */
-code > span.ss { color: #bb6688; } /* SpecialString */
-code > span.im { } /* Import */
-code > span.va { color: #19177c; } /* Variable */
-code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code > span.op { color: #666666; } /* Operator */
-code > span.bu { } /* BuiltIn */
-code > span.ex { } /* Extension */
-code > span.pp { color: #bc7a00; } /* Preprocessor */
-code > span.at { color: #7d9029; } /* Attribute */
-code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(data-line-number);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
 
 </style>
 <script>
@@ -81,7 +107,192 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 
 
-<link href="data:text/css;charset=utf-8,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23header%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%20code%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" rel="stylesheet" type="text/css" />
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#header {
+text-align: center;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
 
 </head>
 
@@ -91,34 +302,34 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 
 <h1 class="title toc-ignore">Multi Class vtreat</h1>
-<h4 class="author"><em>John Mount</em></h4>
-<h4 class="date"><em>2019-03-31</em></h4>
+<h4 class="author">John Mount</h4>
+<h4 class="date">2019-05-05</h4>
 
 
 
 <p><a href="https://github.com/WinVector/vtreat"><code>vtreat</code></a> can now effectively prepare data for multi-class classification or multinomial modeling.</p>
 <p>The two functions needed (<a href="https://winvector.github.io/vtreat/reference/mkCrossFrameMExperiment.html"><code>mkCrossFrameMExperiment()</code></a> and the <code>S3</code> method <a href="https://winvector.github.io/vtreat/reference/prepare.multinomial_plan.html"><code>prepare.multinomial_plan()</code></a>) are now part of <code>vtreat</code>.</p>
 <p>Let’s work a specific example: trying to model multi-class <code>y</code> as a function of <code>x1</code> and <code>x2</code>.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(<span class="st">&quot;vtreat&quot;</span>)</code></pre></div>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># create example data</span>
-<span class="kw">set.seed</span>(<span class="dv">326346</span>)
-sym_bonuses &lt;-<span class="st"> </span><span class="kw">rnorm</span>(<span class="dv">3</span>)
-<span class="kw">names</span>(sym_bonuses) &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;a&quot;</span>, <span class="st">&quot;b&quot;</span>, <span class="st">&quot;c&quot;</span>)
-sym_bonuses3 &lt;-<span class="st"> </span><span class="kw">rnorm</span>(<span class="dv">3</span>)
-<span class="kw">names</span>(sym_bonuses3) &lt;-<span class="st"> </span><span class="kw">as.character</span>(<span class="kw">seq_len</span>(<span class="kw">length</span>(sym_bonuses3)))
-n_row &lt;-<span class="st"> </span><span class="dv">1000</span>
-d &lt;-<span class="st"> </span><span class="kw">data.frame</span>(
-  <span class="dt">x1 =</span> <span class="kw">rnorm</span>(n_row),
-  <span class="dt">x2 =</span> <span class="kw">sample</span>(<span class="kw">names</span>(sym_bonuses), n_row, <span class="dt">replace =</span> <span class="ot">TRUE</span>),
-  <span class="dt">x3 =</span> <span class="kw">sample</span>(<span class="kw">names</span>(sym_bonuses3), n_row, <span class="dt">replace =</span> <span class="ot">TRUE</span>),
-  <span class="dt">y =</span> <span class="st">&quot;NoInfo&quot;</span>,
-  <span class="dt">stringsAsFactors =</span> <span class="ot">FALSE</span>)
-d<span class="op">$</span>y[sym_bonuses[d<span class="op">$</span>x2] <span class="op">&gt;</span><span class="st"> </span>
-<span class="st">      </span><span class="kw">pmax</span>(d<span class="op">$</span>x1, sym_bonuses3[d<span class="op">$</span>x3], <span class="kw">runif</span>(n_row))] &lt;-<span class="st"> &quot;Large1&quot;</span>
-d<span class="op">$</span>y[sym_bonuses3[d<span class="op">$</span>x3] <span class="op">&gt;</span><span class="st"> </span>
-<span class="st">      </span><span class="kw">pmax</span>(sym_bonuses[d<span class="op">$</span>x2], d<span class="op">$</span>x1, <span class="kw">runif</span>(n_row))] &lt;-<span class="st"> &quot;Large2&quot;</span>
-
-knitr<span class="op">::</span><span class="kw">kable</span>(<span class="kw">head</span>(d))</code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw">library</span>(<span class="st">&quot;vtreat&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="co"># create example data</span></a>
+<a class="sourceLine" id="cb2-2" data-line-number="2"><span class="kw">set.seed</span>(<span class="dv">326346</span>)</a>
+<a class="sourceLine" id="cb2-3" data-line-number="3">sym_bonuses &lt;-<span class="st"> </span><span class="kw">rnorm</span>(<span class="dv">3</span>)</a>
+<a class="sourceLine" id="cb2-4" data-line-number="4"><span class="kw">names</span>(sym_bonuses) &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;a&quot;</span>, <span class="st">&quot;b&quot;</span>, <span class="st">&quot;c&quot;</span>)</a>
+<a class="sourceLine" id="cb2-5" data-line-number="5">sym_bonuses3 &lt;-<span class="st"> </span><span class="kw">rnorm</span>(<span class="dv">3</span>)</a>
+<a class="sourceLine" id="cb2-6" data-line-number="6"><span class="kw">names</span>(sym_bonuses3) &lt;-<span class="st"> </span><span class="kw">as.character</span>(<span class="kw">seq_len</span>(<span class="kw">length</span>(sym_bonuses3)))</a>
+<a class="sourceLine" id="cb2-7" data-line-number="7">n_row &lt;-<span class="st"> </span><span class="dv">1000</span></a>
+<a class="sourceLine" id="cb2-8" data-line-number="8">d &lt;-<span class="st"> </span><span class="kw">data.frame</span>(</a>
+<a class="sourceLine" id="cb2-9" data-line-number="9">  <span class="dt">x1 =</span> <span class="kw">rnorm</span>(n_row),</a>
+<a class="sourceLine" id="cb2-10" data-line-number="10">  <span class="dt">x2 =</span> <span class="kw">sample</span>(<span class="kw">names</span>(sym_bonuses), n_row, <span class="dt">replace =</span> <span class="ot">TRUE</span>),</a>
+<a class="sourceLine" id="cb2-11" data-line-number="11">  <span class="dt">x3 =</span> <span class="kw">sample</span>(<span class="kw">names</span>(sym_bonuses3), n_row, <span class="dt">replace =</span> <span class="ot">TRUE</span>),</a>
+<a class="sourceLine" id="cb2-12" data-line-number="12">  <span class="dt">y =</span> <span class="st">&quot;NoInfo&quot;</span>,</a>
+<a class="sourceLine" id="cb2-13" data-line-number="13">  <span class="dt">stringsAsFactors =</span> <span class="ot">FALSE</span>)</a>
+<a class="sourceLine" id="cb2-14" data-line-number="14">d<span class="op">$</span>y[sym_bonuses[d<span class="op">$</span>x2] <span class="op">&gt;</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb2-15" data-line-number="15"><span class="st">      </span><span class="kw">pmax</span>(d<span class="op">$</span>x1, sym_bonuses3[d<span class="op">$</span>x3], <span class="kw">runif</span>(n_row))] &lt;-<span class="st"> &quot;Large1&quot;</span></a>
+<a class="sourceLine" id="cb2-16" data-line-number="16">d<span class="op">$</span>y[sym_bonuses3[d<span class="op">$</span>x3] <span class="op">&gt;</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb2-17" data-line-number="17"><span class="st">      </span><span class="kw">pmax</span>(sym_bonuses[d<span class="op">$</span>x2], d<span class="op">$</span>x1, <span class="kw">runif</span>(n_row))] &lt;-<span class="st"> &quot;Large2&quot;</span></a>
+<a class="sourceLine" id="cb2-18" data-line-number="18"></a>
+<a class="sourceLine" id="cb2-19" data-line-number="19">knitr<span class="op">::</span><span class="kw">kable</span>(<span class="kw">head</span>(d))</a></code></pre></div>
 <table>
 <thead>
 <tr class="header">
@@ -131,15 +342,15 @@ knitr<span class="op">::</span><span class="kw">kable</span>(<span class="kw">he
 <tbody>
 <tr class="odd">
 <td align="right">0.8178292</td>
-<td align="left">b</td>
-<td align="left">3</td>
-<td align="left">Large2</td>
+<td align="left">a</td>
+<td align="left">2</td>
+<td align="left">NoInfo</td>
 </tr>
 <tr class="even">
 <td align="right">0.5867139</td>
-<td align="left">b</td>
-<td align="left">3</td>
-<td align="left">Large2</td>
+<td align="left">c</td>
+<td align="left">1</td>
+<td align="left">NoInfo</td>
 </tr>
 <tr class="odd">
 <td align="right">-0.6711920</td>
@@ -149,15 +360,15 @@ knitr<span class="op">::</span><span class="kw">kable</span>(<span class="kw">he
 </tr>
 <tr class="even">
 <td align="right">0.1033166</td>
-<td align="left">c</td>
+<td align="left">a</td>
 <td align="left">2</td>
-<td align="left">NoInfo</td>
+<td align="left">Large1</td>
 </tr>
 <tr class="odd">
 <td align="right">-0.3182176</td>
-<td align="left">b</td>
-<td align="left">1</td>
-<td align="left">NoInfo</td>
+<td align="left">c</td>
+<td align="left">3</td>
+<td align="left">Large2</td>
 </tr>
 <tr class="even">
 <td align="right">-0.5914308</td>
@@ -168,62 +379,62 @@ knitr<span class="op">::</span><span class="kw">kable</span>(<span class="kw">he
 </tbody>
 </table>
 <p>We define the problem controls and use <code>mkCrossFrameMExperiment()</code> to build both a cross-frame and a treatment plan.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># define problem</span>
-vars &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;x1&quot;</span>, <span class="st">&quot;x2&quot;</span>, <span class="st">&quot;x3&quot;</span>)
-y_name &lt;-<span class="st"> &quot;y&quot;</span>
-
-<span class="co"># build the multi-class cross frame and treatments</span>
-cfe_m &lt;-<span class="st"> </span><span class="kw">mkCrossFrameMExperiment</span>(d, vars, y_name)</code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1"><span class="co"># define problem</span></a>
+<a class="sourceLine" id="cb3-2" data-line-number="2">vars &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;x1&quot;</span>, <span class="st">&quot;x2&quot;</span>, <span class="st">&quot;x3&quot;</span>)</a>
+<a class="sourceLine" id="cb3-3" data-line-number="3">y_name &lt;-<span class="st"> &quot;y&quot;</span></a>
+<a class="sourceLine" id="cb3-4" data-line-number="4"></a>
+<a class="sourceLine" id="cb3-5" data-line-number="5"><span class="co"># build the multi-class cross frame and treatments</span></a>
+<a class="sourceLine" id="cb3-6" data-line-number="6">cfe_m &lt;-<span class="st"> </span><span class="kw">mkCrossFrameMExperiment</span>(d, vars, y_name)</a></code></pre></div>
 <p>The cross-frame is the entity safest for training on (unless you have made separate data split for the treatment design step). It uses cross-validation to reduce nested model bias. Some notes on this issue are available <a href="https://winvector.github.io/vtreat/articles/vtreatCrossFrames.html">here</a>, and <a href="https://github.com/WinVector/vtreat/blob/master/extras/vtreat.pdf">here</a>.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># look at the data we would train models on</span>
-<span class="kw">str</span>(cfe_m<span class="op">$</span>cross_frame)</code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="co"># look at the data we would train models on</span></a>
+<a class="sourceLine" id="cb4-2" data-line-number="2"><span class="kw">str</span>(cfe_m<span class="op">$</span>cross_frame)</a></code></pre></div>
 <pre><code>## 'data.frame':    1000 obs. of  16 variables:
 ##  $ x1            : num  0.818 0.587 -0.671 0.103 -0.318 ...
-##  $ x2_catP       : num  0.313 0.313 0.325 0.362 0.313 0.362 0.362 0.325 0.313 0.325 ...
-##  $ x3_catP       : num  0.333 0.333 0.333 0.347 0.32 0.347 0.333 0.347 0.333 0.347 ...
-##  $ x2_lev_x_a    : num  0 0 1 0 0 0 0 1 0 1 ...
-##  $ x2_lev_x_b    : num  1 1 0 0 1 0 0 0 1 0 ...
-##  $ x2_lev_x_c    : num  0 0 0 1 0 1 1 0 0 0 ...
-##  $ x3_lev_x_1    : num  0 0 0 0 1 0 0 0 0 0 ...
-##  $ x3_lev_x_2    : num  0 0 0 1 0 1 0 1 0 1 ...
-##  $ x3_lev_x_3    : num  1 1 1 0 0 0 1 0 1 0 ...
-##  $ Large1_x2_catB: num  -10.48 -10.48 1.25 -10.53 -10.53 ...
-##  $ Large1_x3_catB: num  -10.485 -10.483 -10.483 0.379 0.431 ...
-##  $ Large2_x2_catB: num  0.0862 0.1446 -0.0243 -0.1268 0.0862 ...
-##  $ Large2_x3_catB: num  4.98 6.09 4.69 -3.11 -13.13 ...
-##  $ NoInfo_x2_catB: num  -0.0537 0.1084 -0.2827 0.2859 0.1084 ...
-##  $ NoInfo_x3_catB: num  -4.82 -5.24 -4.83 2.13 2.53 ...
-##  $ y             : chr  &quot;Large2&quot; &quot;Large2&quot; &quot;Large2&quot; &quot;NoInfo&quot; ...</code></pre>
+##  $ x2_catP       : num  0.333 0.334 0.333 0.333 0.334 0.334 0.333 0.333 0.333 0.333 ...
+##  $ x3_catP       : num  0.35 0.321 0.329 0.35 0.329 0.35 0.321 0.321 0.321 0.35 ...
+##  $ x2_lev_x_a    : num  1 0 1 1 0 0 0 0 1 1 ...
+##  $ x2_lev_x_b    : num  0 0 0 0 0 0 1 1 0 0 ...
+##  $ x2_lev_x_c    : num  0 1 0 0 1 1 0 0 0 0 ...
+##  $ x3_lev_x_1    : num  0 1 0 0 0 0 1 1 1 0 ...
+##  $ x3_lev_x_2    : num  1 0 0 1 0 1 0 0 0 1 ...
+##  $ x3_lev_x_3    : num  0 0 1 0 1 0 0 0 0 0 ...
+##  $ Large1_x2_catB: num  1.11 -10.61 1.25 1.11 -10.57 ...
+##  $ Large1_x3_catB: num  0.616 0.362 -10.571 0.616 -10.57 ...
+##  $ Large2_x2_catB: num  -0.0638 0.1074 0.0821 -0.0638 0.1074 ...
+##  $ Large2_x3_catB: num  -4.69 -13.09 4.71 -4.69 4.71 ...
+##  $ NoInfo_x2_catB: num  -0.378 0.132 -0.304 -0.378 0.132 ...
+##  $ NoInfo_x3_catB: num  2.25 2.56 -4.82 2.25 -4.16 ...
+##  $ y             : chr  &quot;NoInfo&quot; &quot;NoInfo&quot; &quot;Large2&quot; &quot;Large1&quot; ...</code></pre>
 <p><code>prepare()</code> can apply the designed treatments to new data. Here we are simulating new data by re-using our design data.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># pretend original data is new data to be treated</span>
-<span class="co"># NA out top row to show processing</span>
-<span class="cf">for</span>(vi <span class="cf">in</span> vars) {
-  d[[vi]][[<span class="dv">1</span>]] &lt;-<span class="st"> </span><span class="ot">NA</span>
-}
-<span class="kw">str</span>(<span class="kw">prepare</span>(cfe_m<span class="op">$</span>treat_m, d))</code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1"><span class="co"># pretend original data is new data to be treated</span></a>
+<a class="sourceLine" id="cb6-2" data-line-number="2"><span class="co"># NA out top row to show processing</span></a>
+<a class="sourceLine" id="cb6-3" data-line-number="3"><span class="cf">for</span>(vi <span class="cf">in</span> vars) {</a>
+<a class="sourceLine" id="cb6-4" data-line-number="4">  d[[vi]][[<span class="dv">1</span>]] &lt;-<span class="st"> </span><span class="ot">NA</span></a>
+<a class="sourceLine" id="cb6-5" data-line-number="5">}</a>
+<a class="sourceLine" id="cb6-6" data-line-number="6"><span class="kw">str</span>(<span class="kw">prepare</span>(cfe_m<span class="op">$</span>treat_m, d))</a></code></pre></div>
 <pre><code>## 'data.frame':    1000 obs. of  16 variables:
 ##  $ x1            : num  0.0205 0.5867 -0.6712 0.1033 -0.3182 ...
-##  $ x2_catP       : num  0.0005 0.313 0.325 0.362 0.313 0.362 0.362 0.325 0.313 0.325 ...
-##  $ x3_catP       : num  0.0005 0.333 0.333 0.347 0.32 0.347 0.333 0.347 0.333 0.347 ...
-##  $ x2_lev_x_a    : num  0 0 1 0 0 0 0 1 0 1 ...
-##  $ x2_lev_x_b    : num  0 1 0 0 1 0 0 0 1 0 ...
-##  $ x2_lev_x_c    : num  0 0 0 1 0 1 1 0 0 0 ...
-##  $ x3_lev_x_1    : num  0 0 0 0 1 0 0 0 0 0 ...
-##  $ x3_lev_x_2    : num  0 0 0 1 0 1 0 1 0 1 ...
-##  $ x3_lev_x_3    : num  0 1 1 0 0 0 1 0 1 0 ...
-##  $ Large1_x2_catB: num  0 -10.5 1.2 -10.5 -10.5 ...
-##  $ Large1_x3_catB: num  0 -10.499 -10.499 0.411 0.436 ...
-##  $ Large2_x2_catB: num  0 0.133 -0.0215 -0.0999 0.133 ...
-##  $ Large2_x3_catB: num  0 5.1 5.1 -3.54 -13.13 ...
-##  $ NoInfo_x2_catB: num  0 0.0206 -0.2829 0.2536 0.0206 ...
-##  $ NoInfo_x3_catB: num  0 -4.95 -4.95 2.11 2.34 ...
-##  $ y             : chr  &quot;Large2&quot; &quot;Large2&quot; &quot;Large2&quot; &quot;NoInfo&quot; ...</code></pre>
+##  $ x2_catP       : num  0.0005 0.334 0.333 0.333 0.334 0.334 0.333 0.333 0.333 0.333 ...
+##  $ x3_catP       : num  0.0005 0.321 0.329 0.35 0.329 0.35 0.321 0.321 0.321 0.35 ...
+##  $ x2_lev_x_a    : num  0 0 1 1 0 0 0 0 1 1 ...
+##  $ x2_lev_x_b    : num  0 0 0 0 0 0 1 1 0 0 ...
+##  $ x2_lev_x_c    : num  0 1 0 0 1 1 0 0 0 0 ...
+##  $ x3_lev_x_1    : num  0 1 0 0 0 0 1 1 1 0 ...
+##  $ x3_lev_x_2    : num  0 0 0 1 0 1 0 0 0 1 ...
+##  $ x3_lev_x_3    : num  0 0 1 0 1 0 0 0 0 0 ...
+##  $ Large1_x2_catB: num  0 -10.58 1.18 1.18 -10.58 ...
+##  $ Large1_x3_catB: num  0 0.284 -10.584 0.529 -10.584 ...
+##  $ Large2_x2_catB: num  0 0.1 0.0242 0.0242 0.1 ...
+##  $ Large2_x3_catB: num  0 -13.08 4.72 -4.43 4.72 ...
+##  $ NoInfo_x2_catB: num  0 0.0685 -0.3392 -0.3392 0.0685 ...
+##  $ NoInfo_x3_catB: num  0 2.39 -4.55 2.05 -4.55 ...
+##  $ y             : chr  &quot;NoInfo&quot; &quot;NoInfo&quot; &quot;Large2&quot; &quot;Large1&quot; ...</code></pre>
 <p>Obvious issues include: computing variable importance, and blow up and co-dependency of produced columns. These we leave for the next modeling step to deal with (this is our philosophy with most issues that involve joint distributions of variables).</p>
 <p>We also have per-outcome variable importance.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">knitr<span class="op">::</span><span class="kw">kable</span>(
-  cfe_m<span class="op">$</span>score_frame[, 
-                    <span class="kw">c</span>(<span class="st">&quot;varName&quot;</span>, <span class="st">&quot;rsq&quot;</span>, <span class="st">&quot;sig&quot;</span>, <span class="st">&quot;outcome_level&quot;</span>), 
-                    <span class="dt">drop =</span> <span class="ot">FALSE</span>])</code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1">knitr<span class="op">::</span><span class="kw">kable</span>(</a>
+<a class="sourceLine" id="cb8-2" data-line-number="2">  cfe_m<span class="op">$</span>score_frame[, </a>
+<a class="sourceLine" id="cb8-3" data-line-number="3">                    <span class="kw">c</span>(<span class="st">&quot;varName&quot;</span>, <span class="st">&quot;rsq&quot;</span>, <span class="st">&quot;sig&quot;</span>, <span class="st">&quot;outcome_level&quot;</span>), </a>
+<a class="sourceLine" id="cb8-4" data-line-number="4">                    <span class="dt">drop =</span> <span class="ot">FALSE</span>])</a></code></pre></div>
 <table>
 <thead>
 <tr class="header">
@@ -236,215 +447,215 @@ cfe_m &lt;-<span class="st"> </span><span class="kw">mkCrossFrameMExperiment</sp
 <tbody>
 <tr class="odd">
 <td align="left">x1</td>
-<td align="right">0.0558908</td>
-<td align="right">0.0000382</td>
+<td align="right">0.0427675</td>
+<td align="right">0.0002015</td>
 <td align="left">Large1</td>
 </tr>
 <tr class="even">
 <td align="left">x2_catP</td>
-<td align="right">0.0275238</td>
-<td align="right">0.0038536</td>
+<td align="right">0.0979334</td>
+<td align="right">0.0000000</td>
 <td align="left">Large1</td>
 </tr>
 <tr class="odd">
 <td align="left">x2_lev_x_a</td>
-<td align="right">0.2680953</td>
+<td align="right">0.2681130</td>
 <td align="right">0.0000000</td>
 <td align="left">Large1</td>
 </tr>
 <tr class="even">
 <td align="left">x2_lev_x_b</td>
-<td align="right">0.0885021</td>
-<td align="right">0.0000002</td>
+<td align="right">0.0975700</td>
+<td align="right">0.0000000</td>
 <td align="left">Large1</td>
 </tr>
 <tr class="odd">
 <td align="left">x2_lev_x_c</td>
-<td align="right">0.1060407</td>
+<td align="right">0.0979334</td>
 <td align="right">0.0000000</td>
 <td align="left">Large1</td>
 </tr>
 <tr class="even">
 <td align="left">x3_catP</td>
-<td align="right">0.0000346</td>
-<td align="right">0.9183445</td>
+<td align="right">0.0125618</td>
+<td align="right">0.0439536</td>
 <td align="left">Large1</td>
 </tr>
 <tr class="odd">
 <td align="left">x3_lev_x_1</td>
-<td align="right">0.0141504</td>
-<td align="right">0.0382554</td>
+<td align="right">0.0053772</td>
+<td align="right">0.1874933</td>
 <td align="left">Large1</td>
 </tr>
 <tr class="even">
 <td align="left">x3_lev_x_2</td>
-<td align="right">0.0140364</td>
-<td align="right">0.0390420</td>
+<td align="right">0.0266092</td>
+<td align="right">0.0033678</td>
 <td align="left">Large1</td>
 </tr>
 <tr class="odd">
 <td align="left">x3_lev_x_3</td>
-<td align="right">0.0955004</td>
-<td align="right">0.0000001</td>
+<td align="right">0.0961219</td>
+<td align="right">0.0000000</td>
 <td align="left">Large1</td>
 </tr>
 <tr class="even">
 <td align="left">x1</td>
-<td align="right">0.0015382</td>
-<td align="right">0.1615618</td>
+<td align="right">0.0003984</td>
+<td align="right">0.4784542</td>
 <td align="left">Large2</td>
 </tr>
 <tr class="odd">
 <td align="left">x2_catP</td>
-<td align="right">0.0013055</td>
-<td align="right">0.1971725</td>
+<td align="right">0.0008969</td>
+<td align="right">0.2875322</td>
 <td align="left">Large2</td>
 </tr>
 <tr class="even">
 <td align="left">x2_lev_x_a</td>
-<td align="right">0.0000387</td>
-<td align="right">0.8242956</td>
+<td align="right">0.0000512</td>
+<td align="right">0.7994128</td>
 <td align="left">Large2</td>
 </tr>
 <tr class="odd">
 <td align="left">x2_lev_x_b</td>
-<td align="right">0.0014571</td>
-<td align="right">0.1730603</td>
+<td align="right">0.0013961</td>
+<td align="right">0.1845435</td>
 <td align="left">Large2</td>
 </tr>
 <tr class="even">
 <td align="left">x2_lev_x_c</td>
-<td align="right">0.0009604</td>
-<td align="right">0.2686774</td>
+<td align="right">0.0008969</td>
+<td align="right">0.2875322</td>
 <td align="left">Large2</td>
 </tr>
 <tr class="odd">
 <td align="left">x3_catP</td>
-<td align="right">0.0007725</td>
-<td align="right">0.3211959</td>
+<td align="right">0.0574052</td>
+<td align="right">0.0000000</td>
 <td align="left">Large2</td>
 </tr>
 <tr class="even">
 <td align="left">x3_lev_x_1</td>
-<td align="right">0.2602002</td>
+<td align="right">0.2546121</td>
 <td align="right">0.0000000</td>
 <td align="left">Large2</td>
 </tr>
 <tr class="odd">
 <td align="left">x3_lev_x_2</td>
-<td align="right">0.2483708</td>
+<td align="right">0.2659830</td>
 <td align="right">0.0000000</td>
 <td align="left">Large2</td>
 </tr>
 <tr class="even">
 <td align="left">x3_lev_x_3</td>
-<td align="right">0.9197595</td>
+<td align="right">0.9308590</td>
 <td align="right">0.0000000</td>
 <td align="left">Large2</td>
 </tr>
 <tr class="odd">
 <td align="left">x1</td>
-<td align="right">0.0064771</td>
-<td align="right">0.0034947</td>
+<td align="right">0.0035420</td>
+<td align="right">0.0312177</td>
 <td align="left">NoInfo</td>
 </tr>
 <tr class="even">
 <td align="left">x2_catP</td>
-<td align="right">0.0040540</td>
-<td align="right">0.0208595</td>
+<td align="right">0.0004091</td>
+<td align="right">0.4641054</td>
 <td align="left">NoInfo</td>
 </tr>
 <tr class="odd">
 <td align="left">x2_lev_x_a</td>
-<td align="right">0.0071709</td>
-<td align="right">0.0021196</td>
+<td align="right">0.0108027</td>
+<td align="right">0.0001684</td>
 <td align="left">NoInfo</td>
 </tr>
 <tr class="even">
 <td align="left">x2_lev_x_b</td>
-<td align="right">0.0000340</td>
-<td align="right">0.8323647</td>
+<td align="right">0.0072297</td>
+<td align="right">0.0020855</td>
 <td align="left">NoInfo</td>
 </tr>
 <tr class="odd">
 <td align="left">x2_lev_x_c</td>
-<td align="right">0.0060493</td>
-<td align="right">0.0047665</td>
+<td align="right">0.0004091</td>
+<td align="right">0.4641054</td>
 <td align="left">NoInfo</td>
 </tr>
 <tr class="even">
 <td align="left">x3_catP</td>
-<td align="right">0.0006576</td>
-<td align="right">0.3520950</td>
+<td align="right">0.0416046</td>
+<td align="right">0.0000000</td>
 <td align="left">NoInfo</td>
 </tr>
 <tr class="odd">
 <td align="left">x3_lev_x_1</td>
-<td align="right">0.1838759</td>
+<td align="right">0.1848006</td>
 <td align="right">0.0000000</td>
 <td align="left">NoInfo</td>
 </tr>
 <tr class="even">
 <td align="left">x3_lev_x_2</td>
-<td align="right">0.1857824</td>
+<td align="right">0.1796720</td>
 <td align="right">0.0000000</td>
 <td align="left">NoInfo</td>
 </tr>
 <tr class="odd">
 <td align="left">x3_lev_x_3</td>
-<td align="right">0.7372570</td>
+<td align="right">0.7228777</td>
 <td align="right">0.0000000</td>
 <td align="left">NoInfo</td>
 </tr>
 <tr class="even">
 <td align="left">Large1_x2_catB</td>
-<td align="right">0.2675617</td>
+<td align="right">0.2677786</td>
 <td align="right">0.0000000</td>
 <td align="left">Large1</td>
 </tr>
 <tr class="odd">
 <td align="left">Large1_x3_catB</td>
-<td align="right">0.0946332</td>
-<td align="right">0.0000001</td>
+<td align="right">0.0971273</td>
+<td align="right">0.0000000</td>
 <td align="left">Large1</td>
 </tr>
 <tr class="even">
 <td align="left">Large2_x2_catB</td>
-<td align="right">0.0000291</td>
-<td align="right">0.8472707</td>
+<td align="right">0.0000502</td>
+<td align="right">0.8012468</td>
 <td align="left">Large2</td>
 </tr>
 <tr class="odd">
 <td align="left">Large2_x3_catB</td>
-<td align="right">0.9239857</td>
+<td align="right">0.9310333</td>
 <td align="right">0.0000000</td>
 <td align="left">Large2</td>
 </tr>
 <tr class="even">
 <td align="left">NoInfo_x2_catB</td>
-<td align="right">0.0068238</td>
-<td align="right">0.0027207</td>
+<td align="right">0.0073151</td>
+<td align="right">0.0019622</td>
 <td align="left">NoInfo</td>
 </tr>
 <tr class="odd">
 <td align="left">NoInfo_x3_catB</td>
-<td align="right">0.7326682</td>
+<td align="right">0.7167572</td>
 <td align="right">0.0000000</td>
 <td align="left">NoInfo</td>
 </tr>
 </tbody>
 </table>
 <p>One can relate these per-target and per-treatment performances back to original columns by aggregating.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">tapply</span>(cfe_m<span class="op">$</span>score_frame<span class="op">$</span>rsq, 
-       cfe_m<span class="op">$</span>score_frame<span class="op">$</span>origName, 
-       max)</code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1"><span class="kw">tapply</span>(cfe_m<span class="op">$</span>score_frame<span class="op">$</span>rsq, </a>
+<a class="sourceLine" id="cb9-2" data-line-number="2">       cfe_m<span class="op">$</span>score_frame<span class="op">$</span>origName, </a>
+<a class="sourceLine" id="cb9-3" data-line-number="3">       max)</a></code></pre></div>
 <pre><code>##         x1         x2         x3 
-## 0.05589076 0.26809534 0.92398574</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">tapply</span>(cfe_m<span class="op">$</span>score_frame<span class="op">$</span>sig, 
-       cfe_m<span class="op">$</span>score_frame<span class="op">$</span>origName, 
-       min)</code></pre></div>
+## 0.04276746 0.26811298 0.93103329</code></pre>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" data-line-number="1"><span class="kw">tapply</span>(cfe_m<span class="op">$</span>score_frame<span class="op">$</span>sig, </a>
+<a class="sourceLine" id="cb11-2" data-line-number="2">       cfe_m<span class="op">$</span>score_frame<span class="op">$</span>origName, </a>
+<a class="sourceLine" id="cb11-3" data-line-number="3">       min)</a></code></pre></div>
 <pre><code>##            x1            x2            x3 
-##  3.819834e-05  1.892838e-19 5.747933e-258</code></pre>
+##  2.015164e-04  1.315559e-20 2.488384e-257</code></pre>
 
 
 
