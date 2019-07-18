@@ -1,4 +1,9 @@
 
+# vtreat 1.4.3 2019/07/16
+
+ * Fix bug in custom coder NA path and let numeric coder center if wanted.
+ * More tests.
+ 
 # vtreat 1.4.2 2019/07/01
 
  * Fix eronious Cohen reference in documentation.
