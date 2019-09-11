@@ -7,12 +7,13 @@
 <meta charset="utf-8" />
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <meta name="author" content="John Mount" />
 
-<meta name="date" content="2019-07-27" />
+<meta name="date" content="2019-09-11" />
 
 <title>vtreat Variable Importance</title>
 
@@ -96,7 +97,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
       if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
       var style = rule.style.cssText;
       // check if color or background-color is set
-      if (rule.style.color === '' || rule.style.backgroundColor === '') continue;
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
       // replace div.sourceCode by a pre.sourceCode rule
       sheets[i].deleteRule(j);
       sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
@@ -303,7 +304,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 
 <h1 class="title toc-ignore">vtreat Variable Importance</h1>
 <h4 class="author">John Mount</h4>
-<h4 class="date">2019-07-27</h4>
+<h4 class="date">2019-09-11</h4>
 
 
 
@@ -327,9 +328,9 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 <a class="sourceLine" id="cb3-2" data-line-number="2">  d, </a>
 <a class="sourceLine" id="cb3-3" data-line-number="3">  <span class="dt">varlist =</span> <span class="kw">c</span>(<span class="st">&quot;x&quot;</span>, <span class="st">&quot;x_noise&quot;</span>), </a>
 <a class="sourceLine" id="cb3-4" data-line-number="4">  <span class="dt">outcomename =</span> <span class="st">&quot;y&quot;</span>)</a></code></pre></div>
-<pre><code>## [1] &quot;vtreat 1.4.4 start initial treatment design Sat Jul 27 07:53:34 2019&quot;
-## [1] &quot; start cross frame work Sat Jul 27 07:53:34 2019&quot;
-## [1] &quot; vtreat::mkCrossFrameNExperiment done Sat Jul 27 07:53:34 2019&quot;</code></pre>
+<pre><code>## [1] &quot;vtreat 1.4.5 start initial treatment design Wed Sep 11 08:33:48 2019&quot;
+## [1] &quot; start cross frame work Wed Sep 11 08:33:48 2019&quot;
+## [1] &quot; vtreat::mkCrossFrameNExperiment done Wed Sep 11 08:33:48 2019&quot;</code></pre>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1">sf &lt;-<span class="st"> </span>cfe<span class="op">$</span>treatments<span class="op">$</span>scoreFrame</a>
 <a class="sourceLine" id="cb5-2" data-line-number="2">knitr<span class="op">::</span><span class="kw">kable</span>(sf[, <span class="kw">c</span>(<span class="st">&quot;varName&quot;</span>, <span class="st">&quot;rsq&quot;</span>, <span class="st">&quot;sig&quot;</span>)])</a></code></pre></div>
 <table>
@@ -393,6 +394,9 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 <p>Obviously there are situations where variable importance can not be discovered without considering joint distributions. The most famous one being “xor” where the concept to be learned is if an odd or even number of indicator variables are zero or one (each such variable is individual completely uninformative about the outcome until you have all of the variables simultaneously). However, for practical problems you often have that most variables have a higher marginal predictive power taken alone than they have in the final joint model (as other, better, variables consume some of common variables’ predictive power in the joint model). With this in mind single variable screening often at least gives an indication where to look.</p>
 <p>In conclusion the <code>vtreat</code> package and <code>vtreat::value_variables_*()</code> can be a valuable addition to your supervised learning practice.</p>
 
+
+
+<!-- code folding -->
 
 
 <!-- dynamically load mathjax for compatibility with self-contained -->

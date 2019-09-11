@@ -7,12 +7,13 @@
 <meta charset="utf-8" />
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <meta name="author" content="Win-Vector LLC" />
 
-<meta name="date" content="2019-07-27" />
+<meta name="date" content="2019-09-11" />
 
 <title>vtreat scale mode</title>
 
@@ -96,7 +97,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
       if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
       var style = rule.style.cssText;
       // check if color or background-color is set
-      if (rule.style.color === '' || rule.style.backgroundColor === '') continue;
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
       // replace div.sourceCode by a pre.sourceCode rule
       sheets[i].deleteRule(j);
       sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
@@ -303,7 +304,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 
 <h1 class="title toc-ignore">vtreat scale mode</h1>
 <h4 class="author">Win-Vector LLC</h4>
-<h4 class="date">2019-07-27</h4>
+<h4 class="date">2019-09-11</h4>
 
 
 
@@ -446,9 +447,9 @@ For classification problems (or categorical <code>y</code>’s) as of version <c
 <a class="sourceLine" id="cb20-7" data-line-number="7">cEraw &lt;-<span class="st"> </span>vtreat<span class="op">::</span><span class="kw">mkCrossFrameNExperiment</span>(dTrainN,</a>
 <a class="sourceLine" id="cb20-8" data-line-number="8">                                         <span class="kw">c</span>(<span class="st">'x1'</span>,<span class="st">'x2'</span>,<span class="st">'x3'</span>),<span class="st">'y'</span>,</a>
 <a class="sourceLine" id="cb20-9" data-line-number="9">                                         <span class="dt">scale=</span><span class="ot">TRUE</span>)</a></code></pre></div>
-<pre><code>## [1] &quot;vtreat 1.4.4 start initial treatment design Sat Jul 27 07:53:40 2019&quot;
-## [1] &quot; start cross frame work Sat Jul 27 07:53:40 2019&quot;
-## [1] &quot; vtreat::mkCrossFrameNExperiment done Sat Jul 27 07:53:40 2019&quot;</code></pre>
+<pre><code>## [1] &quot;vtreat 1.4.5 start initial treatment design Wed Sep 11 08:33:54 2019&quot;
+## [1] &quot; start cross frame work Wed Sep 11 08:33:54 2019&quot;
+## [1] &quot; vtreat::mkCrossFrameNExperiment done Wed Sep 11 08:33:54 2019&quot;</code></pre>
 <div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb22-1" data-line-number="1">newvars &lt;-<span class="st"> </span>cEraw<span class="op">$</span>treatments<span class="op">$</span>scoreFrame<span class="op">$</span>varName</a>
 <a class="sourceLine" id="cb22-2" data-line-number="2"><span class="kw">print</span>(newvars)</a></code></pre></div>
 <pre><code>## [1] &quot;x1&quot; &quot;x2&quot; &quot;x3&quot;</code></pre>
@@ -468,9 +469,9 @@ For classification problems (or categorical <code>y</code>’s) as of version <c
 <a class="sourceLine" id="cb26-2" data-line-number="2">cEscaled &lt;-<span class="st"> </span>vtreat<span class="op">::</span><span class="kw">mkCrossFrameNExperiment</span>(dTrainN,</a>
 <a class="sourceLine" id="cb26-3" data-line-number="3">                                            <span class="kw">c</span>(<span class="st">'x1'</span>,<span class="st">'x2'</span>,<span class="st">'x3'</span>),<span class="st">'yScaled'</span>,</a>
 <a class="sourceLine" id="cb26-4" data-line-number="4">                                            <span class="dt">scale=</span><span class="ot">TRUE</span>)</a></code></pre></div>
-<pre><code>## [1] &quot;vtreat 1.4.4 start initial treatment design Sat Jul 27 07:53:40 2019&quot;
-## [1] &quot; start cross frame work Sat Jul 27 07:53:40 2019&quot;
-## [1] &quot; vtreat::mkCrossFrameNExperiment done Sat Jul 27 07:53:40 2019&quot;</code></pre>
+<pre><code>## [1] &quot;vtreat 1.4.5 start initial treatment design Wed Sep 11 08:33:54 2019&quot;
+## [1] &quot; start cross frame work Wed Sep 11 08:33:54 2019&quot;
+## [1] &quot; vtreat::mkCrossFrameNExperiment done Wed Sep 11 08:33:54 2019&quot;</code></pre>
 <div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb28-1" data-line-number="1">newvars_s &lt;-<span class="st"> </span>cEscaled<span class="op">$</span>treatments<span class="op">$</span>scoreFrame<span class="op">$</span>varName</a>
 <a class="sourceLine" id="cb28-2" data-line-number="2"><span class="kw">print</span>(newvars_s)</a></code></pre></div>
 <pre><code>## [1] &quot;x1&quot; &quot;x2&quot; &quot;x3&quot;</code></pre>
@@ -489,6 +490,9 @@ For classification problems (or categorical <code>y</code>’s) as of version <c
 <p>Notice the second application of <code>stats::prcomp</code> has more standard scaling of the reported standard deviations (though we still do not advise choosing latent variables based on mere comparisons to unit magnitude).</p>
 </div>
 
+
+
+<!-- code folding -->
 
 
 <!-- dynamically load mathjax for compatibility with self-contained -->

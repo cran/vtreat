@@ -5,21 +5,45 @@
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1173313.svg)](https://doi.org/10.5281/zenodo.1173313)
 [![CRAN\_Status\_Badge](https://www.r-pkg.org/badges/version/vtreat)](https://cran.r-project.org/package=vtreat)
 
-[vtreat](http://winvector.github.io/vtreat/) is an
-[R](https://cran.r-project.org) `data.frame` and
-[`Python`/`Pandas`](https://github.com/WinVector/pyvtreat)
-processor/conditioner that prepares real-world data for predictive
-modeling in a statistically sound manner.
+`vtreat` is a `data.frame` processor/conditioner that prepares
+real-world data for supervised machine learning or predictive modeling
+in a statistically sound manner.
+
+`vtreat` takes an input `data.frame` that has a specified column called
+“the outcome variable” (or “y”) that is the quantity to be predicted
+(and must not have missing values). Other input columns are possible
+explanatory variables (typically numeric or categorical/string-valued,
+these columns may have missing values) that the user later wants to use
+to predict “y”. In practice such an input `data.frame` may not be
+immediately suitable for machine learning procedures that often expect
+only numeric explanatory variables, and may not tolerate missing values.
+
+To solve this, `vtreat` builds a transformed `data.frame` where all
+explanatory variable columns have been transformed into a number of
+numeric explanatory variable columns, without missing values. The
+`vtreat` implementation produces derived numeric columns that capture
+most of the information relating the explanatory columns to the
+specified “y” or dependent/outcome column through a number of numeric
+transforms (indicator variables, impact codes, prevalence codes, and
+more). This transformed `data.frame` is suitable for a wide range of
+supervised learning methods from linear regression, through gradient
+boosted machines.
+
+The idea is: you can take a `data.frame` of messy real world data and
+easily, faithfully, reliably, and repeatably prepare it for machine
+learning using documented methods using `vtreat`. Incorporating `vtreat`
+into your machine learning workflow lets you quickly work with very
+diverse structured data.
 
 For more detail please see here: [arXiv:1611.09477
-stat.AP](https://arxiv.org/abs/1611.09477) . There is also a series of
-articles recording the evolution of `vtreat` including some tutorials
-[here](http://www.win-vector.com/blog/tag/vtreat/).
+stat.AP](https://arxiv.org/abs/1611.09477) (the documentation describes
+the `R` version, however all of the examples can be found worked in
+`Python`
+[here](https://github.com/WinVector/pyvtreat/tree/master/Examples/vtreat_paper1)).
 
-`vtreat` is supplied by [Win-Vector LLC](http://www.win-vector.com)
-under a GPL-2 | GPL-3 license, without warranty. We are also developing
-a [Python version of `vtreat`](https://github.com/WinVector/pyvtreat)
-(under a BSD 3-clause license).
+`vtreat` is available as an [`R`
+package](https://github.com/WinVector/vtreat), and also as a
+[`Python`/`Pandas` package](https://github.com/WinVector/vtreat).
 
 ![](https://github.com/WinVector/vtreat/raw/master/tools/vtreat.png)
 
@@ -199,18 +223,21 @@ the steps taught in chapters 4 and 6 of [*Practical Data Science with R*
 [very short
 worksheet](http://winvector.github.io/KDD2009/KDD2009RF.html) (though we
 think for understanding it is *essential* to work all the steps by hand
-as we did in the book). The idea is: `data.frame`s prepared with the
-`vtreat` library are somewhat safe to train on as some precaution has
-been taken against all of the above issues. Also of interest are the
-`vtreat` variable significances (help in initial variable pruning, a
-necessity when there are a large number of columns) and
-`vtreat::prepare(scale=TRUE)` which re-encodes all variables into effect
-units making them suitable for y-aware dimension reduction (variable
-clustering, or principal component analysis) and for geometry sensitive
-machine learning techniques (k-means, knn, linear SVM, and more). You
-may want to do more than the `vtreat` library does (such as Bayesian
-imputation, variable clustering, and more) but you certainly do not want
-to do less.
+as we did in the book). The 2nd edition of *Practical Data Science with
+R* covers using `vtreat` in `R` in chapter 8 “Advanced Data
+Preparation.”
+
+The idea is: `data.frame`s prepared with the `vtreat` library are
+somewhat safe to train on as some precaution has been taken against all
+of the above issues. Also of interest are the `vtreat` variable
+significances (help in initial variable pruning, a necessity when there
+are a large number of columns) and `vtreat::prepare(scale=TRUE)` which
+re-encodes all variables into effect units making them suitable for
+y-aware dimension reduction (variable clustering, or principal component
+analysis) and for geometry sensitive machine learning techniques
+(k-means, knn, linear SVM, and more). You may want to do more than the
+`vtreat` library does (such as Bayesian imputation, variable clustering,
+and more) but you certainly do not want to do less.
 
 There have been a number of recent substantial improvements to the
 library, including:
@@ -247,7 +274,7 @@ Trivial example:
 ``` r
 library("vtreat")
 packageVersion("vtreat")
- #  [1] '1.4.4'
+ #  [1] '1.4.5'
 citation('vtreat')
  #  
  #  To cite package 'vtreat' in publications use:
@@ -277,14 +304,14 @@ dTestC <- data.frame(x=c('a', 'b', 'c', NA), z=c(10, 20, 30, NA))
 treatmentsC <- designTreatmentsC(dTrainC, colnames(dTrainC), 'y', TRUE,
                                  verbose=FALSE)
 print(treatmentsC$scoreFrame[, c('origName', 'varName', 'code', 'rsq', 'sig', 'extraModelDegrees')])
- #    origName   varName  code         rsq        sig extraModelDegrees
- #  1        x    x_catP  catP 0.057741424 0.45748159                 2
- #  2        x    x_catB  catB 0.019483838 0.66603146                 2
- #  3        z         z clean 0.237601767 0.13176020                 0
- #  4        z   z_isBAD isBAD 0.296065432 0.09248399                 0
- #  5        x  x_lev_NA   lev 0.296065432 0.09248399                 0
- #  6        x x_lev_x_a   lev 0.130005705 0.26490379                 0
- #  7        x x_lev_x_b   lev 0.006067337 0.80967242                 0
+ #    origName   varName  code          rsq        sig extraModelDegrees
+ #  1        x    x_catP  catP 1.030137e-01 0.32099590                 2
+ #  2        x    x_catB  catB 1.125399e-05 0.99172381                 2
+ #  3        z         z clean 2.376018e-01 0.13176020                 0
+ #  4        z   z_isBAD isBAD 2.960654e-01 0.09248399                 0
+ #  5        x  x_lev_NA   lev 2.960654e-01 0.09248399                 0
+ #  6        x x_lev_x_a   lev 1.300057e-01 0.26490379                 0
+ #  7        x x_lev_x_b   lev 6.067337e-03 0.80967242                 0
 
 # help("prepare")
 
@@ -322,9 +349,9 @@ treatmentsN = designTreatmentsN(dTrainN, colnames(dTrainN), 'y',
                                 verbose=FALSE)
 print(treatmentsN$scoreFrame[, c('origName', 'varName', 'code', 'rsq', 'sig', 'extraModelDegrees')])
  #    origName   varName  code          rsq       sig extraModelDegrees
- #  1        x    x_catP  catP 2.500000e-01 0.2070312                 2
- #  2        x    x_catN  catN 2.571429e-01 0.1996217                 2
- #  3        x    x_catD  catD 1.620332e-01 0.3228162                 2
+ #  1        x    x_catP  catP 2.105263e-01 0.2528101                 2
+ #  2        x    x_catN  catN 3.205128e-03 0.8940756                 2
+ #  3        x    x_catD  catD 6.666667e-02 0.5369633                 2
  #  4        z         z clean 2.880952e-01 0.1701892                 0
  #  5        z   z_isBAD isBAD 3.333333e-01 0.1339746                 0
  #  6        x  x_lev_NA   lev 3.333333e-01 0.1339746                 0
@@ -380,11 +407,9 @@ dTrainN %.>%
 
 Related work:
 
-  - [“A Transformation for Simplifying the Interpretation of
-    Coefficients of Binary Variables in Regression
-    Analysis”](https://www.jstor.org/stable/2683780), Robert E.
-    Sweeney and Edwin F. Ulveling; The American Statistician, vol. 26,
-    no. 5, pp. 30-32, 1972.
+  - Cohen J, Cohen P (1983). Applied Multiple Regression/Correlation
+    Analysis For The Behav- ioral Sciences. 2 edition. Lawrence Erlbaum
+    Associates, Inc. ISBN 0-89859-268-2.
   - [“A preprocessing scheme for high-cardinality categorical attributes
     in classification and prediction
     problems”](http://dl.acm.org/citation.cfm?id=507538) Daniele
