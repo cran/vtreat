@@ -4,13 +4,32 @@
 \alias{mkCrossFrameCExperiment}
 \title{Run categorical cross-frame experiment.}
 \usage{
-mkCrossFrameCExperiment(dframe, varlist, outcomename, outcometarget, ...,
-  weights = c(), minFraction = 0.02, smFactor = 0, rareCount = 0,
-  rareSig = 1, collarProb = 0, codeRestriction = NULL,
-  customCoders = NULL, scale = FALSE, doCollar = FALSE,
-  splitFunction = NULL, ncross = 3, forceSplit = FALSE,
-  catScaling = TRUE, verbose = TRUE, parallelCluster = NULL,
-  use_parallel = TRUE)
+mkCrossFrameCExperiment(
+  dframe,
+  varlist,
+  outcomename,
+  outcometarget,
+  ...,
+  weights = c(),
+  minFraction = 0.02,
+  smFactor = 0,
+  rareCount = 0,
+  rareSig = 1,
+  collarProb = 0,
+  codeRestriction = NULL,
+  customCoders = NULL,
+  scale = FALSE,
+  doCollar = FALSE,
+  splitFunction = NULL,
+  ncross = 3,
+  forceSplit = FALSE,
+  catScaling = TRUE,
+  verbose = TRUE,
+  parallelCluster = NULL,
+  use_parallel = TRUE,
+  missingness_imputation = NULL,
+  imputation_map = NULL
+)
 }
 \arguments{
 \item{dframe}{Data frame to learn treatments from (training data), must have at least 1 row.}
@@ -56,6 +75,10 @@ mkCrossFrameCExperiment(dframe, varlist, outcomename, outcometarget, ...,
 \item{parallelCluster}{(optional) a cluster object created by package parallel or package snow.}
 
 \item{use_parallel}{logical, if TRUE use parallel methods.}
+
+\item{missingness_imputation}{function of signature f(values: numeric, weights: numeric), simple missing value imputer.}
+
+\item{imputation_map}{map from column names to functions of signature f(values: numeric, weights: numeric), simple missing value imputers.}
 }
 \value{
 list with treatments and crossFrame

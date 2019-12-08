@@ -1,7 +1,7 @@
-## ----libs----------------------------------------------------------------
+## ----libs---------------------------------------------------------------------
 library("vtreat")
 
-## ----mkex----------------------------------------------------------------
+## ----mkex---------------------------------------------------------------------
 # create example data
 set.seed(326346)
 sym_bonuses <- rnorm(3)
@@ -22,7 +22,7 @@ d$y[sym_bonuses3[d$x3] >
 
 knitr::kable(head(d))
 
-## ----tdef----------------------------------------------------------------
+## ----tdef---------------------------------------------------------------------
 # define problem
 vars <- c("x1", "x2", "x3")
 y_name <- "y"
@@ -30,11 +30,11 @@ y_name <- "y"
 # build the multi-class cross frame and treatments
 cfe_m <- mkCrossFrameMExperiment(d, vars, y_name)
 
-## ----crossframe----------------------------------------------------------
+## ----crossframe---------------------------------------------------------------
 # look at the data we would train models on
 str(cfe_m$cross_frame)
 
-## ----treatment_plan------------------------------------------------------
+## ----treatment_plan-----------------------------------------------------------
 # pretend original data is new data to be treated
 # NA out top row to show processing
 for(vi in vars) {
@@ -42,13 +42,13 @@ for(vi in vars) {
 }
 str(prepare(cfe_m$treat_m, d))
 
-## ----varimp--------------------------------------------------------------
+## ----varimp-------------------------------------------------------------------
 knitr::kable(
   cfe_m$score_frame[, 
                     c("varName", "rsq", "sig", "outcome_level"), 
                     drop = FALSE])
 
-## ----varagg--------------------------------------------------------------
+## ----varagg-------------------------------------------------------------------
 
 tapply(cfe_m$score_frame$rsq, 
        cfe_m$score_frame$origName, 

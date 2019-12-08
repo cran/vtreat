@@ -1,11 +1,10 @@
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
 
 <head>
 
 <meta charset="utf-8" />
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="pandoc" />
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
@@ -13,7 +12,7 @@
 
 <meta name="author" content="John Mount, Nina Zumel" />
 
-<meta name="date" content="2019-10-01" />
+<meta name="date" content="2019-12-08" />
 
 <title>vtreat package</title>
 
@@ -304,7 +303,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 
 <h1 class="title toc-ignore">vtreat package</h1>
 <h4 class="author">John Mount, Nina Zumel</h4>
-<h4 class="date">2019-10-01</h4>
+<h4 class="date">2019-12-08</h4>
 
 
 
@@ -379,7 +378,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 <p>Trivial example:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw">library</span>(<span class="st">&quot;vtreat&quot;</span>)</a>
 <a class="sourceLine" id="cb1-2" data-line-number="2"><span class="kw">packageVersion</span>(<span class="st">&quot;vtreat&quot;</span>)</a></code></pre></div>
-<pre><code>## [1] '1.4.7'</code></pre>
+<pre><code>## [1] '1.4.8'</code></pre>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1"><span class="kw">citation</span>(<span class="st">'vtreat'</span>)</a></code></pre></div>
 <pre><code>## 
 ## To cite package 'vtreat' in publications use:
@@ -429,10 +428,8 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1"><span class="co"># all non NA slopes should be 1</span></a>
 <a class="sourceLine" id="cb9-2" data-line-number="2"><span class="kw">sapply</span>(varsC, <span class="cf">function</span>(c) { <span class="kw">lm</span>(<span class="kw">paste</span>(<span class="st">'y'</span>, c, <span class="dt">sep=</span><span class="st">'~'</span>),</a>
 <a class="sourceLine" id="cb9-3" data-line-number="3">   <span class="dt">data=</span>dTrainCTreated)<span class="op">$</span>coefficients[[<span class="dv">2</span>]]})</a></code></pre></div>
-<pre><code>##     x_catP     x_catB          z    z_isBAD   x_lev_NA  x_lev_x_a 
-## 0.23254609 0.05841932 0.16062145 0.03162633 0.03162633 0.23254609 
-##  x_lev_x_b 
-## 0.24663035</code></pre>
+<pre><code>##     x_catP     x_catB          z    z_isBAD   x_lev_NA  x_lev_x_a  x_lev_x_b 
+## 0.23254609 0.05841932 0.16062145 0.03162633 0.03162633 0.23254609 0.24663035</code></pre>
 <div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" data-line-number="1">dTestCTreated &lt;-<span class="st"> </span><span class="kw">prepare</span>(treatmentsC, dTestC, <span class="dt">pruneSig=</span><span class="kw">c</span>(), <span class="dt">scale=</span><span class="ot">TRUE</span>)</a>
 <a class="sourceLine" id="cb11-2" data-line-number="2"><span class="kw">print</span>(dTestCTreated)</a></code></pre></div>
 <pre><code>##       x_catP    x_catB         z   z_isBAD  x_lev_NA  x_lev_x_a  x_lev_x_b
@@ -468,10 +465,8 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 <div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb17-1" data-line-number="1"><span class="co"># all non NA slopes should be 1</span></a>
 <a class="sourceLine" id="cb17-2" data-line-number="2"><span class="kw">sapply</span>(varsN, <span class="cf">function</span>(c) { <span class="kw">lm</span>(<span class="kw">paste</span>(<span class="st">'y'</span>, c, <span class="dt">sep=</span><span class="st">'~'</span>),</a>
 <a class="sourceLine" id="cb17-3" data-line-number="3">   <span class="dt">data=</span>dTrainNTreated)<span class="op">$</span>coefficients[[<span class="dv">2</span>]]}) </a></code></pre></div>
-<pre><code>##    x_catP    x_catN    x_catD         z   z_isBAD  x_lev_NA x_lev_x_a 
-##         1         1         1         1         1         1         1 
-## x_lev_x_b 
-##         1</code></pre>
+<pre><code>##    x_catP    x_catN    x_catD         z   z_isBAD  x_lev_NA x_lev_x_a x_lev_x_b 
+##         1         1         1         1         1         1         1         1</code></pre>
 <div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb19-1" data-line-number="1">dTestNTreated &lt;-<span class="st"> </span><span class="kw">prepare</span>(treatmentsN, dTestN, <span class="dt">pruneSig=</span><span class="kw">c</span>(), <span class="dt">scale=</span><span class="ot">TRUE</span>)</a>
 <a class="sourceLine" id="cb19-2" data-line-number="2"><span class="kw">print</span>(dTestNTreated)</a></code></pre></div>
 <pre><code>##   x_catP x_catN      x_catD         z    z_isBAD   x_lev_NA x_lev_x_a

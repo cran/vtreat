@@ -1,4 +1,4 @@
-## ----exampledata---------------------------------------------------------
+## ----exampledata--------------------------------------------------------------
 library('vtreat')
 dTrainC <- data.frame(x=c('a','a','a','b','b',NA),
                       y=c(FALSE,FALSE,TRUE,FALSE,TRUE,TRUE))
@@ -8,16 +8,16 @@ treatmentsC <- designTreatmentsC(dTrainC,colnames(dTrainC),'y',TRUE,
 dTrainCTreatedUnscaled <- prepare(treatmentsC,dTrainC,pruneSig=c(),scale=FALSE)
 dTrainCTreatedScaled <- prepare(treatmentsC,dTrainC,pruneSig=c(),scale=TRUE)
 
-## ----printorig-----------------------------------------------------------
+## ----printorig----------------------------------------------------------------
 print(dTrainC)
 
-## ----printunscaled-------------------------------------------------------
+## ----printunscaled------------------------------------------------------------
 print(dTrainCTreatedUnscaled)
 
-## ----printscaled---------------------------------------------------------
+## ----printscaled--------------------------------------------------------------
 print(dTrainCTreatedScaled)
 
-## ----check---------------------------------------------------------------
+## ----check--------------------------------------------------------------------
 slopeFrame <- data.frame(varName = treatmentsC$scoreFrame$varName,
                          stringsAsFactors = FALSE)
 slopeFrame$mean <-
@@ -38,19 +38,19 @@ slopeFrame$badSlope <-
   ifelse(is.na(slopeFrame$slope), TRUE, abs(slopeFrame$slope - 1) > 1.e-8)
 print(slopeFrame)
 
-## ----catscale------------------------------------------------------------
+## ----catscale-----------------------------------------------------------------
 treatmentsC2 <- designTreatmentsC(dTrainC,colnames(dTrainC),'y',TRUE,
                                   catScaling=TRUE,
                                   verbose=FALSE)
 dTrainCTreatedScaled2 <- prepare(treatmentsC2,dTrainC,pruneSig=c(),scale=TRUE)
 print(dTrainCTreatedScaled2)
 
-## ----checks--------------------------------------------------------------
+## ----checks-------------------------------------------------------------------
 colMeans(dTrainCTreatedScaled2)
 lm(y~x_lev_NA,data=dTrainCTreatedScaled)
 lm(y~x_lev_NA,data=dTrainCTreatedScaled2)
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
  vapply(slopeFrame$varName,
                            function(c) {
                              glm(paste('y', c, sep = '~'),family=binomial,
@@ -58,7 +58,7 @@ lm(y~x_lev_NA,data=dTrainCTreatedScaled2)
                            },
                            numeric(1))
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 set.seed(235235)
 dTrainN <- data.frame(x1=rnorm(100),
                       x2=rnorm(100),

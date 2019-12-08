@@ -1,4 +1,4 @@
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 set.seed(22626)
 
 mkData <- function(n) {
@@ -32,7 +32,7 @@ plotRes <- function(d,predName,yName,title) {
   print(paste('accuracy',acc))
 }
 
-## ----badmixcalandtrain---------------------------------------------------
+## ----badmixcalandtrain--------------------------------------------------------
 dTrain <- d[d$rgroup!='test',,drop=FALSE]
 dTest <- d[d$rgroup=='test',,drop=FALSE]
 treatments <- vtreat::designTreatmentsC(dTrain,c('xBad1','xBad2','xBad3','xGood1','xGood2'),
@@ -55,7 +55,7 @@ dTestTreated <- vtreat::prepare(treatments,dTest,pruneSig=c())
 dTest$predM1 <- predict(m1,newdata=dTestTreated,type='response')
 plotRes(dTest,'predM1','y','model1 on test')
 
-## ----separatecalandtrain-------------------------------------------------
+## ----separatecalandtrain------------------------------------------------------
 dCal <- d[d$rgroup=='cal',,drop=FALSE]
 dTrain <- d[d$rgroup=='train',,drop=FALSE]
 dTest <- d[d$rgroup=='test',,drop=FALSE]
@@ -82,7 +82,7 @@ dTestTreated <- vtreat::prepare(treatments,dTest,
 dTest$predM1 <- predict(m1,newdata=dTestTreated,type='response')
 plotRes(dTest,'predM1','y','model1 on test')
 
-## ----crossframes---------------------------------------------------------
+## ----crossframes--------------------------------------------------------------
 dTrain <- d[d$rgroup!='test',,drop=FALSE]
 dTest <- d[d$rgroup=='test',,drop=FALSE]
 prep <- vtreat::mkCrossFrameCExperiment(dTrain,
@@ -105,7 +105,7 @@ newvars <- sort(union(newvars,c("xBad1_catB","xBad2_catB","xBad3_catB")))
 print(newvars)
 dTrainTreated <- prep$crossFrame
 
-## ----xframemodel---------------------------------------------------------
+## ----xframemodel--------------------------------------------------------------
 m1 <- glm(paste('y',paste(newvars,collapse=' + '),sep=' ~ '),
           data=dTrainTreated,family=binomial(link='logit'))
 print(summary(m1))  

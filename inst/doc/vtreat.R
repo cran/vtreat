@@ -1,4 +1,4 @@
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 library("vtreat")
 packageVersion("vtreat")
 citation('vtreat')
@@ -27,7 +27,7 @@ sapply(varsC, function(c) { lm(paste('y', c, sep='~'),
 dTestCTreated <- prepare(treatmentsC, dTestC, pruneSig=c(), scale=TRUE)
 print(dTestCTreated)
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 # numeric example
 dTrainN <- data.frame(x=c('a', 'a', 'a', 'a', 'b', 'b', NA, NA),
    z=c(1, 2, 3, 4, 5, NA, 7, NA), y=c(0, 0, 0, 1, 0, 1, 1, 1))
@@ -54,6 +54,6 @@ dTrainN %.>%
   treatmentsN %.>% 
   knitr::kable(.)
 
-## ----inst1, eval=FALSE---------------------------------------------------
+## ----inst1, eval=FALSE--------------------------------------------------------
 #  install.packages("vtreat")
 

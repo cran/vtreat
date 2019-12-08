@@ -231,7 +231,8 @@ mkVtreatListWorker <- function(scale,doCollar) {
 }
 
 
-.varDesignerW <- function(argv,
+.varDesignerW <- function(...,
+                          argv,
                           zoY,
                           zC,
                           zTarget,
@@ -247,7 +248,9 @@ mkVtreatListWorker <- function(scale,doCollar) {
                           verbose,
                           nRows,
                           yMoves,
-                          codeRestictionWasNULL) {
+                          codeRestictionWasNULL,
+                          missingness_imputation, imputation_map) {
+  wrapr::stop_if_dot_args(substitute(list(...)), ".varDesignerW")
   v <- argv$v
   vcolOrig <- argv$vcolOrig
   vcol <- argv$vcol
@@ -292,7 +295,15 @@ mkVtreatListWorker <- function(scale,doCollar) {
         }
         ti = NULL
         if(codeRestictionWasNULL || ('clean' %in% codeRestriction)) {
-          ti <- .mkPassThrough(v,vcol,zoY,zC,zTarget,weights,collarProb,catScaling)
+          ti <- .mkPassThrough(origVarName = v,
+                               xcol = vcol,
+                               ycol = zoY,
+                               zC = zC,
+                               zTarget = zTarget,
+                               weights = weights,
+                               collarProb = collarProb,
+                               catScaling = catScaling,
+                               missingness_imputation = missingness_imputation, imputation_map = imputation_map)
           acceptTreatment(ti)
         }
         if(codeRestictionWasNULL || ('isBAD' %in% codeRestriction)) {
@@ -364,14 +375,17 @@ mkVtreatListWorker <- function(scale,doCollar) {
 
 # design a treatment for a single variable
 # bind a bunch of variables, so we pass exactly what we need to sub-processes
-.mkVarDesigner <- function(zoY,
+.mkVarDesigner <- function(..., 
+                           zoY,
                            zC,zTarget,
                            weights,
                            minFraction,smFactor,rareCount,rareSig,
                            collarProb,
                            codeRestriction, customCoders,
                            catScaling,
-                           verbose) {
+                           verbose,
+                           missingness_imputation, imputation_map) {
+  wrapr::stop_if_dot_args(substitute(list(...)), ".mkVarDesigner")
   force(zoY)
   force(zC)
   force(zTarget)
@@ -385,6 +399,8 @@ mkVtreatListWorker <- function(scale,doCollar) {
   force(customCoders)
   force(catScaling)
   force(verbose)
+  force(missingness_imputation)
+  force(imputation_map)
   nRows = length(zoY)
   yMoves <- .has.range.cn(zoY)
   # NULL is an alias for "don't restrict"
@@ -407,7 +423,8 @@ mkVtreatListWorker <- function(scale,doCollar) {
                   verbose = verbose,
                   nRows = nRows,
                   yMoves = yMoves,
-                  codeRestictionWasNULL = codeRestictionWasNULL)
+                  codeRestictionWasNULL = codeRestictionWasNULL,
+                  missingness_imputation = missingness_imputation, imputation_map = imputation_map)
   }
 }
 
@@ -533,7 +550,8 @@ mkVtreatListWorker <- function(scale,doCollar) {
   catScaling,
   verbose = FALSE,
   parallelCluster = NULL,
-  use_parallel = TRUE) {
+  use_parallel = TRUE,
+  missingness_imputation, imputation_map) {
   wrapr::stop_if_dot_args(substitute(list(...)), 
                           "vtreat:::.designTreatmentsXS")
   if(verbose) {
@@ -587,14 +605,15 @@ mkVtreatListWorker <- function(scale,doCollar) {
     print(paste(" have initial level statistics", date()))
   }
   # build the treatments we will return to the user
-  worker <- .mkVarDesigner(zoY,
-                           zC,zTarget,
-                           weights,
-                           minFraction,smFactor,rareCount,rareSig,
-                           collarProb,
-                           codeRestriction, customCoders,
-                           catScaling,
-                           verbose)
+  worker <- .mkVarDesigner(zoY = zoY,
+                           zC = zC, zTarget = zTarget,
+                           weights = weights,
+                           minFraction = minFraction, smFactor = smFactor, rareCount = rareCount, rareSig = rareSig,
+                           collarProb = collarProb,
+                           codeRestriction = codeRestriction, customCoders = customCoders,
+                           catScaling = catScaling,
+                           verbose = verbose,
+                           missingness_imputation = missingness_imputation, imputation_map = imputation_map)
   treatments <- plapply(workList, worker,
                         parallelCluster = parallelCluster,
                         use_parallel = use_parallel)
@@ -708,7 +727,8 @@ mkVtreatListWorker <- function(scale,doCollar) {
   catScaling,
   verbose = FALSE,
   parallelCluster = NULL,
-  use_parallel = TRUE) {
+  use_parallel = TRUE,
+  missingness_imputation, imputation_map) {
   wrapr::stop_if_dot_args(substitute(list(...)), 
                           "vtreat:::.designTreatmentsX")
   if(!is.data.frame(dframe)) {
@@ -781,7 +801,8 @@ mkVtreatListWorker <- function(scale,doCollar) {
     catScaling = catScaling,
     verbose = verbose,
     parallelCluster = parallelCluster,
-    use_parallel = use_parallel)
+    use_parallel = use_parallel,
+    missingness_imputation = missingness_imputation, imputation_map = imputation_map)
   treatments$scoreFrame <- treatments$scoreFrame[treatments$scoreFrame$varMoves,]
   if(forceSplit) {
     treatments$scoreFrame$needsSplit <- TRUE
@@ -824,7 +845,8 @@ mkVtreatListWorker <- function(scale,doCollar) {
         catScaling = catScaling,
         parallelCluster = parallelCluster,
         use_parallel = use_parallel,
-        verbose = FALSE)
+        verbose = FALSE,
+        missingness_imputation = missingness_imputation, imputation_map = imputation_map)
       crossFrame <- crossData$crossFrame
       crossWeights <- crossData$crossWeights
       crossMethod <- crossData$method

@@ -1,5 +1,11 @@
 
-# vtreat 1.4.7 2019/10/30
+# vtreat 1.4.8 2019/12/08
+
+ * Center/scale improvement from nfultz.
+ * Documentation updates.
+ * fit_tranform interface.
+
+# vtreat 1.4.7 2019/10/01
 
  * fix wrong y-name in multinomial cross frame.
  

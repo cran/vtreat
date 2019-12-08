@@ -1,7 +1,7 @@
-## ----setup, include=FALSE------------------------------------------------
+## ----setup, include=FALSE-----------------------------------------------------
 knitr::opts_chunk$set(fig.width = 7)
 
-## ----echo=FALSE, message=FALSE, warning=FALSE----------------------------
+## ----echo=FALSE, message=FALSE, warning=FALSE---------------------------------
 library(vtreat)
 set.seed(23255)
 
@@ -11,7 +11,7 @@ if(have_rqdatatable) {
 }
 
 
-## ----echo=FALSE, message=FALSE, warning=FALSE----------------------------
+## ----echo=FALSE, message=FALSE, warning=FALSE---------------------------------
 #
 # takes the frame (d) and the outcome column (d$conc)
 # from the global environment
@@ -26,22 +26,22 @@ showGroupingBehavior = function(groupcol, title) {
   print(paste("Standard deviation of group means:", sd(means)))
 }
 
-## ----data----------------------------------------------------------------
+## ----data---------------------------------------------------------------------
 # panel data for concentration in multiple subjects 
 d <- datasets::Theoph
 head(d)
 summary(d)
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 # a somewhat arbitrary split of patients
 subnum = as.numeric(as.character(d$Subject))
 d$modSplit = as.factor(subnum %% 3)
 
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 print(table(Subject=d$Subject, groupid=d$modSplit))
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 # stratify by outcome only
 # forces concentration to be equivalent
 pStrat <- kWayStratifiedY(nrow(d),3,d,d$conc)
@@ -50,7 +50,7 @@ d$stratSplit <- vtreat::getSplitPlanAppLabels(nrow(d),pStrat)
 
 print(table(Subject=d$Subject, groupid=d$stratSplit))
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 # stratify by patient and outcome
 # allows concentration to vary amoung individual patients
 splitter <- makekWayCrossValidationGroupedByColumn('Subject')
@@ -60,9 +60,9 @@ d$subjectSplit <- vtreat::getSplitPlanAppLabels(nrow(d),split)
 
 print(table(Subject=d$Subject, groupid=d$subjectSplit))
 
-## ----echo=FALSE----------------------------------------------------------
+## ----echo=FALSE---------------------------------------------------------------
 showGroupingBehavior("modSplit", "Arbitrary grouping")
 
-## ----echo=FALSE----------------------------------------------------------
+## ----echo=FALSE---------------------------------------------------------------
 showGroupingBehavior("subjectSplit", "Group by patient, stratify on y")
 

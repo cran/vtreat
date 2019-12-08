@@ -4,13 +4,32 @@
 \alias{mkCrossFrameMExperiment}
 \title{Function to build multi-outcome vtreat cross frame and treatment plan.}
 \usage{
-mkCrossFrameMExperiment(d, vars, y_name, ..., weights = c(),
-  minFraction = 0.02, smFactor = 0, rareCount = 0, rareSig = 1,
-  collarProb = 0, codeRestriction = NULL, customCoders = NULL,
-  scale = FALSE, doCollar = FALSE, splitFunction = NULL,
-  ncross = 3, forceSplit = FALSE, catScaling = FALSE,
-  y_dependent_treatments = c("catB"), verbose = FALSE,
-  parallelCluster = NULL, use_parallel = TRUE)
+mkCrossFrameMExperiment(
+  d,
+  vars,
+  y_name,
+  ...,
+  weights = c(),
+  minFraction = 0.02,
+  smFactor = 0,
+  rareCount = 0,
+  rareSig = 1,
+  collarProb = 0,
+  codeRestriction = NULL,
+  customCoders = NULL,
+  scale = FALSE,
+  doCollar = FALSE,
+  splitFunction = NULL,
+  ncross = 3,
+  forceSplit = FALSE,
+  catScaling = FALSE,
+  y_dependent_treatments = c("catB"),
+  verbose = FALSE,
+  parallelCluster = NULL,
+  use_parallel = TRUE,
+  missingness_imputation = NULL,
+  imputation_map = NULL
+)
 }
 \arguments{
 \item{d}{data to learn from}
@@ -56,6 +75,10 @@ mkCrossFrameMExperiment(d, vars, y_name, ..., weights = c(),
 \item{parallelCluster}{(optional) a cluster object created by package parallel or package snow.}
 
 \item{use_parallel}{logical, if TRUE use parallel methods.}
+
+\item{missingness_imputation}{function of signature f(values: numeric, weights: numeric), simple missing value imputer.}
+
+\item{imputation_map}{map from column names to functions of signature f(values: numeric, weights: numeric), simple missing value imputers.}
 }
 \value{
 list(cross_frame, treatments_0, treatments_m)

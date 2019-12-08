@@ -1,4 +1,4 @@
-## ----savefile------------------------------------------------------------
+## ----savefile-----------------------------------------------------------------
 library("vtreat")
 dTrainC <- data.frame(x=c('a','a','a','b','b',NA,NA),
                       z=c(1,2,3,4,NA,6,NA),
@@ -11,7 +11,7 @@ fileName = paste0(tempfile(c('vtreatPlan')), '.RDS')
 saveRDS(treatmentsC,fileName)
 rm(list=c('treatmentsC'))
 
-## ----loadfile------------------------------------------------------------
+## ----loadfile-----------------------------------------------------------------
 library("vtreat")
 treatmentsC <- readRDS(fileName)
 
@@ -21,7 +21,7 @@ dTestCTreated <- prepare(treatmentsC, dTestC, pruneSig= c())
 # clean up
 unlink(fileName)
 
-## ----dbsave--------------------------------------------------------------
+## ----dbsave-------------------------------------------------------------------
 con <- NULL
 if (requireNamespace('RSQLite', quietly = TRUE) &&
     requireNamespace('DBI', quietly = TRUE)) {
@@ -51,7 +51,7 @@ if (requireNamespace('RSQLite', quietly = TRUE) &&
 }
 rm(list= c('treatmentsC', 'dTestCTreated'))
 
-## ----dbload--------------------------------------------------------------
+## ----dbload-------------------------------------------------------------------
 if(!is.null(con)) {
   treatmentsList <- lapply(
     dbGetQuery(con, 

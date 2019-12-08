@@ -1,11 +1,10 @@
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
 
 <head>
 
 <meta charset="utf-8" />
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="pandoc" />
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
@@ -13,7 +12,7 @@
 
 <meta name="author" content="Nina Zumel, Nate Sutton" />
 
-<meta name="date" content="2019-10-01" />
+<meta name="date" content="2019-12-08" />
 
 <title>Grouping Example</title>
 
@@ -304,7 +303,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 
 <h1 class="title toc-ignore">Grouping Example</h1>
 <h4 class="author">Nina Zumel, Nate Sutton</h4>
-<h4 class="date">2019-10-01</h4>
+<h4 class="date">2019-12-08</h4>
 
 
 
@@ -324,22 +323,14 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 ## 5       1 79.6 4.02 2.02  9.66
 ## 6       1 79.6 4.02 3.82  8.58</code></pre>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1"><span class="kw">summary</span>(d)</a></code></pre></div>
-<pre><code>##     Subject         Wt             Dose            Time       
-##  6      :11   Min.   :54.60   Min.   :3.100   Min.   : 0.000  
-##  7      :11   1st Qu.:63.58   1st Qu.:4.305   1st Qu.: 0.595  
-##  8      :11   Median :70.50   Median :4.530   Median : 3.530  
-##  11     :11   Mean   :69.58   Mean   :4.626   Mean   : 5.895  
-##  3      :11   3rd Qu.:74.42   3rd Qu.:5.037   3rd Qu.: 9.000  
-##  2      :11   Max.   :86.40   Max.   :5.860   Max.   :24.650  
-##  (Other):66                                                   
-##       conc       
-##  Min.   : 0.000  
-##  1st Qu.: 2.877  
-##  Median : 5.275  
-##  Mean   : 4.960  
-##  3rd Qu.: 7.140  
-##  Max.   :11.400  
-## </code></pre>
+<pre><code>##     Subject         Wt             Dose            Time             conc       
+##  6      :11   Min.   :54.60   Min.   :3.100   Min.   : 0.000   Min.   : 0.000  
+##  7      :11   1st Qu.:63.58   1st Qu.:4.305   1st Qu.: 0.595   1st Qu.: 2.877  
+##  8      :11   Median :70.50   Median :4.530   Median : 3.530   Median : 5.275  
+##  11     :11   Mean   :69.58   Mean   :4.626   Mean   : 5.895   Mean   : 4.960  
+##  3      :11   3rd Qu.:74.42   3rd Qu.:5.037   3rd Qu.: 9.000   3rd Qu.: 7.140  
+##  2      :11   Max.   :86.40   Max.   :5.860   Max.   :24.650   Max.   :11.400  
+##  (Other):66</code></pre>
 <p>We have twelve subjects, who each received a dose of the anti-asthma drug theophylline. The theophylline concentration in the patients’ blood was then measured at eleven points during the next 25 hours. Most of the patients got about the same dose, although the dose information reported in the dataset is normalized by weight.</p>
 </div>
 <div id="partitioning-the-data-for-modeling" class="section level2">

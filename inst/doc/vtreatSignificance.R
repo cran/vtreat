@@ -1,4 +1,4 @@
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 signk <- function(n,k) {
   sigTab <- data.frame(y=c(rep(TRUE,n/2),rep(FALSE,n/2)),v=FALSE)
   sigTab[seq_len(k),'v'] <- TRUE
@@ -11,7 +11,7 @@ sigTab$sigEst = vapply(sigTab$k,function(k) signk(1000,k),numeric(1))
 sigTab$minusLogSig = -log(sigTab$sigEst) # we expect this to be approximately k
 print(sigTab)
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 set.seed(3346)
 n <- 1000
 k <- 4
@@ -39,16 +39,16 @@ estSigGLM <- function(xVar,yVar,numberOfHiddenDegrees=0) {
 
 prepD <- vtreat::prepare(treatmentsC,d,pruneSig=c())
 
-## ----scoreframe----------------------------------------------------------
+## ----scoreframe---------------------------------------------------------------
 print(treatmentsC$scoreFrame[,c('varName','rsq','sig','extraModelDegrees')])
 
-## ----scoresignal---------------------------------------------------------
+## ----scoresignal--------------------------------------------------------------
 summary(glm(y~d$catVarPerfect=='lev001T',data=d,family=binomial))
 estSigGLM(prepD$catVarPerfect_catB,prepD$y,0) # wrong est
 estSigGLM(prepD$catVarPerfect_catB,prepD$y,
           numberOfHiddenDegrees=length(unique(d$catVarPerfect))-1)
 
-## ----scorenoise----------------------------------------------------------
+## ----scorenoise---------------------------------------------------------------
 summary(glm(y~d$catVarNoise=='lev001',data=d,family=binomial))
 estSigGLM(prepD$catVarNoise_catB,prepD$y,0) # wrong est
 estSigGLM(prepD$catVarNoise_catB,prepD$y,

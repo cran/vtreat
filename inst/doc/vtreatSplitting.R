@@ -1,11 +1,11 @@
-## ----setup, include=FALSE------------------------------------------------
+## ----setup, include=FALSE-----------------------------------------------------
 knitr::opts_chunk$set(echo = TRUE)
 knitr::opts_chunk$set(fig.width = 7)
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 vtreat::kWayStratifiedY(3,2,NULL,NULL)
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 # This method is not a great idea as the data could have structure that strides
 # in the same pattern as this split.
 # Such technically is possible for any split, but we typically use
@@ -21,19 +21,19 @@ modularSplit <- function(nRows,nSplits,dframe,y) {
          })
 }
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 vtreat::buildEvalSets(nRows=25,nSplits=3,splitFunction=modularSplit)
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 badSplit <- function(nRows,nSplits,dframe,y) {
   list(list(train=seq_len(nRows),app=seq_len(nRows)))
 }
 vtreat::buildEvalSets(nRows=5,nSplits=3,splitFunction=badSplit)
 
-## ----warning=FALSE-------------------------------------------------------
+## ----warning=FALSE------------------------------------------------------------
 library('vtreat')
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 set.seed(23255)
 d <- data.frame(y=sin(1:100))
 
