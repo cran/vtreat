@@ -90,6 +90,7 @@ BinomialOutcomeTreatment <- function(...,
     stop("vtreat::BinomialOutcomeTreatment expected class classification_parameters")
   }
   params <- classification_parameters(params)
+  var_list <- setdiff(var_list, c(outcome_name, cols_to_copy))
   settings <- list(
     var_list = var_list,
     outcome_name = outcome_name, 
@@ -102,7 +103,8 @@ BinomialOutcomeTreatment <- function(...,
   assign("transform", NULL, envir = settings$state)
   assign("score_frame", NULL, envir = settings$state)
   obj <- list(settings = settings)
-  class(obj) <- "vtreat_BinomialOutcomeTreatment"
+  class(obj) <- "vtreat_pipe_step"
+  obj$treatment_type <- "BinomialOutcomeTreatment"
   fit <- function(dframe, ..., weights = NULL, parallelCluster = NULL) {
     wrapr::stop_if_dot_args(substitute(list(...)), 
                             "vtreat::BinomialOutcomeTreatment$fit")
@@ -196,11 +198,23 @@ BinomialOutcomeTreatment <- function(...,
     res <- get('transform', envir = settings$state, inherits = FALSE)
     return(res)
   }
+  # get globalenv early on environment chain for seralization
+  # See pseudo-SEXPTYPEs in https://cran.r-project.org/doc/manuals/r-release/R-ints.html
+  f_env <- new.env(parent = globalenv())
+  assign("settings", settings, envir = f_env)
+  for(nm in c("fit", "transform", "fit_transform",
+              "score_frame", "get_transform")) {
+    fi <- get(nm)
+    environment(fi) <- f_env
+    assign(nm, fi, envir = f_env)
+  }
+  # build up result object
   obj$fit = fit
   obj$transform = transform
   obj$fit_transform = fit_transform
   obj$score_frame = score_frame
   obj$get_transform = get_transform
+  assign("obj", obj, envir = f_env)
   return(obj)
 }
 
@@ -279,6 +293,7 @@ NumericOutcomeTreatment <- function(...,
     stop("vtreat::NumericOutcomeTreatment expected class regression_parameters")
   }
   params <- regression_parameters(params)
+  var_list <- setdiff(var_list, c(outcome_name, cols_to_copy))
   settings <- list(
     var_list = var_list,
     outcome_name = outcome_name, 
@@ -290,7 +305,8 @@ NumericOutcomeTreatment <- function(...,
   assign("transform", NULL, envir = settings$state)
   assign("score_frame", NULL, envir = settings$state)
   obj <- list(settings = settings)
-  class(obj) <- "vtreat_NumericOutcomeTreatment"
+  class(obj) <- "vtreat_pipe_step"
+  obj$treatment_type <- "NumericOutcomeTreatment"
   fit <- function(dframe, ..., weights = NULL, parallelCluster = NULL) {
     wrapr::stop_if_dot_args(substitute(list(...)), 
                             "vtreat::NumericOutcomeTreatment$fit")
@@ -380,11 +396,23 @@ NumericOutcomeTreatment <- function(...,
     res <- get('transform', envir = settings$state, inherits = FALSE)
     return(res)
   }
+  # get globalenv early on environment chain for seralization
+  # See pseudo-SEXPTYPEs in https://cran.r-project.org/doc/manuals/r-release/R-ints.html
+  f_env <- new.env(parent = globalenv())
+  assign("settings", settings, envir = f_env)
+  for(nm in c("fit", "transform", "fit_transform",
+              "score_frame", "get_transform")) {
+    fi <- get(nm)
+    environment(fi) <- f_env
+    assign(nm, fi, envir = f_env)
+  }
+  # build up result object
   obj$fit = fit
   obj$transform = transform
   obj$fit_transform = fit_transform
   obj$score_frame = score_frame
   obj$get_transform = get_transform
+  assign("obj", obj, envir = f_env)
   return(obj)
 }
 
@@ -460,6 +488,7 @@ MultinomialOutcomeTreatment <- function(...,
     stop("vtreat::MultinomialOutcomeTreatment expected class multinomial_parameters")
   }
   params <- multinomial_parameters(params)
+  var_list <- setdiff(var_list, c(outcome_name, cols_to_copy))
   settings <- list(
     var_list = var_list,
     outcome_name = outcome_name, 
@@ -471,7 +500,8 @@ MultinomialOutcomeTreatment <- function(...,
   assign("transform", NULL, envir = settings$state)
   assign("score_frame", NULL, envir = settings$state)
   obj <- list(settings = settings)
-  class(obj) <- "vtreat_MultinomialOutcomeTreatment"
+  class(obj) <- "vtreat_pipe_step"
+  obj$treatment_type <- "MultinomialOutcomeTreatment"
   transform <- function(dframe, ..., parallelCluster = NULL) {
     wrapr::stop_if_dot_args(substitute(list(...)), 
                             "vtreat::MultinomialOutcomeTreatment$transform")
@@ -522,6 +552,9 @@ MultinomialOutcomeTreatment <- function(...,
     assign("transform", td$treat_m, envir = settings$state)
     assign("score_frame", td$score_frame, envir = settings$state)
     res <- td$cross_frame
+    for(c in settings$cols_to_copy) {
+      res[[c]] <- dframe[[c]]
+    }
     return(res)
   }
   fit <- function(dframe, ..., weights = NULL, parallelCluster = NULL) {
@@ -538,11 +571,23 @@ MultinomialOutcomeTreatment <- function(...,
     res <- get('transform', envir = settings$state, inherits = FALSE)
     return(res)
   }
+  # get globalenv early on environment chain for seralization
+  # See pseudo-SEXPTYPEs in https://cran.r-project.org/doc/manuals/r-release/R-ints.html
+  f_env <- new.env(parent = globalenv())
+  assign("settings", settings, envir = f_env)
+  for(nm in c("fit", "transform", "fit_transform",
+              "score_frame", "get_transform")) {
+    fi <- get(nm)
+    environment(fi) <- f_env
+    assign(nm, fi, envir = f_env)
+  }
+  # build up result object
   obj$fit = fit
   obj$transform = transform
   obj$fit_transform = fit_transform
   obj$score_frame = score_frame
   obj$get_transform = get_transform
+  assign("obj", obj, envir = f_env)
   return(obj)
 }
 
@@ -612,6 +657,7 @@ UnsupervisedTreatment <- function(...,
     stop("vtreat::UnsupervisedTreatment expected class unsupervised_parameters")
   }
   params <- unsupervised_parameters(params)
+  var_list <- setdiff(var_list, cols_to_copy)
   settings <- list(
     var_list = var_list,
     cols_to_copy = cols_to_copy,
@@ -622,7 +668,8 @@ UnsupervisedTreatment <- function(...,
   assign("transform", NULL, envir = settings$state)
   assign("score_frame", NULL, envir = settings$state)
   obj <- list(settings = settings)
-  class(obj) <- "vtreat_UnsupervisedTreatment"
+  class(obj) <- "vtreat_pipe_step"
+  obj$treatment_type <- "UnsupervisedTreatment"
   fit <- function(dframe, ..., weights = NULL, parallelCluster = NULL) {
     wrapr::stop_if_dot_args(substitute(list(...)), 
                             "vtreat::UnsupervisedTreatment$fit")
@@ -677,12 +724,48 @@ UnsupervisedTreatment <- function(...,
     res <- get('transform', envir = settings$state, inherits = FALSE)
     return(res)
   }
+  # get globalenv early on environment chain for seralization
+  # See pseudo-SEXPTYPEs in https://cran.r-project.org/doc/manuals/r-release/R-ints.html
+  f_env <- new.env(parent = globalenv())
+  assign("settings", settings, envir = f_env)
+  for(nm in c("fit", "transform", "fit_transform",
+              "score_frame", "get_transform")) {
+    fi <- get(nm)
+    environment(fi) <- f_env
+    assign(nm, fi, envir = f_env)
+  }
+  # build up result object
   obj$fit = fit
   obj$transform = transform
   obj$fit_transform = fit_transform
   obj$score_frame = score_frame
   obj$get_transform = get_transform
+  assign("obj", obj, envir = f_env)
   return(obj)
 }
+
+
+#' @export
+format.vtreat_pipe_step <- function(x, ...) {
+  return(x$treatment_type)
+}
+
+
+#' @export
+as.character.vtreat_pipe_step <- function(x, ...) {
+  return(format(x, ...))
+}
+
+
+#' @export
+print.vtreat_pipe_step <- function(x, ...) {
+  print(format(x, ...))
+  sf <- x$score_frame()[, c('varName', 'origName', 'code', 'varMoves', 'rsq', 'sig')]
+  sf <- sf[order(sf$origName, sf$varName), , drop = FALSE]
+  rownames(sf) <- NULL
+  print(sf)
+  invisible(x)
+}
+
 
 

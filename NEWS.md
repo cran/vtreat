@@ -1,4 +1,12 @@
 
+# vtreat 1.5.0 2020/01/07
+
+ * Fix multinomial variable restriction.
+ * Fix FT multinomial columns copy.
+ * Work on ft serialization environments.
+ * More tests.
+ * Improve custom coder flexibility.
+
 # vtreat 1.4.8 2019/12/08
 
  * Center/scale improvement from nfultz.

@@ -12,7 +12,7 @@
 
 <meta name="author" content="Win-Vector LLC" />
 
-<meta name="date" content="2019-12-08" />
+<meta name="date" content="2020-01-07" />
 
 <title>vtreat scale mode</title>
 
@@ -303,7 +303,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 
 <h1 class="title toc-ignore">vtreat scale mode</h1>
 <h4 class="author">Win-Vector LLC</h4>
-<h4 class="date">2019-12-08</h4>
+<h4 class="date">2020-01-07</h4>
 
 
 
@@ -444,9 +444,9 @@ For classification problems (or categorical <code>y</code>’s) as of version <c
 <a class="sourceLine" id="cb20-7" data-line-number="7">cEraw &lt;-<span class="st"> </span>vtreat<span class="op">::</span><span class="kw">mkCrossFrameNExperiment</span>(dTrainN,</a>
 <a class="sourceLine" id="cb20-8" data-line-number="8">                                         <span class="kw">c</span>(<span class="st">'x1'</span>,<span class="st">'x2'</span>,<span class="st">'x3'</span>),<span class="st">'y'</span>,</a>
 <a class="sourceLine" id="cb20-9" data-line-number="9">                                         <span class="dt">scale=</span><span class="ot">TRUE</span>)</a></code></pre></div>
-<pre><code>## [1] &quot;vtreat 1.4.8 start initial treatment design Sun Dec  8 10:43:10 2019&quot;
-## [1] &quot; start cross frame work Sun Dec  8 10:43:10 2019&quot;
-## [1] &quot; vtreat::mkCrossFrameNExperiment done Sun Dec  8 10:43:11 2019&quot;</code></pre>
+<pre><code>## [1] &quot;vtreat 1.5.0 start initial treatment design Tue Jan  7 07:51:18 2020&quot;
+## [1] &quot; start cross frame work Tue Jan  7 07:51:18 2020&quot;
+## [1] &quot; vtreat::mkCrossFrameNExperiment done Tue Jan  7 07:51:18 2020&quot;</code></pre>
 <div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb22-1" data-line-number="1">newvars &lt;-<span class="st"> </span>cEraw<span class="op">$</span>treatments<span class="op">$</span>scoreFrame<span class="op">$</span>varName</a>
 <a class="sourceLine" id="cb22-2" data-line-number="2"><span class="kw">print</span>(newvars)</a></code></pre></div>
 <pre><code>## [1] &quot;x1&quot; &quot;x2&quot; &quot;x3&quot;</code></pre>
@@ -466,9 +466,9 @@ For classification problems (or categorical <code>y</code>’s) as of version <c
 <a class="sourceLine" id="cb26-2" data-line-number="2">cEscaled &lt;-<span class="st"> </span>vtreat<span class="op">::</span><span class="kw">mkCrossFrameNExperiment</span>(dTrainN,</a>
 <a class="sourceLine" id="cb26-3" data-line-number="3">                                            <span class="kw">c</span>(<span class="st">'x1'</span>,<span class="st">'x2'</span>,<span class="st">'x3'</span>),<span class="st">'yScaled'</span>,</a>
 <a class="sourceLine" id="cb26-4" data-line-number="4">                                            <span class="dt">scale=</span><span class="ot">TRUE</span>)</a></code></pre></div>
-<pre><code>## [1] &quot;vtreat 1.4.8 start initial treatment design Sun Dec  8 10:43:11 2019&quot;
-## [1] &quot; start cross frame work Sun Dec  8 10:43:11 2019&quot;
-## [1] &quot; vtreat::mkCrossFrameNExperiment done Sun Dec  8 10:43:11 2019&quot;</code></pre>
+<pre><code>## [1] &quot;vtreat 1.5.0 start initial treatment design Tue Jan  7 07:51:18 2020&quot;
+## [1] &quot; start cross frame work Tue Jan  7 07:51:18 2020&quot;
+## [1] &quot; vtreat::mkCrossFrameNExperiment done Tue Jan  7 07:51:18 2020&quot;</code></pre>
 <div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb28-1" data-line-number="1">newvars_s &lt;-<span class="st"> </span>cEscaled<span class="op">$</span>treatments<span class="op">$</span>scoreFrame<span class="op">$</span>varName</a>
 <a class="sourceLine" id="cb28-2" data-line-number="2"><span class="kw">print</span>(newvars_s)</a></code></pre></div>
 <pre><code>## [1] &quot;x1&quot; &quot;x2&quot; &quot;x3&quot;</code></pre>
