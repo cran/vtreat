@@ -1,4 +1,11 @@
 
+# vtreat 1.5.1 2020/01/16
+
+ * Check for same-frame on prepare paths.
+ * Pipe into ft.
+ * Rename multinomial arguments to match other methods.
+ * Move parallel to a suggestion and configure a global option to shut it down ( vtreat.allow_parallel ).
+
 # vtreat 1.5.0 2020/01/07
 
  * Fix multinomial variable restriction.

@@ -12,7 +12,7 @@
 
 <meta name="author" content="Win-Vector LLC" />
 
-<meta name="date" content="2020-01-07" />
+<meta name="date" content="2020-01-16" />
 
 <title>Variable Types</title>
 
@@ -303,7 +303,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 
 <h1 class="title toc-ignore">Variable Types</h1>
 <h4 class="author">Win-Vector LLC</h4>
-<h4 class="date">2020-01-07</h4>
+<h4 class="date">2020-01-16</h4>
 
 
 
@@ -329,13 +329,13 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 <a class="sourceLine" id="cb1-3" data-line-number="3">   <span class="dt">z=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">4</span>,<span class="ot">NA</span>,<span class="dv">6</span>),<span class="dt">y=</span><span class="kw">c</span>(<span class="ot">FALSE</span>,<span class="ot">FALSE</span>,<span class="ot">TRUE</span>,<span class="ot">FALSE</span>,<span class="ot">TRUE</span>,<span class="ot">TRUE</span>),</a>
 <a class="sourceLine" id="cb1-4" data-line-number="4">   <span class="dt">stringsAsFactors =</span> <span class="ot">FALSE</span>)</a>
 <a class="sourceLine" id="cb1-5" data-line-number="5">treatmentsC &lt;-<span class="st"> </span><span class="kw">designTreatmentsC</span>(dTrainC,<span class="kw">colnames</span>(dTrainC),<span class="st">'y'</span>,<span class="ot">TRUE</span>)</a></code></pre></div>
-<pre><code>## [1] &quot;vtreat 1.5.0 inspecting inputs Tue Jan  7 07:51:20 2020&quot;
-## [1] &quot;designing treatments Tue Jan  7 07:51:20 2020&quot;
-## [1] &quot; have initial level statistics Tue Jan  7 07:51:20 2020&quot;
-## [1] &quot; scoring treatments Tue Jan  7 07:51:20 2020&quot;
-## [1] &quot;have treatment plan Tue Jan  7 07:51:20 2020&quot;
-## [1] &quot;rescoring complex variables Tue Jan  7 07:51:20 2020&quot;
-## [1] &quot;done rescoring complex variables Tue Jan  7 07:51:20 2020&quot;</code></pre>
+<pre><code>## [1] &quot;vtreat 1.5.1 inspecting inputs Thu Jan 16 09:06:59 2020&quot;
+## [1] &quot;designing treatments Thu Jan 16 09:06:59 2020&quot;
+## [1] &quot; have initial level statistics Thu Jan 16 09:06:59 2020&quot;
+## [1] &quot; scoring treatments Thu Jan 16 09:06:59 2020&quot;
+## [1] &quot;have treatment plan Thu Jan 16 09:06:59 2020&quot;
+## [1] &quot;rescoring complex variables Thu Jan 16 09:06:59 2020&quot;
+## [1] &quot;done rescoring complex variables Thu Jan 16 09:06:59 2020&quot;</code></pre>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1">scoreColsToPrint &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">'origName'</span>,<span class="st">'varName'</span>,<span class="st">'code'</span>,<span class="st">'rsq'</span>,<span class="st">'sig'</span>,<span class="st">'extraModelDegrees'</span>)</a>
 <a class="sourceLine" id="cb3-2" data-line-number="2"><span class="kw">print</span>(treatmentsC<span class="op">$</span>scoreFrame[,scoreColsToPrint])</a></code></pre></div>
 <pre><code>##   origName   varName  code        rsq       sig extraModelDegrees
@@ -377,13 +377,13 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 <a class="sourceLine" id="cb9-3" data-line-number="3">   <span class="dt">z=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">4</span>,<span class="ot">NA</span>,<span class="dv">6</span>),<span class="dt">y=</span><span class="kw">as.numeric</span>(<span class="kw">c</span>(<span class="ot">FALSE</span>,<span class="ot">FALSE</span>,<span class="ot">TRUE</span>,<span class="ot">FALSE</span>,<span class="ot">TRUE</span>,<span class="ot">TRUE</span>)),</a>
 <a class="sourceLine" id="cb9-4" data-line-number="4">   <span class="dt">stringsAsFactors =</span> <span class="ot">FALSE</span>)</a>
 <a class="sourceLine" id="cb9-5" data-line-number="5">treatmentsN &lt;-<span class="st"> </span><span class="kw">designTreatmentsN</span>(dTrainN,<span class="kw">colnames</span>(dTrainN),<span class="st">'y'</span>)</a></code></pre></div>
-<pre><code>## [1] &quot;vtreat 1.5.0 inspecting inputs Tue Jan  7 07:51:20 2020&quot;
-## [1] &quot;designing treatments Tue Jan  7 07:51:20 2020&quot;
-## [1] &quot; have initial level statistics Tue Jan  7 07:51:20 2020&quot;
-## [1] &quot; scoring treatments Tue Jan  7 07:51:20 2020&quot;
-## [1] &quot;have treatment plan Tue Jan  7 07:51:20 2020&quot;
-## [1] &quot;rescoring complex variables Tue Jan  7 07:51:20 2020&quot;
-## [1] &quot;done rescoring complex variables Tue Jan  7 07:51:20 2020&quot;</code></pre>
+<pre><code>## [1] &quot;vtreat 1.5.1 inspecting inputs Thu Jan 16 09:06:59 2020&quot;
+## [1] &quot;designing treatments Thu Jan 16 09:06:59 2020&quot;
+## [1] &quot; have initial level statistics Thu Jan 16 09:06:59 2020&quot;
+## [1] &quot; scoring treatments Thu Jan 16 09:06:59 2020&quot;
+## [1] &quot;have treatment plan Thu Jan 16 09:06:59 2020&quot;
+## [1] &quot;rescoring complex variables Thu Jan 16 09:06:59 2020&quot;
+## [1] &quot;done rescoring complex variables Thu Jan 16 09:06:59 2020&quot;</code></pre>
 <div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" data-line-number="1"><span class="kw">print</span>(treatmentsN<span class="op">$</span>scoreFrame[,scoreColsToPrint])</a></code></pre></div>
 <pre><code>##   origName   varName  code       rsq       sig extraModelDegrees
 ## 1        x    x_catP  catP 0.1538462 0.4418233                 2
@@ -414,11 +414,11 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 <a class="sourceLine" id="cb13-3" data-line-number="3">   <span class="dt">z=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">4</span>,<span class="ot">NA</span>,<span class="dv">6</span>),</a>
 <a class="sourceLine" id="cb13-4" data-line-number="4">   <span class="dt">stringsAsFactors =</span> <span class="ot">FALSE</span>)</a>
 <a class="sourceLine" id="cb13-5" data-line-number="5">treatmentsZ &lt;-<span class="st"> </span><span class="kw">designTreatmentsZ</span>(dTrainZ,<span class="kw">colnames</span>(dTrainZ))</a></code></pre></div>
-<pre><code>## [1] &quot;vtreat 1.5.0 inspecting inputs Tue Jan  7 07:51:20 2020&quot;
-## [1] &quot;designing treatments Tue Jan  7 07:51:20 2020&quot;
-## [1] &quot; have initial level statistics Tue Jan  7 07:51:20 2020&quot;
-## [1] &quot; scoring treatments Tue Jan  7 07:51:20 2020&quot;
-## [1] &quot;have treatment plan Tue Jan  7 07:51:20 2020&quot;</code></pre>
+<pre><code>## [1] &quot;vtreat 1.5.1 inspecting inputs Thu Jan 16 09:06:59 2020&quot;
+## [1] &quot;designing treatments Thu Jan 16 09:06:59 2020&quot;
+## [1] &quot; have initial level statistics Thu Jan 16 09:06:59 2020&quot;
+## [1] &quot; scoring treatments Thu Jan 16 09:06:59 2020&quot;
+## [1] &quot;have treatment plan Thu Jan 16 09:07:00 2020&quot;</code></pre>
 <div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" data-line-number="1"><span class="kw">print</span>(treatmentsZ<span class="op">$</span>scoreFrame[, <span class="kw">c</span>(<span class="st">'origName'</span>,<span class="st">'varName'</span>,<span class="st">'code'</span>,<span class="st">'extraModelDegrees'</span>)])</a></code></pre></div>
 <pre><code>##   origName   varName  code extraModelDegrees
 ## 1        x    x_catP  catP                 2
@@ -460,10 +460,13 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 ## 6        x x_lev_x_b   lev 0.0000000 1.0000000                 0</code></pre>
 <p>Conversely, even if you have created a treatment plan for a particular type of variable, you may subsequently decide not to use it. For example, perhaps you only want to use indicator variables and not the <code>catN</code> variable for modeling. You can use <code>codeRestriction</code> in <code>prepare()</code>.</p>
 <div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb19-1" data-line-number="1">dTreated =<span class="st"> </span><span class="kw">prepare</span>(treatmentsN, dTrainN, </a>
-<a class="sourceLine" id="cb19-2" data-line-number="2">                   <span class="dt">codeRestriction =</span> <span class="kw">c</span>(<span class="st">'lev'</span>,<span class="st">'clean'</span>, <span class="st">'isBAD'</span>))</a>
-<a class="sourceLine" id="cb19-3" data-line-number="3"></a>
-<a class="sourceLine" id="cb19-4" data-line-number="4"><span class="co"># no catN variables</span></a>
-<a class="sourceLine" id="cb19-5" data-line-number="5"><span class="kw">head</span>(dTreated)</a></code></pre></div>
+<a class="sourceLine" id="cb19-2" data-line-number="2">                   <span class="dt">codeRestriction =</span> <span class="kw">c</span>(<span class="st">'lev'</span>,<span class="st">'clean'</span>, <span class="st">'isBAD'</span>))</a></code></pre></div>
+<pre><code>## Warning in prepare.treatmentplan(treatmentsN, dTrainN, codeRestriction =
+## c(&quot;lev&quot;, : possibly called prepare() on same data frame as designTreatments*()/
+## mkCrossFrame*Experiment(), this can lead to over-fit. To avoid this, please use
+## mkCrossFrame*Experiment$crossFrame.</code></pre>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb21-1" data-line-number="1"><span class="co"># no catN variables</span></a>
+<a class="sourceLine" id="cb21-2" data-line-number="2"><span class="kw">head</span>(dTreated)</a></code></pre></div>
 <pre><code>##     z z_isBAD x_lev_NA x_lev_x_a x_lev_x_b y
 ## 1 1.0       0        0         1         0 0
 ## 2 2.0       0        0         1         0 0
@@ -486,16 +489,16 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 <p>‘vtreat’ attempts to compute “out of sample” significances for each variable effect ( the <code>sig</code> column in <code>scoreFrame</code>) through cross-validation techniques.</p>
 <p>‘vtreat’ is primarily intended to be “y-aware” processing. Of particular interest is using <code>vtreat::prepare()</code> with <code>scale=TRUE</code> which tries to put most columns in ‘y-effect’ units. This can be an important pre-processing step before attempting dimension reduction (such as principal components methods).</p>
 <p>The vtreat user should pick which sorts of variables they are want and also filter on estimated significance. Doing this looks like the following:</p>
-<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb21-1" data-line-number="1">dTrainN &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">x=</span><span class="kw">c</span>(<span class="st">'a'</span>,<span class="st">'a'</span>,<span class="st">'a'</span>,<span class="st">'b'</span>,<span class="st">'b'</span>,<span class="ot">NA</span>),</a>
-<a class="sourceLine" id="cb21-2" data-line-number="2">   <span class="dt">z=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">4</span>,<span class="ot">NA</span>,<span class="dv">6</span>),<span class="dt">y=</span><span class="kw">as.numeric</span>(<span class="kw">c</span>(<span class="ot">FALSE</span>,<span class="ot">FALSE</span>,<span class="ot">TRUE</span>,<span class="ot">FALSE</span>,<span class="ot">TRUE</span>,<span class="ot">TRUE</span>)),</a>
-<a class="sourceLine" id="cb21-3" data-line-number="3">   <span class="dt">stringsAsFactors =</span> <span class="ot">FALSE</span>)</a>
-<a class="sourceLine" id="cb21-4" data-line-number="4">treatmentsN &lt;-<span class="st"> </span><span class="kw">designTreatmentsN</span>(dTrainN,<span class="kw">colnames</span>(dTrainN),<span class="st">'y'</span>,</a>
-<a class="sourceLine" id="cb21-5" data-line-number="5">                                  <span class="dt">codeRestriction =</span> <span class="kw">c</span>(<span class="st">'lev'</span>, </a>
-<a class="sourceLine" id="cb21-6" data-line-number="6">                                                      <span class="st">'catN'</span>,</a>
-<a class="sourceLine" id="cb21-7" data-line-number="7">                                                      <span class="st">'clean'</span>,</a>
-<a class="sourceLine" id="cb21-8" data-line-number="8">                                                      <span class="st">'isBAD'</span>),</a>
-<a class="sourceLine" id="cb21-9" data-line-number="9">                                 <span class="dt">verbose=</span><span class="ot">FALSE</span>)</a>
-<a class="sourceLine" id="cb21-10" data-line-number="10"><span class="kw">print</span>(treatmentsN<span class="op">$</span>scoreFrame[,scoreColsToPrint])</a></code></pre></div>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb23-1" data-line-number="1">dTrainN &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">x=</span><span class="kw">c</span>(<span class="st">'a'</span>,<span class="st">'a'</span>,<span class="st">'a'</span>,<span class="st">'b'</span>,<span class="st">'b'</span>,<span class="ot">NA</span>),</a>
+<a class="sourceLine" id="cb23-2" data-line-number="2">   <span class="dt">z=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">4</span>,<span class="ot">NA</span>,<span class="dv">6</span>),<span class="dt">y=</span><span class="kw">as.numeric</span>(<span class="kw">c</span>(<span class="ot">FALSE</span>,<span class="ot">FALSE</span>,<span class="ot">TRUE</span>,<span class="ot">FALSE</span>,<span class="ot">TRUE</span>,<span class="ot">TRUE</span>)),</a>
+<a class="sourceLine" id="cb23-3" data-line-number="3">   <span class="dt">stringsAsFactors =</span> <span class="ot">FALSE</span>)</a>
+<a class="sourceLine" id="cb23-4" data-line-number="4">treatmentsN &lt;-<span class="st"> </span><span class="kw">designTreatmentsN</span>(dTrainN,<span class="kw">colnames</span>(dTrainN),<span class="st">'y'</span>,</a>
+<a class="sourceLine" id="cb23-5" data-line-number="5">                                  <span class="dt">codeRestriction =</span> <span class="kw">c</span>(<span class="st">'lev'</span>, </a>
+<a class="sourceLine" id="cb23-6" data-line-number="6">                                                      <span class="st">'catN'</span>,</a>
+<a class="sourceLine" id="cb23-7" data-line-number="7">                                                      <span class="st">'clean'</span>,</a>
+<a class="sourceLine" id="cb23-8" data-line-number="8">                                                      <span class="st">'isBAD'</span>),</a>
+<a class="sourceLine" id="cb23-9" data-line-number="9">                                 <span class="dt">verbose=</span><span class="ot">FALSE</span>)</a>
+<a class="sourceLine" id="cb23-10" data-line-number="10"><span class="kw">print</span>(treatmentsN<span class="op">$</span>scoreFrame[,scoreColsToPrint])</a></code></pre></div>
 <pre><code>##   origName   varName  code          rsq       sig extraModelDegrees
 ## 1        x    x_catN  catN 1.110223e-16 1.0000000                 2
 ## 2        z         z clean 3.045045e-01 0.2562868                 0
@@ -503,19 +506,22 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 ## 4        x  x_lev_NA   lev 2.000000e-01 0.3739010                 0
 ## 5        x x_lev_x_a   lev 1.111111e-01 0.5185185                 0
 ## 6        x x_lev_x_b   lev 0.000000e+00 1.0000000                 0</code></pre>
-<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb23-1" data-line-number="1">pruneSig &lt;-<span class="st"> </span><span class="fl">1.0</span> <span class="co"># don't filter on significance for this tiny example</span></a>
-<a class="sourceLine" id="cb23-2" data-line-number="2">vScoreFrame &lt;-<span class="st"> </span>treatmentsN<span class="op">$</span>scoreFrame</a>
-<a class="sourceLine" id="cb23-3" data-line-number="3">varsToUse &lt;-<span class="st"> </span>vScoreFrame<span class="op">$</span>varName[(vScoreFrame<span class="op">$</span>sig<span class="op">&lt;=</span>pruneSig)]</a>
-<a class="sourceLine" id="cb23-4" data-line-number="4"><span class="kw">print</span>(varsToUse)</a></code></pre></div>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb25-1" data-line-number="1">pruneSig &lt;-<span class="st"> </span><span class="fl">1.0</span> <span class="co"># don't filter on significance for this tiny example</span></a>
+<a class="sourceLine" id="cb25-2" data-line-number="2">vScoreFrame &lt;-<span class="st"> </span>treatmentsN<span class="op">$</span>scoreFrame</a>
+<a class="sourceLine" id="cb25-3" data-line-number="3">varsToUse &lt;-<span class="st"> </span>vScoreFrame<span class="op">$</span>varName[(vScoreFrame<span class="op">$</span>sig<span class="op">&lt;=</span>pruneSig)]</a>
+<a class="sourceLine" id="cb25-4" data-line-number="4"><span class="kw">print</span>(varsToUse)</a></code></pre></div>
 <pre><code>## [1] &quot;x_catN&quot;    &quot;z&quot;         &quot;z_isBAD&quot;   &quot;x_lev_NA&quot;  &quot;x_lev_x_a&quot; &quot;x_lev_x_b&quot;</code></pre>
-<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb25-1" data-line-number="1">origVarNames &lt;-<span class="st"> </span><span class="kw">sort</span>(<span class="kw">unique</span>(vScoreFrame<span class="op">$</span>origName[vScoreFrame<span class="op">$</span>varName <span class="op">%in%</span><span class="st"> </span>varsToUse]))</a>
-<a class="sourceLine" id="cb25-2" data-line-number="2"><span class="kw">print</span>(origVarNames)</a></code></pre></div>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb27-1" data-line-number="1">origVarNames &lt;-<span class="st"> </span><span class="kw">sort</span>(<span class="kw">unique</span>(vScoreFrame<span class="op">$</span>origName[vScoreFrame<span class="op">$</span>varName <span class="op">%in%</span><span class="st"> </span>varsToUse]))</a>
+<a class="sourceLine" id="cb27-2" data-line-number="2"><span class="kw">print</span>(origVarNames)</a></code></pre></div>
 <pre><code>## [1] &quot;x&quot; &quot;z&quot;</code></pre>
-<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb27-1" data-line-number="1"><span class="co"># prepare a treated data frame using only the &quot;significant&quot; variables</span></a>
-<a class="sourceLine" id="cb27-2" data-line-number="2">dTreated =<span class="st"> </span><span class="kw">prepare</span>(treatmentsN, dTrainN, </a>
-<a class="sourceLine" id="cb27-3" data-line-number="3">                   <span class="dt">varRestriction =</span> varsToUse)</a>
-<a class="sourceLine" id="cb27-4" data-line-number="4"></a>
-<a class="sourceLine" id="cb27-5" data-line-number="5"><span class="kw">head</span>(dTreated)</a></code></pre></div>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb29-1" data-line-number="1"><span class="co"># prepare a treated data frame using only the &quot;significant&quot; variables</span></a>
+<a class="sourceLine" id="cb29-2" data-line-number="2">dTreated =<span class="st"> </span><span class="kw">prepare</span>(treatmentsN, dTrainN, </a>
+<a class="sourceLine" id="cb29-3" data-line-number="3">                   <span class="dt">varRestriction =</span> varsToUse)</a></code></pre></div>
+<pre><code>## Warning in prepare.treatmentplan(treatmentsN, dTrainN, varRestriction =
+## varsToUse): possibly called prepare() on same data frame as designTreatments*()/
+## mkCrossFrame*Experiment(), this can lead to over-fit. To avoid this, please use
+## mkCrossFrame*Experiment$crossFrame.</code></pre>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb31-1" data-line-number="1"><span class="kw">head</span>(dTreated)</a></code></pre></div>
 <pre><code>##       x_catN   z z_isBAD x_lev_NA x_lev_x_a x_lev_x_b y
 ## 1 -0.1666667 1.0       0        0         1         0 0
 ## 2 -0.1666667 2.0       0        0         1         0 0
@@ -525,11 +531,11 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 ## 6  0.5000000 6.0       0        1         0         0 1</code></pre>
 <p>We strongly suggest using the standard variables coded as ‘lev’, ‘clean’, and ‘isBad’; and the “y aware” variables coded as ‘catN’ and ‘catB’. The non sub-model variables (‘catP’ and ‘catD’) can be useful (possibly as interactions or guards on the corresponding ‘catN’ and ‘catB’ variables) but also encode distributional facts about the data that may or may not be appropriate depending on your problem domain.</p>
 <p>When displaying variables to end users we suggest using the original names and the min significance seen on any derived variable:</p>
-<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb29-1" data-line-number="1">origVarNames &lt;-<span class="st"> </span><span class="kw">sort</span>(<span class="kw">unique</span>(vScoreFrame<span class="op">$</span>origName[vScoreFrame<span class="op">$</span>varName <span class="op">%in%</span><span class="st"> </span>varsToUse]))</a>
-<a class="sourceLine" id="cb29-2" data-line-number="2"><span class="kw">print</span>(origVarNames)</a></code></pre></div>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb33-1" data-line-number="1">origVarNames &lt;-<span class="st"> </span><span class="kw">sort</span>(<span class="kw">unique</span>(vScoreFrame<span class="op">$</span>origName[vScoreFrame<span class="op">$</span>varName <span class="op">%in%</span><span class="st"> </span>varsToUse]))</a>
+<a class="sourceLine" id="cb33-2" data-line-number="2"><span class="kw">print</span>(origVarNames)</a></code></pre></div>
 <pre><code>## [1] &quot;x&quot; &quot;z&quot;</code></pre>
-<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb31-1" data-line-number="1">origVarSigs &lt;-<span class="st"> </span>vScoreFrame[vScoreFrame<span class="op">$</span>varName <span class="op">%in%</span><span class="st"> </span>varsToUse,]</a>
-<a class="sourceLine" id="cb31-2" data-line-number="2"><span class="kw">aggregate</span>(sig<span class="op">~</span>origName,<span class="dt">data=</span>origVarSigs,<span class="dt">FUN=</span>min)</a></code></pre></div>
+<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb35-1" data-line-number="1">origVarSigs &lt;-<span class="st"> </span>vScoreFrame[vScoreFrame<span class="op">$</span>varName <span class="op">%in%</span><span class="st"> </span>varsToUse,]</a>
+<a class="sourceLine" id="cb35-2" data-line-number="2"><span class="kw">aggregate</span>(sig<span class="op">~</span>origName,<span class="dt">data=</span>origVarSigs,<span class="dt">FUN=</span>min)</a></code></pre></div>
 <pre><code>##   origName       sig
 ## 1        x 0.3739010
 ## 2        z 0.2562868</code></pre>

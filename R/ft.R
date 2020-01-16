@@ -16,6 +16,7 @@ merge_params <- function(..., params = NULL, user_params = NULL) {
 }
 
 
+
 #' vtreat classification parameters.
 #' 
 #' A list of settings and values for vtreat binomial classification fitting. 
@@ -49,7 +50,8 @@ classification_parameters <- function(user_params = NULL) {
     scale = FALSE,
     doCollar= FALSE,
     varRestriction = NULL,
-    trackedValues = NULL)
+    trackedValues = NULL,
+    check_for_duplicate_frames = TRUE)
   merged_params <- merge_params(params = params, 
                                 user_params = user_params)
   class(merged_params) <- 'classification_parameters'
@@ -139,7 +141,23 @@ BinomialOutcomeTreatment <- function(...,
   transform <- function(dframe, ..., parallelCluster = NULL) {
     wrapr::stop_if_dot_args(substitute(list(...)), 
                             "vtreat::BinomialOutcomeTreatment$transform")
-    tp <- get('transform', envir = settings$state, inherits = FALSE)
+    tp <- mget('transform', envir = settings$state, inherits = FALSE,
+               ifnotfound = list('transform' = NULL))[[1]]
+    if(is.null(tp)) {
+      stop("tried to use transform() on a not-fit treatment")
+    }
+    if(isTRUE(settings$params$check_for_duplicate_frames)) {
+      old_obj_id <- tp$fit_obj_id
+      fit_obj_id <- NULL
+      if(!is.null(old_obj_id)) {
+        fit_obj_id <- id_f(dframe)
+      }
+      if(!is.null(fit_obj_id)) {
+        if(fit_obj_id == old_obj_id) {
+          warning("possibly called transform() on same data frame as fit(), this can lead to over-fit.  To avoid this, please use fit_transform().")
+        }
+      }
+    }
     res <- prepare(
       treatmentplan = tp,
       dframe = dframe,
@@ -151,7 +169,8 @@ BinomialOutcomeTreatment <- function(...,
       trackedValues= settings$params$trackedValues,
       extracols = settings$cols_to_copy,
       parallelCluster = parallelCluster,
-      use_parallel = settings$params$use_parallel)
+      use_parallel = settings$params$use_parallel,
+      check_for_duplicate_frames = FALSE)
     return(res)
   }
   fit_transform <- function(dframe, ..., weights = NULL, parallelCluster = NULL) {
@@ -198,12 +217,20 @@ BinomialOutcomeTreatment <- function(...,
     res <- get('transform', envir = settings$state, inherits = FALSE)
     return(res)
   }
+  get_feature_names <- function(input_features=NULL) {
+    sf <- get('score_frame', envir = settings$state, inherits = FALSE)
+    want <- sf$varMoves
+    if(!is.null(input_features)) {
+      want <- want & (sf$origName %in% input_features)
+    }
+    return(sf$varName[want])
+  }
   # get globalenv early on environment chain for seralization
   # See pseudo-SEXPTYPEs in https://cran.r-project.org/doc/manuals/r-release/R-ints.html
   f_env <- new.env(parent = globalenv())
   assign("settings", settings, envir = f_env)
   for(nm in c("fit", "transform", "fit_transform",
-              "score_frame", "get_transform")) {
+              "score_frame", "get_transform", "get_feature_names")) {
     fi <- get(nm)
     environment(fi) <- f_env
     assign(nm, fi, envir = f_env)
@@ -214,6 +241,7 @@ BinomialOutcomeTreatment <- function(...,
   obj$fit_transform = fit_transform
   obj$score_frame = score_frame
   obj$get_transform = get_transform
+  obj$get_feature_names = get_feature_names
   assign("obj", obj, envir = f_env)
   return(obj)
 }
@@ -254,7 +282,8 @@ regression_parameters <- function(user_params = NULL) {
     scale = FALSE,
     doCollar= FALSE,
     varRestriction = NULL,
-    trackedValues = NULL)
+    trackedValues = NULL,
+    check_for_duplicate_frames = TRUE)
   merged_params <- merge_params(params = params, 
                                 user_params = user_params)
   class(merged_params) <- 'regression_parameters'
@@ -339,7 +368,23 @@ NumericOutcomeTreatment <- function(...,
   transform <- function(dframe, ..., parallelCluster = NULL) {
     wrapr::stop_if_dot_args(substitute(list(...)), 
                             "vtreat::NumericOutcomeTreatment$transform")
-    tp <- get('transform', envir = settings$state, inherits = FALSE)
+    tp <- mget('transform', envir = settings$state, inherits = FALSE,
+               ifnotfound = list('transform' = NULL))[[1]]
+    if(is.null(tp)) {
+      stop("tried to use transform() on a not-fit treatment")
+    }
+    if(isTRUE(settings$params$check_for_duplicate_frames)) {
+      old_obj_id <- tp$fit_obj_id
+      fit_obj_id <- NULL
+      if(!is.null(old_obj_id)) {
+        fit_obj_id <- id_f(dframe)
+      }
+      if(!is.null(fit_obj_id)) {
+        if(fit_obj_id == old_obj_id) {
+          warning("possibly called transform() on same data frame as fit(), this can lead to over-fit.  To avoid this, please use fit_transform().")
+        }
+      }
+    }
     res <- prepare(
       treatmentplan = tp,
       dframe = dframe,
@@ -351,7 +396,8 @@ NumericOutcomeTreatment <- function(...,
       trackedValues= settings$params$trackedValues,
       extracols = settings$cols_to_copy,
       parallelCluster = parallelCluster,
-      use_parallel = settings$params$use_parallel)
+      use_parallel = settings$params$use_parallel,
+      check_for_duplicate_frames = FALSE)
     return(res)
   }
   fit_transform <- function(dframe, ..., weights = NULL, parallelCluster = NULL) {
@@ -396,12 +442,20 @@ NumericOutcomeTreatment <- function(...,
     res <- get('transform', envir = settings$state, inherits = FALSE)
     return(res)
   }
+  get_feature_names <- function(input_features=NULL) {
+    sf <- get('score_frame', envir = settings$state, inherits = FALSE)
+    want <- sf$varMoves
+    if(!is.null(input_features)) {
+      want <- want & (sf$origName %in% input_features)
+    }
+    return(sf$varName[want])
+  }
   # get globalenv early on environment chain for seralization
   # See pseudo-SEXPTYPEs in https://cran.r-project.org/doc/manuals/r-release/R-ints.html
   f_env <- new.env(parent = globalenv())
   assign("settings", settings, envir = f_env)
   for(nm in c("fit", "transform", "fit_transform",
-              "score_frame", "get_transform")) {
+              "score_frame", "get_transform", "get_feature_names")) {
     fi <- get(nm)
     environment(fi) <- f_env
     assign(nm, fi, envir = f_env)
@@ -412,6 +466,7 @@ NumericOutcomeTreatment <- function(...,
   obj$fit_transform = fit_transform
   obj$score_frame = score_frame
   obj$get_transform = get_transform
+  obj$get_feature_names = get_feature_names
   assign("obj", obj, envir = f_env)
   return(obj)
 }
@@ -446,7 +501,8 @@ multinomial_parameters <- function(user_params = NULL) {
     verbose=FALSE,
     use_parallel = TRUE,
     missingness_imputation = NULL, 
-    imputation_map = NULL)
+    imputation_map = NULL,
+    check_for_duplicate_frames = TRUE)
   merged_params <- merge_params(params = params, 
                                 user_params = user_params)
   class(merged_params) <- 'multinomial_parameters'
@@ -505,7 +561,23 @@ MultinomialOutcomeTreatment <- function(...,
   transform <- function(dframe, ..., parallelCluster = NULL) {
     wrapr::stop_if_dot_args(substitute(list(...)), 
                             "vtreat::MultinomialOutcomeTreatment$transform")
-    tp <- get('transform', envir = settings$state, inherits = FALSE)
+    tp <- mget('transform', envir = settings$state, inherits = FALSE,
+               ifnotfound = list('transform' = NULL))[[1]]
+    if(is.null(tp)) {
+      stop("tried to use transform() on a not-fit treatment")
+    }
+    if(isTRUE(settings$params$check_for_duplicate_frames)) {
+      old_obj_id <- tp$fit_obj_id
+      fit_obj_id <- NULL
+      if(!is.null(old_obj_id)) {
+        fit_obj_id <- id_f(dframe)
+      }
+      if(!is.null(fit_obj_id)) {
+        if(fit_obj_id == old_obj_id) {
+          warning("possibly called transform() on same data frame as fit(), this can lead to over-fit.  To avoid this, please use fit_transform().")
+        }
+      }
+    }
     res <- prepare(
       treatmentplan = tp,
       dframe = dframe,
@@ -517,7 +589,8 @@ MultinomialOutcomeTreatment <- function(...,
       codeRestriction= settings$params$codeRestriction,
       trackedValues= settings$params$trackedValues,
       extracols= settings$cols_to_copy,
-      use_parallel= settings$params$use_parallel)
+      use_parallel= settings$params$use_parallel,
+      check_for_duplicate_frames = FALSE)
     return(res)
   }
   fit_transform <- function(dframe, ..., weights = NULL, parallelCluster = NULL) {
@@ -526,9 +599,9 @@ MultinomialOutcomeTreatment <- function(...,
     assign("transform", NULL, envir = settings$state)
     assign("score_frame", NULL, envir = settings$state)
     td <- mkCrossFrameMExperiment(
-      d = dframe,
-      vars = settings$var_list,
-      y_name = settings$outcome_name, 
+      dframe = dframe,
+      varlist = settings$var_list,
+      outcomename = settings$outcome_name, 
       weights = weights,
       parallelCluster = parallelCluster,
       minFraction=settings$params$minFraction,
@@ -571,12 +644,20 @@ MultinomialOutcomeTreatment <- function(...,
     res <- get('transform', envir = settings$state, inherits = FALSE)
     return(res)
   }
+  get_feature_names <- function(input_features=NULL) {
+    sf <- get('score_frame', envir = settings$state, inherits = FALSE)
+    want <- sf$varMoves
+    if(!is.null(input_features)) {
+      want <- want & (sf$origName %in% input_features)
+    }
+    return(unique(sf$varName[want]))
+  }
   # get globalenv early on environment chain for seralization
   # See pseudo-SEXPTYPEs in https://cran.r-project.org/doc/manuals/r-release/R-ints.html
   f_env <- new.env(parent = globalenv())
   assign("settings", settings, envir = f_env)
   for(nm in c("fit", "transform", "fit_transform",
-              "score_frame", "get_transform")) {
+              "score_frame", "get_transform", "get_feature_names")) {
     fi <- get(nm)
     environment(fi) <- f_env
     assign(nm, fi, envir = f_env)
@@ -587,6 +668,7 @@ MultinomialOutcomeTreatment <- function(...,
   obj$fit_transform = fit_transform
   obj$score_frame = score_frame
   obj$get_transform = get_transform
+  obj$get_feature_names = get_feature_names
   assign("obj", obj, envir = f_env)
   return(obj)
 }
@@ -695,7 +777,11 @@ UnsupervisedTreatment <- function(...,
   transform <- function(dframe, ..., parallelCluster = NULL) {
     wrapr::stop_if_dot_args(substitute(list(...)), 
                             "vtreat::UnsupervisedTreatment$transform")
-    tp <- get('transform', envir = settings$state, inherits = FALSE)
+    tp <- mget('transform', envir = settings$state, inherits = FALSE,
+               ifnotfound = list('transform' = NULL))[[1]]
+    if(is.null(tp)) {
+      stop("tried to use transform() on a not-fit treatment")
+    }
     res <- prepare(
       treatmentplan = tp,
       dframe = dframe,
@@ -706,7 +792,8 @@ UnsupervisedTreatment <- function(...,
       trackedValues= settings$params$trackedValues,
       extracols = settings$cols_to_copy,
       parallelCluster = parallelCluster,
-      use_parallel = settings$params$use_parallel)
+      use_parallel = settings$params$use_parallel,
+      check_for_duplicate_frames = FALSE)
     return(res)
   }
   fit_transform <- function(dframe, ..., weights = NULL, parallelCluster = NULL) {
@@ -724,12 +811,20 @@ UnsupervisedTreatment <- function(...,
     res <- get('transform', envir = settings$state, inherits = FALSE)
     return(res)
   }
+  get_feature_names <- function(input_features=NULL) {
+    sf <- get('score_frame', envir = settings$state, inherits = FALSE)
+    want <- sf$varMoves
+    if(!is.null(input_features)) {
+      want <- want & (sf$origName %in% input_features)
+    }
+    return(sf$varName[want])
+  }
   # get globalenv early on environment chain for seralization
   # See pseudo-SEXPTYPEs in https://cran.r-project.org/doc/manuals/r-release/R-ints.html
   f_env <- new.env(parent = globalenv())
   assign("settings", settings, envir = f_env)
   for(nm in c("fit", "transform", "fit_transform",
-              "score_frame", "get_transform")) {
+              "score_frame", "get_transform", "get_feature_names")) {
     fi <- get(nm)
     environment(fi) <- f_env
     assign(nm, fi, envir = f_env)
@@ -740,6 +835,7 @@ UnsupervisedTreatment <- function(...,
   obj$fit_transform = fit_transform
   obj$score_frame = score_frame
   obj$get_transform = get_transform
+  obj$get_feature_names = get_feature_names
   assign("obj", obj, envir = f_env)
   return(obj)
 }
@@ -767,5 +863,15 @@ print.vtreat_pipe_step <- function(x, ...) {
   invisible(x)
 }
 
+
+#' @export
+apply_right.vtreat_pipe_step <- function(pipe_left_arg,
+                                         pipe_right_arg,
+                                         pipe_environment,
+                                         left_arg_name,
+                                         pipe_string,
+                                         right_arg_name) {
+  pipe_right_arg$transform(pipe_left_arg)
+}
 
 

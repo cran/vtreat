@@ -1,12 +1,13 @@
 
 test_Parallel <- function() {
-  # seems to kill testthat on stop, possibly https://github.com/hadley/testthat/issues/129
-  Sys.setenv("R_TESTS" = "")
+  # # # left-over from when we were using testthat
+  # # seems to kill testthat on stop, possibly https://github.com/hadley/testthat/issues/129
+  # Sys.setenv("R_TESTS" = "")
 
   dir <- system.file("unit_tests", package = "vtreat", mustWork = TRUE)
   load(paste(dir, 'uci.car.data.Rdata', sep = "/"))
   cl <- NULL
-  if(requireNamespace("parallel",quietly=TRUE)) {
+  if(requireNamespace("parallel", quietly=TRUE)) {
     cl <- parallel::makeCluster(2)
   }
   
@@ -19,7 +20,7 @@ test_Parallel <- function() {
                                    pvars,dYName,dYTarget,verbose=FALSE,
                                    parallelCluster=cl)
   dTrainCTreatedP <- prepare(treatmentsCP,uci.car.data,pruneSig=c(),
-                             parallelCluster=cl)
+                             parallelCluster=cl, check_for_duplicate_frames=FALSE)
   if(!is.null(cl)) {
     parallel::stopCluster(cl)
     cl <- NULL
@@ -27,7 +28,7 @@ test_Parallel <- function() {
   set.seed(seedVal)
   treatmentsC <- designTreatmentsC(uci.car.data,
                                     pvars,dYName,dYTarget,verbose=FALSE)
-  dTrainCTreated <- prepare(treatmentsC,uci.car.data,pruneSig=c())
+  dTrainCTreated <- prepare(treatmentsC,uci.car.data,pruneSig=c(), check_for_duplicate_frames=FALSE)
   
   RUnit::checkTrue(nrow(dTrainCTreated)==nrow(dTrainCTreatedP))
   RUnit::checkTrue(length(colnames(dTrainCTreated))==length(colnames(dTrainCTreatedP)))

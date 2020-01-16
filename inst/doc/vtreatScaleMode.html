@@ -12,7 +12,7 @@
 
 <meta name="author" content="Win-Vector LLC" />
 
-<meta name="date" content="2020-01-07" />
+<meta name="date" content="2020-01-16" />
 
 <title>vtreat scale mode</title>
 
@@ -303,7 +303,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 
 <h1 class="title toc-ignore">vtreat scale mode</h1>
 <h4 class="author">Win-Vector LLC</h4>
-<h4 class="date">2020-01-07</h4>
+<h4 class="date">2020-01-16</h4>
 
 
 
@@ -318,10 +318,18 @@ For classification problems (or categorical <code>y</code>’s) as of version <c
 <a class="sourceLine" id="cb1-4" data-line-number="4">treatmentsC &lt;-<span class="st"> </span><span class="kw">designTreatmentsC</span>(dTrainC,<span class="kw">colnames</span>(dTrainC),<span class="st">'y'</span>,<span class="ot">TRUE</span>,</a>
 <a class="sourceLine" id="cb1-5" data-line-number="5">                                 <span class="dt">catScaling=</span><span class="ot">FALSE</span>,</a>
 <a class="sourceLine" id="cb1-6" data-line-number="6">                                 <span class="dt">verbose=</span><span class="ot">FALSE</span>)</a>
-<a class="sourceLine" id="cb1-7" data-line-number="7">dTrainCTreatedUnscaled &lt;-<span class="st"> </span><span class="kw">prepare</span>(treatmentsC,dTrainC,<span class="dt">pruneSig=</span><span class="kw">c</span>(),<span class="dt">scale=</span><span class="ot">FALSE</span>)</a>
-<a class="sourceLine" id="cb1-8" data-line-number="8">dTrainCTreatedScaled &lt;-<span class="st"> </span><span class="kw">prepare</span>(treatmentsC,dTrainC,<span class="dt">pruneSig=</span><span class="kw">c</span>(),<span class="dt">scale=</span><span class="ot">TRUE</span>)</a></code></pre></div>
+<a class="sourceLine" id="cb1-7" data-line-number="7">dTrainCTreatedUnscaled &lt;-<span class="st"> </span><span class="kw">prepare</span>(treatmentsC,dTrainC,<span class="dt">pruneSig=</span><span class="kw">c</span>(),<span class="dt">scale=</span><span class="ot">FALSE</span>)</a></code></pre></div>
+<pre><code>## Warning in prepare.treatmentplan(treatmentsC, dTrainC, pruneSig = c(), scale
+## = FALSE): possibly called prepare() on same data frame as designTreatments*()/
+## mkCrossFrame*Experiment(), this can lead to over-fit. To avoid this, please use
+## mkCrossFrame*Experiment$crossFrame.</code></pre>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1">dTrainCTreatedScaled &lt;-<span class="st"> </span><span class="kw">prepare</span>(treatmentsC,dTrainC,<span class="dt">pruneSig=</span><span class="kw">c</span>(),<span class="dt">scale=</span><span class="ot">TRUE</span>)</a></code></pre></div>
+<pre><code>## Warning in prepare.treatmentplan(treatmentsC, dTrainC, pruneSig = c(), scale
+## = TRUE): possibly called prepare() on same data frame as designTreatments*()/
+## mkCrossFrame*Experiment(), this can lead to over-fit. To avoid this, please use
+## mkCrossFrame*Experiment$crossFrame.</code></pre>
 <p>Note we have set <code>catScaling=FALSE</code> to ask that we treat <code>y</code> as a 0/1 indicator and scale using linear regression. The standard vtreat treated frame converts the original data from this:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="kw">print</span>(dTrainC)</a></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1"><span class="kw">print</span>(dTrainC)</a></code></pre></div>
 <pre><code>##      x     y
 ## 1    a FALSE
 ## 2    a FALSE
@@ -330,7 +338,7 @@ For classification problems (or categorical <code>y</code>’s) as of version <c
 ## 5    b  TRUE
 ## 6 &lt;NA&gt;  TRUE</code></pre>
 <p>into this:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="kw">print</span>(dTrainCTreatedUnscaled)</a></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1"><span class="kw">print</span>(dTrainCTreatedUnscaled)</a></code></pre></div>
 <pre><code>##      x_catP     x_catB x_lev_NA x_lev_x_a x_lev_x_b     y
 ## 1 0.5000000 -0.6930972        0         1         0 FALSE
 ## 2 0.5000000 -0.6930972        0         1         0 FALSE
@@ -340,7 +348,7 @@ For classification problems (or categorical <code>y</code>’s) as of version <c
 ## 6 0.1666667  9.2104404        1         0         0  TRUE</code></pre>
 <p>This is the “standard way” to run vtreat – with the exception that for this example we set <code>pruneSig</code> to <code>NULL</code> to suppress variable pruning, instead of setting it to a value in the interval <code>(0,1)</code>. The principle is: vtreat inflicts the minimal possible alterations on the data, leaving as much as possible to the downstream machine learning code. This does turn out to already be a lot of alteration. Mostly vtreat is taking only steps that are unsafe to leave for later: re-encoding of large categoricals, re-coding of aberrant values, and bulk pruning of variables.</p>
 <p>However some procedures, in particular principal components analysis or geometric clustering, assume all of the columns have been fully transformed. The usual assumption (“more honored in the breach than the observance”) is that the columns are centered (mean zero) and scaled. The non y-aware meaning of “scaled” is unit variance. However, vtreat is designed to emphasize y-aware processing and we feel the y-aware sense of scaling should be: unit slope when regressed against y. If you want standard scaling you can use the standard frame produced by vtreat and scale it yourself. If you want vtreat style y-aware scaling you (which we strongly think is the right thing to do) you can use <code>vtreat::prepare(scale=TRUE)</code> which produces a frame that looks like the following:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1"><span class="kw">print</span>(dTrainCTreatedScaled)</a></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1"><span class="kw">print</span>(dTrainCTreatedScaled)</a></code></pre></div>
 <pre><code>##   x_catP      x_catB x_lev_NA  x_lev_x_a x_lev_x_b     y
 ## 1   -0.2 -0.11976374     -0.1 -0.1666667         0 FALSE
 ## 2   -0.2 -0.11976374     -0.1 -0.1666667         0 FALSE
@@ -349,25 +357,25 @@ For classification problems (or categorical <code>y</code>’s) as of version <c
 ## 5    0.1 -0.07564865     -0.1  0.1666667         0  TRUE
 ## 6    0.4  0.51058851      0.5  0.1666667         0  TRUE</code></pre>
 <p>First we can check the claims. Are the variables mean-zero and slope 1 when regressed against y?</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1">slopeFrame &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">varName =</span> treatmentsC<span class="op">$</span>scoreFrame<span class="op">$</span>varName,</a>
-<a class="sourceLine" id="cb8-2" data-line-number="2">                         <span class="dt">stringsAsFactors =</span> <span class="ot">FALSE</span>)</a>
-<a class="sourceLine" id="cb8-3" data-line-number="3">slopeFrame<span class="op">$</span>mean &lt;-</a>
-<a class="sourceLine" id="cb8-4" data-line-number="4"><span class="st">  </span><span class="kw">vapply</span>(dTrainCTreatedScaled[, slopeFrame<span class="op">$</span>varName, <span class="dt">drop =</span> <span class="ot">FALSE</span>], mean,</a>
-<a class="sourceLine" id="cb8-5" data-line-number="5">         <span class="kw">numeric</span>(<span class="dv">1</span>))</a>
-<a class="sourceLine" id="cb8-6" data-line-number="6">slopeFrame<span class="op">$</span>slope &lt;-<span class="st"> </span><span class="kw">vapply</span>(slopeFrame<span class="op">$</span>varName,</a>
-<a class="sourceLine" id="cb8-7" data-line-number="7">                           <span class="cf">function</span>(c) {</a>
-<a class="sourceLine" id="cb8-8" data-line-number="8">                             <span class="kw">lm</span>(<span class="kw">paste</span>(<span class="st">'y'</span>, c, <span class="dt">sep =</span> <span class="st">'~'</span>),</a>
-<a class="sourceLine" id="cb8-9" data-line-number="9">                                <span class="dt">data =</span> dTrainCTreatedScaled)<span class="op">$</span>coefficients[[<span class="dv">2</span>]]</a>
-<a class="sourceLine" id="cb8-10" data-line-number="10">                           },</a>
-<a class="sourceLine" id="cb8-11" data-line-number="11">                           <span class="kw">numeric</span>(<span class="dv">1</span>))</a>
-<a class="sourceLine" id="cb8-12" data-line-number="12">slopeFrame<span class="op">$</span>sig &lt;-<span class="st"> </span><span class="kw">vapply</span>(slopeFrame<span class="op">$</span>varName,</a>
-<a class="sourceLine" id="cb8-13" data-line-number="13">                         <span class="cf">function</span>(c) {</a>
-<a class="sourceLine" id="cb8-14" data-line-number="14">                           treatmentsC<span class="op">$</span>scoreFrame[treatmentsC<span class="op">$</span>scoreFrame<span class="op">$</span>varName <span class="op">==</span><span class="st"> </span>c, <span class="st">'sig'</span>]</a>
-<a class="sourceLine" id="cb8-15" data-line-number="15">                         },</a>
-<a class="sourceLine" id="cb8-16" data-line-number="16">                         <span class="kw">numeric</span>(<span class="dv">1</span>))</a>
-<a class="sourceLine" id="cb8-17" data-line-number="17">slopeFrame<span class="op">$</span>badSlope &lt;-</a>
-<a class="sourceLine" id="cb8-18" data-line-number="18"><span class="st">  </span><span class="kw">ifelse</span>(<span class="kw">is.na</span>(slopeFrame<span class="op">$</span>slope), <span class="ot">TRUE</span>, <span class="kw">abs</span>(slopeFrame<span class="op">$</span>slope <span class="op">-</span><span class="st"> </span><span class="dv">1</span>) <span class="op">&gt;</span><span class="st"> </span><span class="dv">1</span>.e<span class="dv">-8</span>)</a>
-<a class="sourceLine" id="cb8-19" data-line-number="19"><span class="kw">print</span>(slopeFrame)</a></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" data-line-number="1">slopeFrame &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">varName =</span> treatmentsC<span class="op">$</span>scoreFrame<span class="op">$</span>varName,</a>
+<a class="sourceLine" id="cb11-2" data-line-number="2">                         <span class="dt">stringsAsFactors =</span> <span class="ot">FALSE</span>)</a>
+<a class="sourceLine" id="cb11-3" data-line-number="3">slopeFrame<span class="op">$</span>mean &lt;-</a>
+<a class="sourceLine" id="cb11-4" data-line-number="4"><span class="st">  </span><span class="kw">vapply</span>(dTrainCTreatedScaled[, slopeFrame<span class="op">$</span>varName, <span class="dt">drop =</span> <span class="ot">FALSE</span>], mean,</a>
+<a class="sourceLine" id="cb11-5" data-line-number="5">         <span class="kw">numeric</span>(<span class="dv">1</span>))</a>
+<a class="sourceLine" id="cb11-6" data-line-number="6">slopeFrame<span class="op">$</span>slope &lt;-<span class="st"> </span><span class="kw">vapply</span>(slopeFrame<span class="op">$</span>varName,</a>
+<a class="sourceLine" id="cb11-7" data-line-number="7">                           <span class="cf">function</span>(c) {</a>
+<a class="sourceLine" id="cb11-8" data-line-number="8">                             <span class="kw">lm</span>(<span class="kw">paste</span>(<span class="st">'y'</span>, c, <span class="dt">sep =</span> <span class="st">'~'</span>),</a>
+<a class="sourceLine" id="cb11-9" data-line-number="9">                                <span class="dt">data =</span> dTrainCTreatedScaled)<span class="op">$</span>coefficients[[<span class="dv">2</span>]]</a>
+<a class="sourceLine" id="cb11-10" data-line-number="10">                           },</a>
+<a class="sourceLine" id="cb11-11" data-line-number="11">                           <span class="kw">numeric</span>(<span class="dv">1</span>))</a>
+<a class="sourceLine" id="cb11-12" data-line-number="12">slopeFrame<span class="op">$</span>sig &lt;-<span class="st"> </span><span class="kw">vapply</span>(slopeFrame<span class="op">$</span>varName,</a>
+<a class="sourceLine" id="cb11-13" data-line-number="13">                         <span class="cf">function</span>(c) {</a>
+<a class="sourceLine" id="cb11-14" data-line-number="14">                           treatmentsC<span class="op">$</span>scoreFrame[treatmentsC<span class="op">$</span>scoreFrame<span class="op">$</span>varName <span class="op">==</span><span class="st"> </span>c, <span class="st">'sig'</span>]</a>
+<a class="sourceLine" id="cb11-15" data-line-number="15">                         },</a>
+<a class="sourceLine" id="cb11-16" data-line-number="16">                         <span class="kw">numeric</span>(<span class="dv">1</span>))</a>
+<a class="sourceLine" id="cb11-17" data-line-number="17">slopeFrame<span class="op">$</span>badSlope &lt;-</a>
+<a class="sourceLine" id="cb11-18" data-line-number="18"><span class="st">  </span><span class="kw">ifelse</span>(<span class="kw">is.na</span>(slopeFrame<span class="op">$</span>slope), <span class="ot">TRUE</span>, <span class="kw">abs</span>(slopeFrame<span class="op">$</span>slope <span class="op">-</span><span class="st"> </span><span class="dv">1</span>) <span class="op">&gt;</span><span class="st"> </span><span class="dv">1</span>.e<span class="dv">-8</span>)</a>
+<a class="sourceLine" id="cb11-19" data-line-number="19"><span class="kw">print</span>(slopeFrame)</a></code></pre></div>
 <pre><code>##     varName          mean slope       sig badSlope
 ## 1    x_catP  1.850372e-17     1 0.1547700    FALSE
 ## 2    x_catB  1.387779e-17     1 0.5160763    FALSE
@@ -382,11 +390,15 @@ For classification problems (or categorical <code>y</code>’s) as of version <c
 <p>As of version <code>0.5.26</code> <code>vtreat</code> also supports a “scaling mode for categorical outcomes.” In this mode scaling is performed using the coefficient of a logistic regression fit on a categorical instead of the coefficient of a linear fit (with the outcome encoded as a zero/one indicator).</p>
 <p>The idea is with this mode on we are scaling as a logistic regression would- so we are in logistic regression “link space” (where logistic regression assume effects are additive). The mode may be well suited for principal components analysis or principal components regression where the target variable is a categorical (i.e. classification tasks).</p>
 <p>To ensure this effect we set the argument <code>catScaling=TRUE</code> in <code>vtreat::designTreatmentsC</code> or <code>vtreat::mkCrossFrameCExperiment</code>. WE demonstrate this below.</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1">treatmentsC2 &lt;-<span class="st"> </span><span class="kw">designTreatmentsC</span>(dTrainC,<span class="kw">colnames</span>(dTrainC),<span class="st">'y'</span>,<span class="ot">TRUE</span>,</a>
-<a class="sourceLine" id="cb10-2" data-line-number="2">                                  <span class="dt">catScaling=</span><span class="ot">TRUE</span>,</a>
-<a class="sourceLine" id="cb10-3" data-line-number="3">                                  <span class="dt">verbose=</span><span class="ot">FALSE</span>)</a>
-<a class="sourceLine" id="cb10-4" data-line-number="4">dTrainCTreatedScaled2 &lt;-<span class="st"> </span><span class="kw">prepare</span>(treatmentsC2,dTrainC,<span class="dt">pruneSig=</span><span class="kw">c</span>(),<span class="dt">scale=</span><span class="ot">TRUE</span>)</a>
-<a class="sourceLine" id="cb10-5" data-line-number="5"><span class="kw">print</span>(dTrainCTreatedScaled2)</a></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" data-line-number="1">treatmentsC2 &lt;-<span class="st"> </span><span class="kw">designTreatmentsC</span>(dTrainC,<span class="kw">colnames</span>(dTrainC),<span class="st">'y'</span>,<span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb13-2" data-line-number="2">                                  <span class="dt">catScaling=</span><span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb13-3" data-line-number="3">                                  <span class="dt">verbose=</span><span class="ot">FALSE</span>)</a>
+<a class="sourceLine" id="cb13-4" data-line-number="4">dTrainCTreatedScaled2 &lt;-<span class="st"> </span><span class="kw">prepare</span>(treatmentsC2,dTrainC,<span class="dt">pruneSig=</span><span class="kw">c</span>(),<span class="dt">scale=</span><span class="ot">TRUE</span>)</a></code></pre></div>
+<pre><code>## Warning in prepare.treatmentplan(treatmentsC2, dTrainC, pruneSig = c(), :
+## possibly called prepare() on same data frame as designTreatments*()/
+## mkCrossFrame*Experiment(), this can lead to over-fit. To avoid this, please use
+## mkCrossFrame*Experiment$crossFrame.</code></pre>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" data-line-number="1"><span class="kw">print</span>(dTrainCTreatedScaled2)</a></code></pre></div>
 <pre><code>##       x_catP    x_catB  x_lev_NA  x_lev_x_a x_lev_x_b     y
 ## 1 -0.9396225 -1.894112 -3.161922 -0.6931472         0 FALSE
 ## 2 -0.9396225 -1.894112 -3.161922 -0.6931472         0 FALSE
@@ -396,10 +408,10 @@ For classification problems (or categorical <code>y</code>’s) as of version <c
 ## 6  1.8792449  8.075166 15.809611  0.6931472         0  TRUE</code></pre>
 <p>Notice the new scaled frame is in a different scale than the original scaled frame. It likely is a function of the problem domain which scaling is more appropriate or useful.</p>
 <p>The new scaled columns are again mean-0 (so they are not exactly the logistic link values, which may not have been so shifted). The new scaled columns do not necessarily have linear model slope 1 as the original scaled columns did as we see below:</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" data-line-number="1"><span class="kw">colMeans</span>(dTrainCTreatedScaled2)</a></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb17-1" data-line-number="1"><span class="kw">colMeans</span>(dTrainCTreatedScaled2)</a></code></pre></div>
 <pre><code>##       x_catP       x_catB     x_lev_NA    x_lev_x_a    x_lev_x_b            y 
 ## 3.700743e-16 7.401487e-17 0.000000e+00 0.000000e+00 0.000000e+00 5.000000e-01</code></pre>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" data-line-number="1"><span class="kw">lm</span>(y<span class="op">~</span>x_lev_NA,<span class="dt">data=</span>dTrainCTreatedScaled)</a></code></pre></div>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb19-1" data-line-number="1"><span class="kw">lm</span>(y<span class="op">~</span>x_lev_NA,<span class="dt">data=</span>dTrainCTreatedScaled)</a></code></pre></div>
 <pre><code>## 
 ## Call:
 ## lm(formula = y ~ x_lev_NA, data = dTrainCTreatedScaled)
@@ -407,7 +419,7 @@ For classification problems (or categorical <code>y</code>’s) as of version <c
 ## Coefficients:
 ## (Intercept)     x_lev_NA  
 ##         0.5          1.0</code></pre>
-<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb16-1" data-line-number="1"><span class="kw">lm</span>(y<span class="op">~</span>x_lev_NA,<span class="dt">data=</span>dTrainCTreatedScaled2)</a></code></pre></div>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb21-1" data-line-number="1"><span class="kw">lm</span>(y<span class="op">~</span>x_lev_NA,<span class="dt">data=</span>dTrainCTreatedScaled2)</a></code></pre></div>
 <pre><code>## 
 ## Call:
 ## lm(formula = y ~ x_lev_NA, data = dTrainCTreatedScaled2)
@@ -416,12 +428,12 @@ For classification problems (or categorical <code>y</code>’s) as of version <c
 ## (Intercept)     x_lev_NA  
 ##     0.50000      0.03163</code></pre>
 <p>The new scaled columns, however are in good logistic link units.</p>
-<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb18-1" data-line-number="1"> <span class="kw">vapply</span>(slopeFrame<span class="op">$</span>varName,</a>
-<a class="sourceLine" id="cb18-2" data-line-number="2">                           <span class="cf">function</span>(c) {</a>
-<a class="sourceLine" id="cb18-3" data-line-number="3">                             <span class="kw">glm</span>(<span class="kw">paste</span>(<span class="st">'y'</span>, c, <span class="dt">sep =</span> <span class="st">'~'</span>),<span class="dt">family=</span>binomial,</a>
-<a class="sourceLine" id="cb18-4" data-line-number="4">                                <span class="dt">data =</span> dTrainCTreatedScaled2)<span class="op">$</span>coefficients[[<span class="dv">2</span>]]</a>
-<a class="sourceLine" id="cb18-5" data-line-number="5">                           },</a>
-<a class="sourceLine" id="cb18-6" data-line-number="6">                           <span class="kw">numeric</span>(<span class="dv">1</span>))</a></code></pre></div>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb23-1" data-line-number="1"> <span class="kw">vapply</span>(slopeFrame<span class="op">$</span>varName,</a>
+<a class="sourceLine" id="cb23-2" data-line-number="2">                           <span class="cf">function</span>(c) {</a>
+<a class="sourceLine" id="cb23-3" data-line-number="3">                             <span class="kw">glm</span>(<span class="kw">paste</span>(<span class="st">'y'</span>, c, <span class="dt">sep =</span> <span class="st">'~'</span>),<span class="dt">family=</span>binomial,</a>
+<a class="sourceLine" id="cb23-4" data-line-number="4">                                <span class="dt">data =</span> dTrainCTreatedScaled2)<span class="op">$</span>coefficients[[<span class="dv">2</span>]]</a>
+<a class="sourceLine" id="cb23-5" data-line-number="5">                           },</a>
+<a class="sourceLine" id="cb23-6" data-line-number="6">                           <span class="kw">numeric</span>(<span class="dv">1</span>))</a></code></pre></div>
 <pre><code>##    x_catP    x_catB  x_lev_NA x_lev_x_a x_lev_x_b 
 ##         1         1         1         1        NA</code></pre>
 </div>
@@ -435,25 +447,25 @@ For classification problems (or categorical <code>y</code>’s) as of version <c
 <li>Significance prune resulting latent variables.</li>
 </ul>
 <p>However, practitioners experienced in principal components analysis may uncomfortable with the range of eigenvalues or singular values returned by <em>y</em>-aware analysis. If a more familiar scale is desired we suggest performing the <em>y</em>-aware scaling against an additional scaled and centered <em>y</em> to try to get ranges closer the traditional unit ranges. This can be achieved as shown below.</p>
-<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb20-1" data-line-number="1"><span class="kw">set.seed</span>(<span class="dv">235235</span>)</a>
-<a class="sourceLine" id="cb20-2" data-line-number="2">dTrainN &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">x1=</span><span class="kw">rnorm</span>(<span class="dv">100</span>),</a>
-<a class="sourceLine" id="cb20-3" data-line-number="3">                      <span class="dt">x2=</span><span class="kw">rnorm</span>(<span class="dv">100</span>),</a>
-<a class="sourceLine" id="cb20-4" data-line-number="4">                      <span class="dt">x3=</span><span class="kw">rnorm</span>(<span class="dv">100</span>),</a>
-<a class="sourceLine" id="cb20-5" data-line-number="5">                      <span class="dt">stringsAsFactors=</span><span class="ot">FALSE</span>)</a>
-<a class="sourceLine" id="cb20-6" data-line-number="6">dTrainN<span class="op">$</span>y &lt;-<span class="st"> </span><span class="dv">1000</span><span class="op">*</span>(dTrainN<span class="op">$</span>x1 <span class="op">+</span><span class="st"> </span>dTrainN<span class="op">$</span>x2)</a>
-<a class="sourceLine" id="cb20-7" data-line-number="7">cEraw &lt;-<span class="st"> </span>vtreat<span class="op">::</span><span class="kw">mkCrossFrameNExperiment</span>(dTrainN,</a>
-<a class="sourceLine" id="cb20-8" data-line-number="8">                                         <span class="kw">c</span>(<span class="st">'x1'</span>,<span class="st">'x2'</span>,<span class="st">'x3'</span>),<span class="st">'y'</span>,</a>
-<a class="sourceLine" id="cb20-9" data-line-number="9">                                         <span class="dt">scale=</span><span class="ot">TRUE</span>)</a></code></pre></div>
-<pre><code>## [1] &quot;vtreat 1.5.0 start initial treatment design Tue Jan  7 07:51:18 2020&quot;
-## [1] &quot; start cross frame work Tue Jan  7 07:51:18 2020&quot;
-## [1] &quot; vtreat::mkCrossFrameNExperiment done Tue Jan  7 07:51:18 2020&quot;</code></pre>
-<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb22-1" data-line-number="1">newvars &lt;-<span class="st"> </span>cEraw<span class="op">$</span>treatments<span class="op">$</span>scoreFrame<span class="op">$</span>varName</a>
-<a class="sourceLine" id="cb22-2" data-line-number="2"><span class="kw">print</span>(newvars)</a></code></pre></div>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb25-1" data-line-number="1"><span class="kw">set.seed</span>(<span class="dv">235235</span>)</a>
+<a class="sourceLine" id="cb25-2" data-line-number="2">dTrainN &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">x1=</span><span class="kw">rnorm</span>(<span class="dv">100</span>),</a>
+<a class="sourceLine" id="cb25-3" data-line-number="3">                      <span class="dt">x2=</span><span class="kw">rnorm</span>(<span class="dv">100</span>),</a>
+<a class="sourceLine" id="cb25-4" data-line-number="4">                      <span class="dt">x3=</span><span class="kw">rnorm</span>(<span class="dv">100</span>),</a>
+<a class="sourceLine" id="cb25-5" data-line-number="5">                      <span class="dt">stringsAsFactors=</span><span class="ot">FALSE</span>)</a>
+<a class="sourceLine" id="cb25-6" data-line-number="6">dTrainN<span class="op">$</span>y &lt;-<span class="st"> </span><span class="dv">1000</span><span class="op">*</span>(dTrainN<span class="op">$</span>x1 <span class="op">+</span><span class="st"> </span>dTrainN<span class="op">$</span>x2)</a>
+<a class="sourceLine" id="cb25-7" data-line-number="7">cEraw &lt;-<span class="st"> </span>vtreat<span class="op">::</span><span class="kw">mkCrossFrameNExperiment</span>(dTrainN,</a>
+<a class="sourceLine" id="cb25-8" data-line-number="8">                                         <span class="kw">c</span>(<span class="st">'x1'</span>,<span class="st">'x2'</span>,<span class="st">'x3'</span>),<span class="st">'y'</span>,</a>
+<a class="sourceLine" id="cb25-9" data-line-number="9">                                         <span class="dt">scale=</span><span class="ot">TRUE</span>)</a></code></pre></div>
+<pre><code>## [1] &quot;vtreat 1.5.1 start initial treatment design Thu Jan 16 09:06:57 2020&quot;
+## [1] &quot; start cross frame work Thu Jan 16 09:06:57 2020&quot;
+## [1] &quot; vtreat::mkCrossFrameNExperiment done Thu Jan 16 09:06:57 2020&quot;</code></pre>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb27-1" data-line-number="1">newvars &lt;-<span class="st"> </span>cEraw<span class="op">$</span>treatments<span class="op">$</span>scoreFrame<span class="op">$</span>varName</a>
+<a class="sourceLine" id="cb27-2" data-line-number="2"><span class="kw">print</span>(newvars)</a></code></pre></div>
 <pre><code>## [1] &quot;x1&quot; &quot;x2&quot; &quot;x3&quot;</code></pre>
-<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb24-1" data-line-number="1">dM1 &lt;-<span class="st"> </span><span class="kw">as.matrix</span>(cEraw<span class="op">$</span>crossFrame[, newvars])</a>
-<a class="sourceLine" id="cb24-2" data-line-number="2">pCraw &lt;-<span class="st"> </span>stats<span class="op">::</span><span class="kw">prcomp</span>(dM1,</a>
-<a class="sourceLine" id="cb24-3" data-line-number="3">                       <span class="dt">scale.=</span><span class="ot">FALSE</span>,<span class="dt">center=</span><span class="ot">TRUE</span>)</a>
-<a class="sourceLine" id="cb24-4" data-line-number="4"><span class="kw">print</span>(pCraw)</a></code></pre></div>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb29-1" data-line-number="1">dM1 &lt;-<span class="st"> </span><span class="kw">as.matrix</span>(cEraw<span class="op">$</span>crossFrame[, newvars])</a>
+<a class="sourceLine" id="cb29-2" data-line-number="2">pCraw &lt;-<span class="st"> </span>stats<span class="op">::</span><span class="kw">prcomp</span>(dM1,</a>
+<a class="sourceLine" id="cb29-3" data-line-number="3">                       <span class="dt">scale.=</span><span class="ot">FALSE</span>,<span class="dt">center=</span><span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb29-4" data-line-number="4"><span class="kw">print</span>(pCraw)</a></code></pre></div>
 <pre><code>## Standard deviations (1, .., p=3):
 ## [1] 1160.3144 1057.6874  101.1756
 ## 
@@ -462,20 +474,20 @@ For classification problems (or categorical <code>y</code>’s) as of version <c
 ## x1  0.9653602255 -0.260919781 -0.0007092447
 ## x2  0.2609205097  0.965359437  0.0012824611
 ## x3 -0.0003500566  0.001423093 -0.9999989261</code></pre>
-<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb26-1" data-line-number="1">dTrainN<span class="op">$</span>yScaled &lt;-<span class="st"> </span><span class="kw">scale</span>(dTrainN<span class="op">$</span>y,<span class="dt">center=</span><span class="ot">TRUE</span>,<span class="dt">scale=</span><span class="ot">TRUE</span>)</a>
-<a class="sourceLine" id="cb26-2" data-line-number="2">cEscaled &lt;-<span class="st"> </span>vtreat<span class="op">::</span><span class="kw">mkCrossFrameNExperiment</span>(dTrainN,</a>
-<a class="sourceLine" id="cb26-3" data-line-number="3">                                            <span class="kw">c</span>(<span class="st">'x1'</span>,<span class="st">'x2'</span>,<span class="st">'x3'</span>),<span class="st">'yScaled'</span>,</a>
-<a class="sourceLine" id="cb26-4" data-line-number="4">                                            <span class="dt">scale=</span><span class="ot">TRUE</span>)</a></code></pre></div>
-<pre><code>## [1] &quot;vtreat 1.5.0 start initial treatment design Tue Jan  7 07:51:18 2020&quot;
-## [1] &quot; start cross frame work Tue Jan  7 07:51:18 2020&quot;
-## [1] &quot; vtreat::mkCrossFrameNExperiment done Tue Jan  7 07:51:18 2020&quot;</code></pre>
-<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb28-1" data-line-number="1">newvars_s &lt;-<span class="st"> </span>cEscaled<span class="op">$</span>treatments<span class="op">$</span>scoreFrame<span class="op">$</span>varName</a>
-<a class="sourceLine" id="cb28-2" data-line-number="2"><span class="kw">print</span>(newvars_s)</a></code></pre></div>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb31-1" data-line-number="1">dTrainN<span class="op">$</span>yScaled &lt;-<span class="st"> </span><span class="kw">scale</span>(dTrainN<span class="op">$</span>y,<span class="dt">center=</span><span class="ot">TRUE</span>,<span class="dt">scale=</span><span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb31-2" data-line-number="2">cEscaled &lt;-<span class="st"> </span>vtreat<span class="op">::</span><span class="kw">mkCrossFrameNExperiment</span>(dTrainN,</a>
+<a class="sourceLine" id="cb31-3" data-line-number="3">                                            <span class="kw">c</span>(<span class="st">'x1'</span>,<span class="st">'x2'</span>,<span class="st">'x3'</span>),<span class="st">'yScaled'</span>,</a>
+<a class="sourceLine" id="cb31-4" data-line-number="4">                                            <span class="dt">scale=</span><span class="ot">TRUE</span>)</a></code></pre></div>
+<pre><code>## [1] &quot;vtreat 1.5.1 start initial treatment design Thu Jan 16 09:06:57 2020&quot;
+## [1] &quot; start cross frame work Thu Jan 16 09:06:57 2020&quot;
+## [1] &quot; vtreat::mkCrossFrameNExperiment done Thu Jan 16 09:06:57 2020&quot;</code></pre>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb33-1" data-line-number="1">newvars_s &lt;-<span class="st"> </span>cEscaled<span class="op">$</span>treatments<span class="op">$</span>scoreFrame<span class="op">$</span>varName</a>
+<a class="sourceLine" id="cb33-2" data-line-number="2"><span class="kw">print</span>(newvars_s)</a></code></pre></div>
 <pre><code>## [1] &quot;x1&quot; &quot;x2&quot; &quot;x3&quot;</code></pre>
-<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb30-1" data-line-number="1">dM2 &lt;-<span class="st"> </span><span class="kw">as.matrix</span>(cEscaled<span class="op">$</span>crossFrame[, newvars_s])</a>
-<a class="sourceLine" id="cb30-2" data-line-number="2">pCscaled &lt;-<span class="st"> </span>stats<span class="op">::</span><span class="kw">prcomp</span>(dM2,</a>
-<a class="sourceLine" id="cb30-3" data-line-number="3">                          <span class="dt">scale.=</span><span class="ot">FALSE</span>,<span class="dt">center=</span><span class="ot">TRUE</span>)</a>
-<a class="sourceLine" id="cb30-4" data-line-number="4"><span class="kw">print</span>(pCscaled)</a></code></pre></div>
+<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb35-1" data-line-number="1">dM2 &lt;-<span class="st"> </span><span class="kw">as.matrix</span>(cEscaled<span class="op">$</span>crossFrame[, newvars_s])</a>
+<a class="sourceLine" id="cb35-2" data-line-number="2">pCscaled &lt;-<span class="st"> </span>stats<span class="op">::</span><span class="kw">prcomp</span>(dM2,</a>
+<a class="sourceLine" id="cb35-3" data-line-number="3">                          <span class="dt">scale.=</span><span class="ot">FALSE</span>,<span class="dt">center=</span><span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb35-4" data-line-number="4"><span class="kw">print</span>(pCscaled)</a></code></pre></div>
 <pre><code>## Standard deviations (1, .., p=3):
 ## [1] 0.7866757 0.6880818 0.1097586
 ## 
