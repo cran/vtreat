@@ -8,11 +8,11 @@
 <meta name="generator" content="pandoc" />
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 
 <meta name="author" content="John Mount, Nina Zumel" />
 
-<meta name="date" content="2020-01-16" />
+<meta name="date" content="2020-02-08" />
 
 <title>vtreat cross frames</title>
 
@@ -117,9 +117,6 @@ padding-right: 2em;
 font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
 font-size: 14px;
 line-height: 1.35;
-}
-#header {
-text-align: center;
 }
 #TOC {
 clear: both;
@@ -288,7 +285,8 @@ code > span.st { color: #d14; }
 code > span.co { color: #888888; font-style: italic; } 
 code > span.ot { color: #007020; } 
 code > span.al { color: #ff0000; font-weight: bold; } 
-code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61717; background-color: #e3d2d2; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
 </style>
 
 
@@ -303,7 +301,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 
 <h1 class="title toc-ignore">vtreat cross frames</h1>
 <h4 class="author">John Mount, Nina Zumel</h4>
-<h4 class="date">2020-01-16</h4>
+<h4 class="date">2020-02-08</h4>
 
 
 
@@ -350,13 +348,13 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 <a class="sourceLine" id="cb2-4" data-line-number="4">                                        <span class="st">'y'</span>,<span class="ot">TRUE</span>,</a>
 <a class="sourceLine" id="cb2-5" data-line-number="5">  <span class="dt">rareCount=</span><span class="dv">0</span> <span class="co"># Note: usually want rareCount&gt;0, setting to zero to illustrate problem</span></a>
 <a class="sourceLine" id="cb2-6" data-line-number="6">)</a></code></pre></div>
-<pre><code>## [1] &quot;vtreat 1.5.1 inspecting inputs Thu Jan 16 09:06:52 2020&quot;
-## [1] &quot;designing treatments Thu Jan 16 09:06:52 2020&quot;
-## [1] &quot; have initial level statistics Thu Jan 16 09:06:52 2020&quot;
-## [1] &quot; scoring treatments Thu Jan 16 09:06:52 2020&quot;
-## [1] &quot;have treatment plan Thu Jan 16 09:06:52 2020&quot;
-## [1] &quot;rescoring complex variables Thu Jan 16 09:06:52 2020&quot;
-## [1] &quot;done rescoring complex variables Thu Jan 16 09:06:53 2020&quot;</code></pre>
+<pre><code>## [1] &quot;vtreat 1.5.2 inspecting inputs Sat Feb  8 10:35:25 2020&quot;
+## [1] &quot;designing treatments Sat Feb  8 10:35:25 2020&quot;
+## [1] &quot; have initial level statistics Sat Feb  8 10:35:25 2020&quot;
+## [1] &quot; scoring treatments Sat Feb  8 10:35:25 2020&quot;
+## [1] &quot;have treatment plan Sat Feb  8 10:35:25 2020&quot;
+## [1] &quot;rescoring complex variables Sat Feb  8 10:35:25 2020&quot;
+## [1] &quot;done rescoring complex variables Sat Feb  8 10:35:26 2020&quot;</code></pre>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1">dTrainTreated &lt;-<span class="st"> </span>vtreat<span class="op">::</span><span class="kw">prepare</span>(treatments,dTrain,</a>
 <a class="sourceLine" id="cb4-2" data-line-number="2">  <span class="dt">pruneSig=</span><span class="kw">c</span>() <span class="co"># Note: usually want pruneSig to be a small fraction, setting to null to illustrate problems</span></a>
 <a class="sourceLine" id="cb4-3" data-line-number="3">)</a></code></pre></div>
@@ -436,13 +434,13 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 <a class="sourceLine" id="cb16-10" data-line-number="10">                                        <span class="st">'y'</span>,<span class="ot">TRUE</span>,</a>
 <a class="sourceLine" id="cb16-11" data-line-number="11">  <span class="dt">rareCount=</span><span class="dv">0</span> <span class="co"># Note: usually want rareCount&gt;0, setting to zero to illustrate problem</span></a>
 <a class="sourceLine" id="cb16-12" data-line-number="12">)</a></code></pre></div>
-<pre><code>## [1] &quot;vtreat 1.5.1 inspecting inputs Thu Jan 16 09:06:53 2020&quot;
-## [1] &quot;designing treatments Thu Jan 16 09:06:53 2020&quot;
-## [1] &quot; have initial level statistics Thu Jan 16 09:06:53 2020&quot;
-## [1] &quot; scoring treatments Thu Jan 16 09:06:53 2020&quot;
-## [1] &quot;have treatment plan Thu Jan 16 09:06:53 2020&quot;
-## [1] &quot;rescoring complex variables Thu Jan 16 09:06:53 2020&quot;
-## [1] &quot;done rescoring complex variables Thu Jan 16 09:06:53 2020&quot;</code></pre>
+<pre><code>## [1] &quot;vtreat 1.5.2 inspecting inputs Sat Feb  8 10:35:26 2020&quot;
+## [1] &quot;designing treatments Sat Feb  8 10:35:26 2020&quot;
+## [1] &quot; have initial level statistics Sat Feb  8 10:35:26 2020&quot;
+## [1] &quot; scoring treatments Sat Feb  8 10:35:26 2020&quot;
+## [1] &quot;have treatment plan Sat Feb  8 10:35:26 2020&quot;
+## [1] &quot;rescoring complex variables Sat Feb  8 10:35:26 2020&quot;
+## [1] &quot;done rescoring complex variables Sat Feb  8 10:35:26 2020&quot;</code></pre>
 <div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb18-1" data-line-number="1">dTrainTreated &lt;-<span class="st"> </span>vtreat<span class="op">::</span><span class="kw">prepare</span>(treatments,dTrain,</a>
 <a class="sourceLine" id="cb18-2" data-line-number="2">  <span class="dt">pruneSig=</span>pruneSig)</a>
 <a class="sourceLine" id="cb18-3" data-line-number="3">newvars &lt;-<span class="st"> </span><span class="kw">setdiff</span>(<span class="kw">colnames</span>(dTrainTreated),<span class="st">'y'</span>)</a>
@@ -543,9 +541,9 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 <a class="sourceLine" id="cb24-5" data-line-number="5">           <span class="st">'y'</span>,<span class="ot">TRUE</span>,</a>
 <a class="sourceLine" id="cb24-6" data-line-number="6">           <span class="dt">rareCount=</span><span class="dv">0</span> <span class="co"># Note: usually want rareCount&gt;0, setting to zero to illustrate problems</span></a>
 <a class="sourceLine" id="cb24-7" data-line-number="7">)</a></code></pre></div>
-<pre><code>## [1] &quot;vtreat 1.5.1 start initial treatment design Thu Jan 16 09:06:53 2020&quot;
-## [1] &quot; start cross frame work Thu Jan 16 09:06:54 2020&quot;
-## [1] &quot; vtreat::mkCrossFrameCExperiment done Thu Jan 16 09:06:54 2020&quot;</code></pre>
+<pre><code>## [1] &quot;vtreat 1.5.2 start initial treatment design Sat Feb  8 10:35:26 2020&quot;
+## [1] &quot; start cross frame work Sat Feb  8 10:35:27 2020&quot;
+## [1] &quot; vtreat::mkCrossFrameCExperiment done Sat Feb  8 10:35:27 2020&quot;</code></pre>
 <div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb26-1" data-line-number="1">treatments &lt;-<span class="st"> </span>prep<span class="op">$</span>treatments</a>
 <a class="sourceLine" id="cb26-2" data-line-number="2"></a>
 <a class="sourceLine" id="cb26-3" data-line-number="3">knitr<span class="op">::</span><span class="kw">kable</span>(treatments<span class="op">$</span>scoreFrame[,<span class="kw">c</span>(<span class="st">'varName'</span>,<span class="st">'sig'</span>)])</a></code></pre></div>

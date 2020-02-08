@@ -1,4 +1,13 @@
 
+# vtreat 1.5.2 2020/02/08
+
+ * Control imputation on design_missingness_treatment.
+ * Share cross-splits in multinomial mode to minimize data leakage.
+ * Earlier argument checking.
+ * Default classification target to TRUE.
+ * Some documentation improvements.
+ * Move wrapr to Depends.
+
 # vtreat 1.5.1 2020/01/16
 
  * Check for same-frame on prepare paths.
