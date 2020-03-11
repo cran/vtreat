@@ -81,8 +81,11 @@ print.vtreatment <- function(x, ...) {
 
 #' @export
 format.treatmentplan <- function(x, ...) { 
-  format(x$scoreFrame[ , 
-                       c('origName', 'varName', 'code', 'rsq', 'sig', 'extraModelDegrees'), 
+  sf <- x$scoreFrame
+  cols <- c('origName', 'varName', 'code', 'rsq', 'sig', 'extraModelDegrees', 'recommended')
+  cols <- intersect(cols, colnames(sf))
+  format(sf[ , 
+                       cols, 
                        drop = FALSE])
 }
 
@@ -98,11 +101,22 @@ as.character.treatmentplan <- function (x, ...) {
 #' @seealso \code{\link{designTreatmentsC}}, \code{\link{designTreatmentsN}}, \code{\link{designTreatmentsZ}}, \code{\link{prepare.treatmentplan}}
 #' @export
 print.treatmentplan <- function(x, ...) { 
+  print(class(x))
   print(format(x), ...) 
 }
 
 
 
+
+# add in the recommendation column
+augment_score_frame <- function(score_frame) {
+  n_treatment_types <- length(unique(score_frame$code))
+  code_counts <- table(score_frame$code)
+  vcount <- code_counts[score_frame$code]
+  score_frame$default_threshold <- 1/(n_treatment_types * vcount)
+  score_frame$recommended <- score_frame$varMoves & (score_frame$sig < score_frame$default_threshold)
+  score_frame
+}
 
 
 
@@ -218,6 +232,7 @@ designTreatmentsC <- function(dframe,varlist,
   treatments$outcomeTarget <- outcometarget
   treatments$outcomeType <- 'Binary'
   treatments$fit_obj_id <- id_f(dframe)
+  treatments$scoreFrame <- augment_score_frame(treatments$scoreFrame)
   treatments
 }
 
@@ -328,6 +343,7 @@ designTreatmentsN <- function(dframe,varlist,outcomename,
     missingness_imputation = missingness_imputation, imputation_map = imputation_map)
   treatments$outcomeType <- 'Numeric'
   treatments$fit_obj_id <- id_f(dframe)
+  treatments$scoreFrame <- augment_score_frame(treatments$scoreFrame)
   treatments
 }
 
@@ -529,6 +545,8 @@ prepare <- function(treatmentplan, dframe,
   UseMethod("prepare")
 }
 
+
+
 #' Apply treatments and restrict to useful variables.
 #' 
 #' Use a treatment plan to prepare a data frame for analysis.  The
@@ -712,6 +730,7 @@ prepare.treatmentplan <- function(treatmentplan, dframe,
   }
   treated
 }
+
 
 
 
@@ -904,6 +923,7 @@ mkCrossFrameCExperiment <- function(dframe,varlist,
                               logical(1))]
   # Make sure scoreFrame and crossFrame are consistent in variables mentioned
   treatments$scoreFrame <- treatments$scoreFrame[treatments$scoreFrame$varName %in% goodVars,]
+  treatments$scoreFrame <- augment_score_frame(treatments$scoreFrame)
   crossFrame <- crossFrame[,colnames(crossFrame) %in% c(goodVars,outcomename),drop=FALSE]
   if(verbose) {
     print(paste(" vtreat::mkCrossFrameCExperiment done", date()))
@@ -1099,6 +1119,7 @@ mkCrossFrameNExperiment <- function(dframe,varlist,outcomename,
                               logical(1))]
   # Make sure scoreFrame and crossFrame are consistent in variables mentioned
   treatments$scoreFrame <- treatments$scoreFrame[treatments$scoreFrame$varName %in% goodVars,]
+  treatments$scoreFrame <- augment_score_frame(treatments$scoreFrame)
   crossFrame <- crossFrame[,colnames(crossFrame) %in% c(goodVars,outcomename),drop=FALSE]
   if(verbose) {
     print(paste(" vtreat::mkCrossFrameNExperiment done", date()))

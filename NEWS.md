@@ -1,4 +1,9 @@
 
+# vtreat 1.6.0 2020/03/10
+
+ * More S3 methods.
+ * Back-port pyvtreat recommendation code to Rvtreat.
+
 # vtreat 1.5.2 2020/02/08
 
  * Control imputation on design_missingness_treatment.
