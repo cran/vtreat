@@ -12,17 +12,33 @@
 
 <meta name="author" content="John Mount" />
 
-<meta name="date" content="2020-03-10" />
+<meta name="date" content="2020-08-12" />
 
 <title>vtreat Rare Levels</title>
 
+<script>// Hide empty <a> tag within highlighted CodeBlock for screen reader accessibility (see https://github.com/jgm/pandoc/issues/6352#issuecomment-626106786) -->
+// v0.0.1
+// Written by JooYoung Seo (jooyoung@psu.edu) and Atsushi Yasumoto on June 1st, 2020.
+
+document.addEventListener('DOMContentLoaded', function() {
+  const codeList = document.getElementsByClassName("sourceCode");
+  for (var i = 0; i < codeList.length; i++) {
+    var linkList = codeList[i].getElementsByTagName('a');
+    for (var j = 0; j < linkList.length; j++) {
+      if (linkList[j].innerHTML === "") {
+        linkList[j].setAttribute('aria-hidden', 'true');
+      }
+    }
+  }
+});
+</script>
 
 
 <style type="text/css">code{white-space: pre;}</style>
 <style type="text/css" data-origin="pandoc">
-a.sourceLine { display: inline-block; line-height: 1.25; }
-a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
-a.sourceLine:empty { height: 1.2em; }
+code.sourceCode > span { display: inline-block; line-height: 1.25; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode { white-space: pre; position: relative; }
 div.sourceCode { margin: 1em 0; }
@@ -32,14 +48,16 @@ div.sourceCode { overflow: auto; }
 }
 @media print {
 code.sourceCode { white-space: pre-wrap; }
-a.sourceLine { text-indent: -1em; padding-left: 1em; }
+code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
-pre.numberSource a.sourceLine
-  { position: relative; left: -4em; }
-pre.numberSource a.sourceLine::before
-  { content: attr(data-line-number);
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
     position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; pointer-events: all; display: inline-block;
+    border: none; display: inline-block;
     -webkit-touch-callout: none; -webkit-user-select: none;
     -khtml-user-select: none; -moz-user-select: none;
     -ms-user-select: none; user-select: none;
@@ -48,9 +66,9 @@ pre.numberSource a.sourceLine::before
   }
 pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
 div.sourceCode
-  {  }
+  {   }
 @media screen {
-a.sourceLine::before { text-decoration: underline; }
+code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 code span.al { color: #ff0000; font-weight: bold; } /* Alert */
 code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
@@ -301,7 +319,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">vtreat Rare Levels</h1>
 <h4 class="author">John Mount</h4>
-<h4 class="date">2020-03-10</h4>
+<h4 class="date">2020-08-12</h4>
 
 
 
@@ -310,44 +328,44 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <p>This capability was more of an experimental demonstration of possible extensions of <code>vtreat</code> to have more inference capabilities about rare level than a commonly useful feature. Most of this power has since been captured in the more useful <code>catP</code> feature (also demonstrated here). Even more power is found in using an interaction of <code>catN</code> or <code>catB</code> with <code>catP</code>.</p>
 <p>An example of the rare level feature using <code>vtreat</code> is given below.</p>
 <p>First we set up some data by defining a set of population centers (<code>populationFrame</code>) and code to observe individuals (with replacement) uniformly from the combined population with a rare condition (<code>inClass</code>) that has elevated occurrence in observations coming from the small population centers (<code>rareCodes</code>).</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw">library</span>(<span class="st">'vtreat'</span>)</a>
-<a class="sourceLine" id="cb1-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb1-3" data-line-number="3"><span class="kw">set.seed</span>(<span class="dv">2325</span>)</a>
-<a class="sourceLine" id="cb1-4" data-line-number="4">populationFrame &lt;-<span class="st"> </span><span class="kw">data.frame</span>(</a>
-<a class="sourceLine" id="cb1-5" data-line-number="5">   <span class="dt">popsize =</span> <span class="kw">round</span>(<span class="kw">rlnorm</span>(<span class="dv">100</span>,<span class="dt">meanlog=</span><span class="kw">log</span>(<span class="dv">4000</span>),<span class="dt">sdlog=</span><span class="dv">1</span>)),</a>
-<a class="sourceLine" id="cb1-6" data-line-number="6">   <span class="dt">stringsAsFactors =</span> <span class="ot">FALSE</span>)</a>
-<a class="sourceLine" id="cb1-7" data-line-number="7">populationFrame<span class="op">$</span>code &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="st">'z'</span>,<span class="kw">formatC</span>(<span class="kw">sample.int</span>(<span class="dv">100000</span>,</a>
-<a class="sourceLine" id="cb1-8" data-line-number="8">                                              <span class="dt">size=</span><span class="kw">nrow</span>(populationFrame),</a>
-<a class="sourceLine" id="cb1-9" data-line-number="9">                                              <span class="dt">replace=</span><span class="ot">FALSE</span>),<span class="dt">width=</span><span class="dv">5</span>,<span class="dt">flag=</span><span class="st">'0'</span>))</a>
-<a class="sourceLine" id="cb1-10" data-line-number="10">rareCodes &lt;-<span class="st"> </span>populationFrame<span class="op">$</span>code[populationFrame<span class="op">$</span>popsize<span class="op">&lt;</span><span class="dv">1000</span>]</a>
-<a class="sourceLine" id="cb1-11" data-line-number="11"></a>
-<a class="sourceLine" id="cb1-12" data-line-number="12"><span class="co"># Draw individuals from code-regions proportional to size of code region</span></a>
-<a class="sourceLine" id="cb1-13" data-line-number="13"><span class="co"># (or uniformly over all individuals labeled by code region).</span></a>
-<a class="sourceLine" id="cb1-14" data-line-number="14"><span class="co"># Also add the outcome which has altered conditional probability for rareCodes.</span></a>
-<a class="sourceLine" id="cb1-15" data-line-number="15">drawIndividualsAndReturnCodes &lt;-<span class="st"> </span><span class="cf">function</span>(n) {</a>
-<a class="sourceLine" id="cb1-16" data-line-number="16">  ords &lt;-<span class="st"> </span><span class="kw">sort</span>(<span class="kw">sample.int</span>(<span class="kw">sum</span>(populationFrame<span class="op">$</span>popsize),<span class="dt">size=</span>n,<span class="dt">replace=</span><span class="ot">TRUE</span>))</a>
-<a class="sourceLine" id="cb1-17" data-line-number="17">  cs &lt;-<span class="st"> </span><span class="kw">cumsum</span>(populationFrame<span class="op">$</span>popsize)</a>
-<a class="sourceLine" id="cb1-18" data-line-number="18">  indexes &lt;-<span class="st"> </span><span class="kw">findInterval</span>(ords,cs)<span class="op">+</span><span class="dv">1</span></a>
-<a class="sourceLine" id="cb1-19" data-line-number="19">  indexes &lt;-<span class="st"> </span>indexes[<span class="kw">sample.int</span>(n,<span class="dt">size=</span>n,<span class="dt">replace=</span><span class="ot">FALSE</span>)]</a>
-<a class="sourceLine" id="cb1-20" data-line-number="20">  samp &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">code=</span>populationFrame<span class="op">$</span>code[indexes],</a>
-<a class="sourceLine" id="cb1-21" data-line-number="21">                     <span class="dt">stringsAsFactors =</span> <span class="ot">FALSE</span>)</a>
-<a class="sourceLine" id="cb1-22" data-line-number="22">  samp<span class="op">$</span>inClass &lt;-<span class="st"> </span><span class="kw">runif</span>(n) <span class="op">&lt;</span><span class="st"> </span><span class="kw">ifelse</span>(samp<span class="op">$</span>code <span class="op">%in%</span><span class="st"> </span>rareCodes,<span class="fl">0.3</span>,<span class="fl">0.01</span>)</a>
-<a class="sourceLine" id="cb1-23" data-line-number="23">  samp</a>
-<a class="sourceLine" id="cb1-24" data-line-number="24">}</a></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="kw">library</span>(<span class="st">&#39;vtreat&#39;</span>)</span>
+<span id="cb1-2"><a href="#cb1-2"></a></span>
+<span id="cb1-3"><a href="#cb1-3"></a><span class="kw">set.seed</span>(<span class="dv">2325</span>)</span>
+<span id="cb1-4"><a href="#cb1-4"></a>populationFrame &lt;-<span class="st"> </span><span class="kw">data.frame</span>(</span>
+<span id="cb1-5"><a href="#cb1-5"></a>   <span class="dt">popsize =</span> <span class="kw">round</span>(<span class="kw">rlnorm</span>(<span class="dv">100</span>,<span class="dt">meanlog=</span><span class="kw">log</span>(<span class="dv">4000</span>),<span class="dt">sdlog=</span><span class="dv">1</span>)),</span>
+<span id="cb1-6"><a href="#cb1-6"></a>   <span class="dt">stringsAsFactors =</span> <span class="ot">FALSE</span>)</span>
+<span id="cb1-7"><a href="#cb1-7"></a>populationFrame<span class="op">$</span>code &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="st">&#39;z&#39;</span>,<span class="kw">formatC</span>(<span class="kw">sample.int</span>(<span class="dv">100000</span>,</span>
+<span id="cb1-8"><a href="#cb1-8"></a>                                              <span class="dt">size=</span><span class="kw">nrow</span>(populationFrame),</span>
+<span id="cb1-9"><a href="#cb1-9"></a>                                              <span class="dt">replace=</span><span class="ot">FALSE</span>),<span class="dt">width=</span><span class="dv">5</span>,<span class="dt">flag=</span><span class="st">&#39;0&#39;</span>))</span>
+<span id="cb1-10"><a href="#cb1-10"></a>rareCodes &lt;-<span class="st"> </span>populationFrame<span class="op">$</span>code[populationFrame<span class="op">$</span>popsize<span class="op">&lt;</span><span class="dv">1000</span>]</span>
+<span id="cb1-11"><a href="#cb1-11"></a></span>
+<span id="cb1-12"><a href="#cb1-12"></a><span class="co"># Draw individuals from code-regions proportional to size of code region</span></span>
+<span id="cb1-13"><a href="#cb1-13"></a><span class="co"># (or uniformly over all individuals labeled by code region).</span></span>
+<span id="cb1-14"><a href="#cb1-14"></a><span class="co"># Also add the outcome which has altered conditional probability for rareCodes.</span></span>
+<span id="cb1-15"><a href="#cb1-15"></a>drawIndividualsAndReturnCodes &lt;-<span class="st"> </span><span class="cf">function</span>(n) {</span>
+<span id="cb1-16"><a href="#cb1-16"></a>  ords &lt;-<span class="st"> </span><span class="kw">sort</span>(<span class="kw">sample.int</span>(<span class="kw">sum</span>(populationFrame<span class="op">$</span>popsize),<span class="dt">size=</span>n,<span class="dt">replace=</span><span class="ot">TRUE</span>))</span>
+<span id="cb1-17"><a href="#cb1-17"></a>  cs &lt;-<span class="st"> </span><span class="kw">cumsum</span>(populationFrame<span class="op">$</span>popsize)</span>
+<span id="cb1-18"><a href="#cb1-18"></a>  indexes &lt;-<span class="st"> </span><span class="kw">findInterval</span>(ords,cs)<span class="op">+</span><span class="dv">1</span></span>
+<span id="cb1-19"><a href="#cb1-19"></a>  indexes &lt;-<span class="st"> </span>indexes[<span class="kw">sample.int</span>(n,<span class="dt">size=</span>n,<span class="dt">replace=</span><span class="ot">FALSE</span>)]</span>
+<span id="cb1-20"><a href="#cb1-20"></a>  samp &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">code=</span>populationFrame<span class="op">$</span>code[indexes],</span>
+<span id="cb1-21"><a href="#cb1-21"></a>                     <span class="dt">stringsAsFactors =</span> <span class="ot">FALSE</span>)</span>
+<span id="cb1-22"><a href="#cb1-22"></a>  samp<span class="op">$</span>inClass &lt;-<span class="st"> </span><span class="kw">runif</span>(n) <span class="op">&lt;</span><span class="st"> </span><span class="kw">ifelse</span>(samp<span class="op">$</span>code <span class="op">%in%</span><span class="st"> </span>rareCodes,<span class="fl">0.3</span>,<span class="fl">0.01</span>)</span>
+<span id="cb1-23"><a href="#cb1-23"></a>  samp</span>
+<span id="cb1-24"><a href="#cb1-24"></a>}</span></code></pre></div>
 <p>We then draw a sample we want to make some observations on.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1">testSet &lt;-<span class="st"> </span><span class="kw">drawIndividualsAndReturnCodes</span>(<span class="dv">2000</span>)</a>
-<a class="sourceLine" id="cb2-2" data-line-number="2"><span class="kw">table</span>(<span class="dt">generatedAsRare=</span>testSet<span class="op">$</span>code <span class="op">%in%</span><span class="st"> </span>rareCodes,<span class="dt">inClass=</span>testSet<span class="op">$</span>inClass)</a></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a>testSet &lt;-<span class="st"> </span><span class="kw">drawIndividualsAndReturnCodes</span>(<span class="dv">2000</span>)</span>
+<span id="cb2-2"><a href="#cb2-2"></a><span class="kw">table</span>(<span class="dt">generatedAsRare=</span>testSet<span class="op">$</span>code <span class="op">%in%</span><span class="st"> </span>rareCodes,<span class="dt">inClass=</span>testSet<span class="op">$</span>inClass)</span></code></pre></div>
 <pre><code>##                inClass
 ## generatedAsRare FALSE TRUE
 ##           FALSE  1957   19
 ##           TRUE     17    7</code></pre>
 <p>Notice that in the sample we can observe the elevated rate of <code>inClass==TRUE</code> conditioned on coming from a <code>code</code> that is one of the <code>rareCodes</code>.</p>
 <p>We could try to learn this relation using <code>vtreat</code>. To do this we set up another sample (<code>designSet</code>) to work on, so we are not inferring from <code>testSet</code> (where we will evaluate results).</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1">designSet &lt;-<span class="st"> </span><span class="kw">drawIndividualsAndReturnCodes</span>(<span class="dv">2000</span>)</a>
-<a class="sourceLine" id="cb4-2" data-line-number="2">treatments &lt;-<span class="st"> </span>vtreat<span class="op">::</span><span class="kw">designTreatmentsC</span>(designSet,<span class="st">'code'</span>,<span class="st">'inClass'</span>,<span class="ot">TRUE</span>,</a>
-<a class="sourceLine" id="cb4-3" data-line-number="3">                                        <span class="dt">rareCount=</span><span class="dv">5</span>,<span class="dt">rareSig=</span><span class="ot">NULL</span>,</a>
-<a class="sourceLine" id="cb4-4" data-line-number="4">                                        <span class="dt">verbose=</span><span class="ot">FALSE</span>)</a>
-<a class="sourceLine" id="cb4-5" data-line-number="5">treatments<span class="op">$</span>scoreFrame[,<span class="kw">c</span>(<span class="st">'varName'</span>,<span class="st">'sig'</span>),drop=<span class="ot">FALSE</span>]</a></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a>designSet &lt;-<span class="st"> </span><span class="kw">drawIndividualsAndReturnCodes</span>(<span class="dv">2000</span>)</span>
+<span id="cb4-2"><a href="#cb4-2"></a>treatments &lt;-<span class="st"> </span>vtreat<span class="op">::</span><span class="kw">designTreatmentsC</span>(designSet,<span class="st">&#39;code&#39;</span>,<span class="st">&#39;inClass&#39;</span>,<span class="ot">TRUE</span>,</span>
+<span id="cb4-3"><a href="#cb4-3"></a>                                        <span class="dt">rareCount=</span><span class="dv">5</span>,<span class="dt">rareSig=</span><span class="ot">NULL</span>,</span>
+<span id="cb4-4"><a href="#cb4-4"></a>                                        <span class="dt">verbose=</span><span class="ot">FALSE</span>)</span>
+<span id="cb4-5"><a href="#cb4-5"></a>treatments<span class="op">$</span>scoreFrame[,<span class="kw">c</span>(<span class="st">&#39;varName&#39;</span>,<span class="st">&#39;sig&#39;</span>),drop=<span class="ot">FALSE</span>]</span></code></pre></div>
 <pre><code>##              varName         sig
 ## 1          code_catP 0.035934754
 ## 2          code_catB 0.025765020
@@ -369,55 +387,55 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 ## 18 code_lev_x_z86061 0.944465050
 ## 19 code_lev_x_z86248 0.178878966</code></pre>
 <p>We see in <code>treatments$scoreFrame</code> we have a level called <code>code_lev_rare</code>, which is where a number of rare levels are re-coding. We can also confirm levels that occur <code>rareCount</code> or fewer times are eligible to code to to <code>code_lev_rare</code>.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1">designSetTreated &lt;-<span class="st">  </span>vtreat<span class="op">::</span><span class="kw">prepare</span>(treatments,designSet,<span class="dt">pruneSig=</span><span class="fl">0.5</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a>designSetTreated &lt;-<span class="st">  </span>vtreat<span class="op">::</span><span class="kw">prepare</span>(treatments,designSet,<span class="dt">pruneSig=</span><span class="fl">0.5</span>)</span></code></pre></div>
 <pre><code>## Warning in prepare.treatmentplan(treatments, designSet, pruneSig = 0.5):
 ## possibly called prepare() on same data frame as designTreatments*()/
 ## mkCrossFrame*Experiment(), this can lead to over-fit. To avoid this, please use
 ## mkCrossFrame*Experiment$crossFrame.</code></pre>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1">designSetTreated<span class="op">$</span>code &lt;-<span class="st"> </span>designSet<span class="op">$</span>code</a>
-<a class="sourceLine" id="cb8-2" data-line-number="2"><span class="kw">summary</span>(<span class="kw">as.numeric</span>(<span class="kw">table</span>(designSetTreated<span class="op">$</span>code[designSetTreated<span class="op">$</span>code_lev_rare<span class="op">==</span><span class="dv">1</span>])))</a></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a>designSetTreated<span class="op">$</span>code &lt;-<span class="st"> </span>designSet<span class="op">$</span>code</span>
+<span id="cb8-2"><a href="#cb8-2"></a><span class="kw">summary</span>(<span class="kw">as.numeric</span>(<span class="kw">table</span>(designSetTreated<span class="op">$</span>code[designSetTreated<span class="op">$</span>code_lev_rare<span class="op">==</span><span class="dv">1</span>])))</span></code></pre></div>
 <pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
 ##   1.000   2.000   2.000   2.655   4.000   5.000</code></pre>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1"><span class="kw">summary</span>(<span class="kw">as.numeric</span>(<span class="kw">table</span>(designSetTreated<span class="op">$</span>code[designSetTreated<span class="op">$</span>code_lev_rare<span class="op">!=</span><span class="dv">1</span>])))</a></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a><span class="kw">summary</span>(<span class="kw">as.numeric</span>(<span class="kw">table</span>(designSetTreated<span class="op">$</span>code[designSetTreated<span class="op">$</span>code_lev_rare<span class="op">!=</span><span class="dv">1</span>])))</span></code></pre></div>
 <pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
 ##    6.00   10.25   17.00   27.47   38.75  143.00</code></pre>
 <p>We can now apply this treatment to <code>testSet</code> to see how this inferred rare level performs. Notice also the <code>code_catP</code> which directly encodes prevalence or frequency of the level during training also gives usable estimate of size (likely a more useful one then the rare-level code itself).</p>
 <p>As we can see below the <code>code_lev_rare</code> correlates with the condition, and usefully re-codes novel levels (levels in <code>testSet</code> that were not seen in <code>designSet</code>) to rare.</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" data-line-number="1">testSetTreated &lt;-<span class="st"> </span>vtreat<span class="op">::</span><span class="kw">prepare</span>(treatments,testSet,<span class="dt">pruneSig=</span><span class="fl">0.5</span>)</a>
-<a class="sourceLine" id="cb12-2" data-line-number="2">testSetTreated<span class="op">$</span>code &lt;-<span class="st"> </span>testSet<span class="op">$</span>code</a>
-<a class="sourceLine" id="cb12-3" data-line-number="3">testSetTreated<span class="op">$</span>newCode &lt;-<span class="st"> </span><span class="op">!</span>(testSetTreated<span class="op">$</span>code <span class="op">%in%</span><span class="st"> </span><span class="kw">unique</span>(designSet<span class="op">$</span>code))</a>
-<a class="sourceLine" id="cb12-4" data-line-number="4">testSetTreated<span class="op">$</span>generatedAsRareCode &lt;-<span class="st"> </span>testSetTreated<span class="op">$</span>code <span class="op">%in%</span><span class="st"> </span>rareCodes</a>
-<a class="sourceLine" id="cb12-5" data-line-number="5"></a>
-<a class="sourceLine" id="cb12-6" data-line-number="6"><span class="co"># Show code_lev_rare==1 corresponds to a subset of rows with elevated inClass==TRUE rate.</span></a>
-<a class="sourceLine" id="cb12-7" data-line-number="7"><span class="kw">table</span>(<span class="dt">code_lev_rare=</span>testSetTreated<span class="op">$</span>code_lev_rare,</a>
-<a class="sourceLine" id="cb12-8" data-line-number="8">      <span class="dt">inClass=</span>testSetTreated<span class="op">$</span>inClass)</a></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a>testSetTreated &lt;-<span class="st"> </span>vtreat<span class="op">::</span><span class="kw">prepare</span>(treatments,testSet,<span class="dt">pruneSig=</span><span class="fl">0.5</span>)</span>
+<span id="cb12-2"><a href="#cb12-2"></a>testSetTreated<span class="op">$</span>code &lt;-<span class="st"> </span>testSet<span class="op">$</span>code</span>
+<span id="cb12-3"><a href="#cb12-3"></a>testSetTreated<span class="op">$</span>newCode &lt;-<span class="st"> </span><span class="op">!</span>(testSetTreated<span class="op">$</span>code <span class="op">%in%</span><span class="st"> </span><span class="kw">unique</span>(designSet<span class="op">$</span>code))</span>
+<span id="cb12-4"><a href="#cb12-4"></a>testSetTreated<span class="op">$</span>generatedAsRareCode &lt;-<span class="st"> </span>testSetTreated<span class="op">$</span>code <span class="op">%in%</span><span class="st"> </span>rareCodes</span>
+<span id="cb12-5"><a href="#cb12-5"></a></span>
+<span id="cb12-6"><a href="#cb12-6"></a><span class="co"># Show code_lev_rare==1 corresponds to a subset of rows with elevated inClass==TRUE rate.</span></span>
+<span id="cb12-7"><a href="#cb12-7"></a><span class="kw">table</span>(<span class="dt">code_lev_rare=</span>testSetTreated<span class="op">$</span>code_lev_rare,</span>
+<span id="cb12-8"><a href="#cb12-8"></a>      <span class="dt">inClass=</span>testSetTreated<span class="op">$</span>inClass)</span></code></pre></div>
 <pre><code>##              inClass
 ## code_lev_rare FALSE TRUE
 ##             0  1894   18
 ##             1    80    8</code></pre>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" data-line-number="1"><span class="co"># Show newCodes get coded with code_level_rare==1.</span></a>
-<a class="sourceLine" id="cb14-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb14-3" data-line-number="3"><span class="kw">table</span>(<span class="dt">newCode=</span>testSetTreated<span class="op">$</span>newCode,<span class="dt">code_lev_rare=</span>testSetTreated<span class="op">$</span>code_lev_rare)</a></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a><span class="co"># Show newCodes get coded with code_level_rare==1.</span></span>
+<span id="cb14-2"><a href="#cb14-2"></a></span>
+<span id="cb14-3"><a href="#cb14-3"></a><span class="kw">table</span>(<span class="dt">newCode=</span>testSetTreated<span class="op">$</span>newCode,<span class="dt">code_lev_rare=</span>testSetTreated<span class="op">$</span>code_lev_rare)</span></code></pre></div>
 <pre><code>##        code_lev_rare
 ## newCode    0    1
 ##   FALSE 1912   88</code></pre>
-<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb16-1" data-line-number="1"><span class="co"># Show newCodes tend to come from defined rareCodes.</span></a>
-<a class="sourceLine" id="cb16-2" data-line-number="2"><span class="kw">table</span>(<span class="dt">newCode=</span>testSetTreated<span class="op">$</span>newCode,</a>
-<a class="sourceLine" id="cb16-3" data-line-number="3">      <span class="dt">generatedAsRare=</span>testSetTreated<span class="op">$</span>generatedAsRareCode)</a></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1"></a><span class="co"># Show newCodes tend to come from defined rareCodes.</span></span>
+<span id="cb16-2"><a href="#cb16-2"></a><span class="kw">table</span>(<span class="dt">newCode=</span>testSetTreated<span class="op">$</span>newCode,</span>
+<span id="cb16-3"><a href="#cb16-3"></a>      <span class="dt">generatedAsRare=</span>testSetTreated<span class="op">$</span>generatedAsRareCode)</span></code></pre></div>
 <pre><code>##        generatedAsRare
 ## newCode FALSE TRUE
 ##   FALSE  1976   24</code></pre>
-<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb18-1" data-line-number="1"><span class="co"># Show code_catP's behavior on rare and novel levels.</span></a>
-<a class="sourceLine" id="cb18-2" data-line-number="2"><span class="kw">summary</span>(testSetTreated<span class="op">$</span>code_catP)</a></code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1"></a><span class="co"># Show code_catP&#39;s behavior on rare and novel levels.</span></span>
+<span id="cb18-2"><a href="#cb18-2"></a><span class="kw">summary</span>(testSetTreated<span class="op">$</span>code_catP)</span></code></pre></div>
 <pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
 ## 0.00050 0.00950 0.01950 0.02541 0.03450 0.07150</code></pre>
-<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb20-1" data-line-number="1"><span class="kw">summary</span>(testSetTreated<span class="op">$</span>code_catP[testSetTreated<span class="op">$</span>code_lev_rare<span class="op">==</span><span class="dv">1</span>])</a></code></pre></div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1"></a><span class="kw">summary</span>(testSetTreated<span class="op">$</span>code_catP[testSetTreated<span class="op">$</span>code_lev_rare<span class="op">==</span><span class="dv">1</span>])</span></code></pre></div>
 <pre><code>##     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
 ## 0.000500 0.001000 0.001500 0.001398 0.002000 0.002500</code></pre>
-<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb22-1" data-line-number="1"><span class="kw">summary</span>(testSetTreated<span class="op">$</span>code_catP[testSetTreated<span class="op">$</span>newCode])</a></code></pre></div>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1"></a><span class="kw">summary</span>(testSetTreated<span class="op">$</span>code_catP[testSetTreated<span class="op">$</span>newCode])</span></code></pre></div>
 <pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
 ## </code></pre>
-<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb24-1" data-line-number="1"><span class="kw">summary</span>(testSetTreated<span class="op">$</span>code_catP[testSetTreated<span class="op">$</span>generatedAsRareCode])</a></code></pre></div>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1"></a><span class="kw">summary</span>(testSetTreated<span class="op">$</span>code_catP[testSetTreated<span class="op">$</span>generatedAsRareCode])</span></code></pre></div>
 <pre><code>##      Min.   1st Qu.    Median      Mean   3rd Qu.      Max. 
 ## 0.0005000 0.0005000 0.0010000 0.0009792 0.0015000 0.0020000</code></pre>
 

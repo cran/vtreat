@@ -12,17 +12,33 @@
 
 <meta name="author" content="John Mount" />
 
-<meta name="date" content="2020-03-10" />
+<meta name="date" content="2020-08-12" />
 
 <title>Saving Treatment Plans</title>
 
+<script>// Hide empty <a> tag within highlighted CodeBlock for screen reader accessibility (see https://github.com/jgm/pandoc/issues/6352#issuecomment-626106786) -->
+// v0.0.1
+// Written by JooYoung Seo (jooyoung@psu.edu) and Atsushi Yasumoto on June 1st, 2020.
+
+document.addEventListener('DOMContentLoaded', function() {
+  const codeList = document.getElementsByClassName("sourceCode");
+  for (var i = 0; i < codeList.length; i++) {
+    var linkList = codeList[i].getElementsByTagName('a');
+    for (var j = 0; j < linkList.length; j++) {
+      if (linkList[j].innerHTML === "") {
+        linkList[j].setAttribute('aria-hidden', 'true');
+      }
+    }
+  }
+});
+</script>
 
 
 <style type="text/css">code{white-space: pre;}</style>
 <style type="text/css" data-origin="pandoc">
-a.sourceLine { display: inline-block; line-height: 1.25; }
-a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
-a.sourceLine:empty { height: 1.2em; }
+code.sourceCode > span { display: inline-block; line-height: 1.25; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode { white-space: pre; position: relative; }
 div.sourceCode { margin: 1em 0; }
@@ -32,14 +48,16 @@ div.sourceCode { overflow: auto; }
 }
 @media print {
 code.sourceCode { white-space: pre-wrap; }
-a.sourceLine { text-indent: -1em; padding-left: 1em; }
+code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
-pre.numberSource a.sourceLine
-  { position: relative; left: -4em; }
-pre.numberSource a.sourceLine::before
-  { content: attr(data-line-number);
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
     position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; pointer-events: all; display: inline-block;
+    border: none; display: inline-block;
     -webkit-touch-callout: none; -webkit-user-select: none;
     -khtml-user-select: none; -moz-user-select: none;
     -ms-user-select: none; user-select: none;
@@ -48,9 +66,9 @@ pre.numberSource a.sourceLine::before
   }
 pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
 div.sourceCode
-  {  }
+  {   }
 @media screen {
-a.sourceLine::before { text-decoration: underline; }
+code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 code span.al { color: #ff0000; font-weight: bold; } /* Alert */
 code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
@@ -301,75 +319,74 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Saving Treatment Plans</h1>
 <h4 class="author">John Mount</h4>
-<h4 class="date">2020-03-10</h4>
+<h4 class="date">2020-08-12</h4>
 
 
 
 <p>You can save and load treatment plans. Note: treatments plans are intended to be used with the version of <code>vtreat</code> they were constructed with (though we try to make plans forward-compatible). So it is good idea to have procedures to re-build treatment plans.</p>
 <p>The easiest way to save <code>vtreat</code> treatment plans is to use <code>R</code>’s built in <code>saveRDS</code> function.</p>
 <p>To save in a file:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw">library</span>(<span class="st">&quot;vtreat&quot;</span>)</a>
-<a class="sourceLine" id="cb1-2" data-line-number="2">dTrainC &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">x=</span><span class="kw">c</span>(<span class="st">'a'</span>,<span class="st">'a'</span>,<span class="st">'a'</span>,<span class="st">'b'</span>,<span class="st">'b'</span>,<span class="ot">NA</span>,<span class="ot">NA</span>),</a>
-<a class="sourceLine" id="cb1-3" data-line-number="3">                      <span class="dt">z=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">4</span>,<span class="ot">NA</span>,<span class="dv">6</span>,<span class="ot">NA</span>),</a>
-<a class="sourceLine" id="cb1-4" data-line-number="4">                      <span class="dt">y=</span><span class="kw">c</span>(<span class="ot">FALSE</span>,<span class="ot">FALSE</span>,<span class="ot">TRUE</span>,<span class="ot">FALSE</span>,<span class="ot">TRUE</span>,<span class="ot">TRUE</span>,<span class="ot">TRUE</span>))</a>
-<a class="sourceLine" id="cb1-5" data-line-number="5">treatmentsC &lt;-<span class="st"> </span><span class="kw">designTreatmentsC</span>(dTrainC, <span class="kw">colnames</span>(dTrainC),</a>
-<a class="sourceLine" id="cb1-6" data-line-number="6">                                 <span class="st">'y'</span>, <span class="ot">TRUE</span>,</a>
-<a class="sourceLine" id="cb1-7" data-line-number="7">                                 <span class="dt">verbose=</span> <span class="ot">FALSE</span>)</a>
-<a class="sourceLine" id="cb1-8" data-line-number="8"></a>
-<a class="sourceLine" id="cb1-9" data-line-number="9">fileName =<span class="st"> </span><span class="kw">paste0</span>(<span class="kw">tempfile</span>(<span class="kw">c</span>(<span class="st">'vtreatPlan'</span>)), <span class="st">'.RDS'</span>)</a>
-<a class="sourceLine" id="cb1-10" data-line-number="10"><span class="kw">saveRDS</span>(treatmentsC,fileName)</a>
-<a class="sourceLine" id="cb1-11" data-line-number="11"><span class="kw">rm</span>(<span class="dt">list=</span><span class="kw">c</span>(<span class="st">'treatmentsC'</span>))</a></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="kw">library</span>(<span class="st">&quot;vtreat&quot;</span>)</span>
+<span id="cb1-2"><a href="#cb1-2"></a>dTrainC &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">x=</span><span class="kw">c</span>(<span class="st">&#39;a&#39;</span>,<span class="st">&#39;a&#39;</span>,<span class="st">&#39;a&#39;</span>,<span class="st">&#39;b&#39;</span>,<span class="st">&#39;b&#39;</span>,<span class="ot">NA</span>,<span class="ot">NA</span>),</span>
+<span id="cb1-3"><a href="#cb1-3"></a>                      <span class="dt">z=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">4</span>,<span class="ot">NA</span>,<span class="dv">6</span>,<span class="ot">NA</span>),</span>
+<span id="cb1-4"><a href="#cb1-4"></a>                      <span class="dt">y=</span><span class="kw">c</span>(<span class="ot">FALSE</span>,<span class="ot">FALSE</span>,<span class="ot">TRUE</span>,<span class="ot">FALSE</span>,<span class="ot">TRUE</span>,<span class="ot">TRUE</span>,<span class="ot">TRUE</span>))</span>
+<span id="cb1-5"><a href="#cb1-5"></a>treatmentsC &lt;-<span class="st"> </span><span class="kw">designTreatmentsC</span>(dTrainC, <span class="kw">colnames</span>(dTrainC),</span>
+<span id="cb1-6"><a href="#cb1-6"></a>                                 <span class="st">&#39;y&#39;</span>, <span class="ot">TRUE</span>,</span>
+<span id="cb1-7"><a href="#cb1-7"></a>                                 <span class="dt">verbose=</span> <span class="ot">FALSE</span>)</span>
+<span id="cb1-8"><a href="#cb1-8"></a></span>
+<span id="cb1-9"><a href="#cb1-9"></a>fileName =<span class="st"> </span><span class="kw">paste0</span>(<span class="kw">tempfile</span>(<span class="kw">c</span>(<span class="st">&#39;vtreatPlan&#39;</span>)), <span class="st">&#39;.RDS&#39;</span>)</span>
+<span id="cb1-10"><a href="#cb1-10"></a><span class="kw">saveRDS</span>(treatmentsC,fileName)</span>
+<span id="cb1-11"><a href="#cb1-11"></a><span class="kw">rm</span>(<span class="dt">list=</span><span class="kw">c</span>(<span class="st">&#39;treatmentsC&#39;</span>))</span></code></pre></div>
 <p>And then to restore and use.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="kw">library</span>(<span class="st">&quot;vtreat&quot;</span>)</a>
-<a class="sourceLine" id="cb2-2" data-line-number="2">treatmentsC &lt;-<span class="st"> </span><span class="kw">readRDS</span>(fileName)</a>
-<a class="sourceLine" id="cb2-3" data-line-number="3"></a>
-<a class="sourceLine" id="cb2-4" data-line-number="4">dTestC &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">x=</span><span class="kw">c</span>(<span class="st">'a'</span>,<span class="st">'b'</span>,<span class="st">'c'</span>,<span class="ot">NA</span>),<span class="dt">z=</span><span class="kw">c</span>(<span class="dv">10</span>,<span class="dv">20</span>,<span class="dv">30</span>,<span class="ot">NA</span>))</a>
-<a class="sourceLine" id="cb2-5" data-line-number="5">dTestCTreated &lt;-<span class="st"> </span><span class="kw">prepare</span>(treatmentsC, dTestC, <span class="dt">pruneSig=</span> <span class="kw">c</span>())</a>
-<a class="sourceLine" id="cb2-6" data-line-number="6"></a>
-<a class="sourceLine" id="cb2-7" data-line-number="7"><span class="co"># clean up</span></a>
-<a class="sourceLine" id="cb2-8" data-line-number="8"><span class="kw">unlink</span>(fileName)</a></code></pre></div>
-<p>Treatment plans can also be stored as binary blobs in databases. Using ideas from <a href="http://jfaganuk.github.io/2015/01/12/storing-r-objects-in-sqlite-tables/">here</a> gives us the following through the <code>DBI</code> interface.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1">con &lt;-<span class="st"> </span><span class="ot">NULL</span></a>
-<a class="sourceLine" id="cb3-2" data-line-number="2"><span class="cf">if</span> (<span class="kw">requireNamespace</span>(<span class="st">'RSQLite'</span>, <span class="dt">quietly =</span> <span class="ot">TRUE</span>) <span class="op">&amp;&amp;</span></a>
-<a class="sourceLine" id="cb3-3" data-line-number="3"><span class="st">    </span><span class="kw">requireNamespace</span>(<span class="st">'DBI'</span>, <span class="dt">quietly =</span> <span class="ot">TRUE</span>)) {</a>
-<a class="sourceLine" id="cb3-4" data-line-number="4">  <span class="kw">library</span>(<span class="st">&quot;RSQLite&quot;</span>)</a>
-<a class="sourceLine" id="cb3-5" data-line-number="5">  con &lt;-<span class="st"> </span><span class="kw">dbConnect</span>(<span class="dt">drv=</span><span class="kw">SQLite</span>(), <span class="dt">dbname=</span><span class="st">&quot;:memory:&quot;</span>)</a>
-<a class="sourceLine" id="cb3-6" data-line-number="6">  <span class="co"># create table</span></a>
-<a class="sourceLine" id="cb3-7" data-line-number="7">  <span class="kw">dbExecute</span>(con, <span class="st">'create table if not exists treatments </span></a>
-<a class="sourceLine" id="cb3-8" data-line-number="8"><span class="st">                 (key varchar(200) primary key, </span></a>
-<a class="sourceLine" id="cb3-9" data-line-number="9"><span class="st">                  treatment blob)'</span>)</a>
-<a class="sourceLine" id="cb3-10" data-line-number="10">  <span class="co"># wrap data</span></a>
-<a class="sourceLine" id="cb3-11" data-line-number="11">  df &lt;-<span class="st"> </span><span class="kw">data.frame</span>(</a>
-<a class="sourceLine" id="cb3-12" data-line-number="12">    <span class="dt">key=</span><span class="st">'treatmentsC'</span>, </a>
-<a class="sourceLine" id="cb3-13" data-line-number="13">    <span class="dt">treatment =</span> <span class="kw">I</span>(<span class="kw">list</span>(<span class="kw">serialize</span>(treatmentsC, <span class="ot">NULL</span>))))</a>
-<a class="sourceLine" id="cb3-14" data-line-number="14">  <span class="co"># Clear any previous version</span></a>
-<a class="sourceLine" id="cb3-15" data-line-number="15">  <span class="kw">dbExecute</span>(con, </a>
-<a class="sourceLine" id="cb3-16" data-line-number="16">               <span class="st">&quot;delete from treatments where key='treatmentsC'&quot;</span>)</a>
-<a class="sourceLine" id="cb3-17" data-line-number="17">  <span class="co"># insert treatmentplan</span></a>
-<a class="sourceLine" id="cb3-18" data-line-number="18">  <span class="co"># depreciated</span></a>
-<a class="sourceLine" id="cb3-19" data-line-number="19">  <span class="co"># dbGetPreparedQuery(con,</span></a>
-<a class="sourceLine" id="cb3-20" data-line-number="20">  <span class="co">#                    'insert into treatments (key, treatment) values (:key, :treatment)',</span></a>
-<a class="sourceLine" id="cb3-21" data-line-number="21">  <span class="co">#                    bind.data=df)</span></a>
-<a class="sourceLine" id="cb3-22" data-line-number="22">  <span class="kw">dbExecute</span>(con, </a>
-<a class="sourceLine" id="cb3-23" data-line-number="23">             <span class="st">'insert into treatments (key, treatment) values (:key, :treatment)'</span>,</a>
-<a class="sourceLine" id="cb3-24" data-line-number="24">             <span class="dt">params=</span>df)</a>
-<a class="sourceLine" id="cb3-25" data-line-number="25">  constr &lt;-<span class="st"> </span><span class="kw">paste</span>(<span class="kw">capture.output</span>(<span class="kw">print</span>(con)),<span class="dt">collapse=</span><span class="st">'</span><span class="ch">\n</span><span class="st">'</span>)</a>
-<a class="sourceLine" id="cb3-26" data-line-number="26">  <span class="kw">paste</span>(<span class="st">'saved to db: '</span>, constr)</a>
-<a class="sourceLine" id="cb3-27" data-line-number="27">}</a></code></pre></div>
-<pre><code>## Warning: Factors converted to character</code></pre>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="kw">library</span>(<span class="st">&quot;vtreat&quot;</span>)</span>
+<span id="cb2-2"><a href="#cb2-2"></a>treatmentsC &lt;-<span class="st"> </span><span class="kw">readRDS</span>(fileName)</span>
+<span id="cb2-3"><a href="#cb2-3"></a></span>
+<span id="cb2-4"><a href="#cb2-4"></a>dTestC &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">x=</span><span class="kw">c</span>(<span class="st">&#39;a&#39;</span>,<span class="st">&#39;b&#39;</span>,<span class="st">&#39;c&#39;</span>,<span class="ot">NA</span>),<span class="dt">z=</span><span class="kw">c</span>(<span class="dv">10</span>,<span class="dv">20</span>,<span class="dv">30</span>,<span class="ot">NA</span>))</span>
+<span id="cb2-5"><a href="#cb2-5"></a>dTestCTreated &lt;-<span class="st"> </span><span class="kw">prepare</span>(treatmentsC, dTestC, <span class="dt">pruneSig=</span> <span class="kw">c</span>())</span>
+<span id="cb2-6"><a href="#cb2-6"></a></span>
+<span id="cb2-7"><a href="#cb2-7"></a><span class="co"># clean up</span></span>
+<span id="cb2-8"><a href="#cb2-8"></a><span class="kw">unlink</span>(fileName)</span></code></pre></div>
+<p>Treatment plans can also be stored as binary blobs in databases. Using ideas from <a href="https://jfaganuk.github.io/2015/01/12/storing-r-objects-in-sqlite-tables/">here</a> gives us the following through the <code>DBI</code> interface.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a>con &lt;-<span class="st"> </span><span class="ot">NULL</span></span>
+<span id="cb3-2"><a href="#cb3-2"></a><span class="cf">if</span> (<span class="kw">requireNamespace</span>(<span class="st">&#39;RSQLite&#39;</span>, <span class="dt">quietly =</span> <span class="ot">TRUE</span>) <span class="op">&amp;&amp;</span></span>
+<span id="cb3-3"><a href="#cb3-3"></a><span class="st">    </span><span class="kw">requireNamespace</span>(<span class="st">&#39;DBI&#39;</span>, <span class="dt">quietly =</span> <span class="ot">TRUE</span>)) {</span>
+<span id="cb3-4"><a href="#cb3-4"></a>  <span class="kw">library</span>(<span class="st">&quot;RSQLite&quot;</span>)</span>
+<span id="cb3-5"><a href="#cb3-5"></a>  con &lt;-<span class="st"> </span><span class="kw">dbConnect</span>(<span class="dt">drv=</span><span class="kw">SQLite</span>(), <span class="dt">dbname=</span><span class="st">&quot;:memory:&quot;</span>)</span>
+<span id="cb3-6"><a href="#cb3-6"></a>  <span class="co"># create table</span></span>
+<span id="cb3-7"><a href="#cb3-7"></a>  <span class="kw">dbExecute</span>(con, <span class="st">&#39;create table if not exists treatments </span></span>
+<span id="cb3-8"><a href="#cb3-8"></a><span class="st">                 (key varchar(200) primary key, </span></span>
+<span id="cb3-9"><a href="#cb3-9"></a><span class="st">                  treatment blob)&#39;</span>)</span>
+<span id="cb3-10"><a href="#cb3-10"></a>  <span class="co"># wrap data</span></span>
+<span id="cb3-11"><a href="#cb3-11"></a>  df &lt;-<span class="st"> </span><span class="kw">data.frame</span>(</span>
+<span id="cb3-12"><a href="#cb3-12"></a>    <span class="dt">key=</span><span class="st">&#39;treatmentsC&#39;</span>, </span>
+<span id="cb3-13"><a href="#cb3-13"></a>    <span class="dt">treatment =</span> <span class="kw">I</span>(<span class="kw">list</span>(<span class="kw">serialize</span>(treatmentsC, <span class="ot">NULL</span>))))</span>
+<span id="cb3-14"><a href="#cb3-14"></a>  <span class="co"># Clear any previous version</span></span>
+<span id="cb3-15"><a href="#cb3-15"></a>  <span class="kw">dbExecute</span>(con, </span>
+<span id="cb3-16"><a href="#cb3-16"></a>               <span class="st">&quot;delete from treatments where key=&#39;treatmentsC&#39;&quot;</span>)</span>
+<span id="cb3-17"><a href="#cb3-17"></a>  <span class="co"># insert treatmentplan</span></span>
+<span id="cb3-18"><a href="#cb3-18"></a>  <span class="co"># depreciated</span></span>
+<span id="cb3-19"><a href="#cb3-19"></a>  <span class="co"># dbGetPreparedQuery(con,</span></span>
+<span id="cb3-20"><a href="#cb3-20"></a>  <span class="co">#                    &#39;insert into treatments (key, treatment) values (:key, :treatment)&#39;,</span></span>
+<span id="cb3-21"><a href="#cb3-21"></a>  <span class="co">#                    bind.data=df)</span></span>
+<span id="cb3-22"><a href="#cb3-22"></a>  <span class="kw">dbExecute</span>(con, </span>
+<span id="cb3-23"><a href="#cb3-23"></a>             <span class="st">&#39;insert into treatments (key, treatment) values (:key, :treatment)&#39;</span>,</span>
+<span id="cb3-24"><a href="#cb3-24"></a>             <span class="dt">params=</span>df)</span>
+<span id="cb3-25"><a href="#cb3-25"></a>  constr &lt;-<span class="st"> </span><span class="kw">paste</span>(<span class="kw">capture.output</span>(<span class="kw">print</span>(con)),<span class="dt">collapse=</span><span class="st">&#39;</span><span class="ch">\n</span><span class="st">&#39;</span>)</span>
+<span id="cb3-26"><a href="#cb3-26"></a>  <span class="kw">paste</span>(<span class="st">&#39;saved to db: &#39;</span>, constr)</span>
+<span id="cb3-27"><a href="#cb3-27"></a>}</span></code></pre></div>
 <pre><code>## [1] &quot;saved to db:  &lt;SQLiteConnection&gt;\n  Path: :memory:\n  Extensions: TRUE&quot;</code></pre>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1"><span class="kw">rm</span>(<span class="dt">list=</span> <span class="kw">c</span>(<span class="st">'treatmentsC'</span>, <span class="st">'dTestCTreated'</span>))</a></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a><span class="kw">rm</span>(<span class="dt">list=</span> <span class="kw">c</span>(<span class="st">&#39;treatmentsC&#39;</span>, <span class="st">&#39;dTestCTreated&#39;</span>))</span></code></pre></div>
 <p>And we can read the treatment back in as follows.</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1"><span class="cf">if</span>(<span class="op">!</span><span class="kw">is.null</span>(con)) {</a>
-<a class="sourceLine" id="cb7-2" data-line-number="2">  treatmentsList &lt;-<span class="st"> </span><span class="kw">lapply</span>(</a>
-<a class="sourceLine" id="cb7-3" data-line-number="3">    <span class="kw">dbGetQuery</span>(con, </a>
-<a class="sourceLine" id="cb7-4" data-line-number="4">               <span class="st">&quot;select * from treatments where key='treatmentsC'&quot;</span>)<span class="op">$</span>treatment,</a>
-<a class="sourceLine" id="cb7-5" data-line-number="5">    unserialize)</a>
-<a class="sourceLine" id="cb7-6" data-line-number="6">  treatmentsC &lt;-<span class="st"> </span>treatmentsList[[<span class="dv">1</span>]]</a>
-<a class="sourceLine" id="cb7-7" data-line-number="7">  <span class="kw">dbDisconnect</span>(con)</a>
-<a class="sourceLine" id="cb7-8" data-line-number="8">  dTestCTreated &lt;-<span class="st"> </span><span class="kw">prepare</span>(treatmentsC, dTestC, <span class="dt">pruneSig=</span> <span class="kw">c</span>())</a>
-<a class="sourceLine" id="cb7-9" data-line-number="9">  <span class="kw">print</span>(dTestCTreated)</a>
-<a class="sourceLine" id="cb7-10" data-line-number="10">}</a></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="cf">if</span>(<span class="op">!</span><span class="kw">is.null</span>(con)) {</span>
+<span id="cb6-2"><a href="#cb6-2"></a>  treatmentsList &lt;-<span class="st"> </span><span class="kw">lapply</span>(</span>
+<span id="cb6-3"><a href="#cb6-3"></a>    <span class="kw">dbGetQuery</span>(con, </span>
+<span id="cb6-4"><a href="#cb6-4"></a>               <span class="st">&quot;select * from treatments where key=&#39;treatmentsC&#39;&quot;</span>)<span class="op">$</span>treatment,</span>
+<span id="cb6-5"><a href="#cb6-5"></a>    unserialize)</span>
+<span id="cb6-6"><a href="#cb6-6"></a>  treatmentsC &lt;-<span class="st"> </span>treatmentsList[[<span class="dv">1</span>]]</span>
+<span id="cb6-7"><a href="#cb6-7"></a>  <span class="kw">dbDisconnect</span>(con)</span>
+<span id="cb6-8"><a href="#cb6-8"></a>  dTestCTreated &lt;-<span class="st"> </span><span class="kw">prepare</span>(treatmentsC, dTestC, <span class="dt">pruneSig=</span> <span class="kw">c</span>())</span>
+<span id="cb6-9"><a href="#cb6-9"></a>  <span class="kw">print</span>(dTestCTreated)</span>
+<span id="cb6-10"><a href="#cb6-10"></a>}</span></code></pre></div>
 <pre><code>##       x_catP     x_catB    z z_isBAD x_lev_NA x_lev_x_a x_lev_x_b
 ## 1 0.42857143 -0.9807709 10.0       0        0         1         0
 ## 2 0.28571429 -0.2876737 20.0       0        0         0         1

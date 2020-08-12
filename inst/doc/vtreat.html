@@ -12,17 +12,33 @@
 
 <meta name="author" content="John Mount, Nina Zumel" />
 
-<meta name="date" content="2020-03-10" />
+<meta name="date" content="2020-08-12" />
 
 <title>vtreat package</title>
 
+<script>// Hide empty <a> tag within highlighted CodeBlock for screen reader accessibility (see https://github.com/jgm/pandoc/issues/6352#issuecomment-626106786) -->
+// v0.0.1
+// Written by JooYoung Seo (jooyoung@psu.edu) and Atsushi Yasumoto on June 1st, 2020.
+
+document.addEventListener('DOMContentLoaded', function() {
+  const codeList = document.getElementsByClassName("sourceCode");
+  for (var i = 0; i < codeList.length; i++) {
+    var linkList = codeList[i].getElementsByTagName('a');
+    for (var j = 0; j < linkList.length; j++) {
+      if (linkList[j].innerHTML === "") {
+        linkList[j].setAttribute('aria-hidden', 'true');
+      }
+    }
+  }
+});
+</script>
 
 
 <style type="text/css">code{white-space: pre;}</style>
 <style type="text/css" data-origin="pandoc">
-a.sourceLine { display: inline-block; line-height: 1.25; }
-a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
-a.sourceLine:empty { height: 1.2em; }
+code.sourceCode > span { display: inline-block; line-height: 1.25; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode { white-space: pre; position: relative; }
 div.sourceCode { margin: 1em 0; }
@@ -32,14 +48,16 @@ div.sourceCode { overflow: auto; }
 }
 @media print {
 code.sourceCode { white-space: pre-wrap; }
-a.sourceLine { text-indent: -1em; padding-left: 1em; }
+code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
-pre.numberSource a.sourceLine
-  { position: relative; left: -4em; }
-pre.numberSource a.sourceLine::before
-  { content: attr(data-line-number);
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
     position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; pointer-events: all; display: inline-block;
+    border: none; display: inline-block;
     -webkit-touch-callout: none; -webkit-user-select: none;
     -khtml-user-select: none; -moz-user-select: none;
     -ms-user-select: none; user-select: none;
@@ -48,9 +66,9 @@ pre.numberSource a.sourceLine::before
   }
 pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
 div.sourceCode
-  {  }
+  {   }
 @media screen {
-a.sourceLine::before { text-decoration: underline; }
+code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 code span.al { color: #ff0000; font-weight: bold; } /* Alert */
 code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
@@ -301,14 +319,25 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">vtreat package</h1>
 <h4 class="author">John Mount, Nina Zumel</h4>
-<h4 class="date">2020-03-10</h4>
+<h4 class="date">2020-08-12</h4>
 
 
 
-<p><code>vtreat</code> is a <code>data.frame</code> processor/conditioner that prepares real-world data for supervised machine learning or predictive modeling in a statistically sound manner.</p>
-<p><code>vtreat</code> takes an input <code>data.frame</code> that has a specified column called “the outcome variable” (or “y”) that is the quantity to be predicted (and must not have missing values). Other input columns are possible explanatory variables (typically numeric or categorical/string-valued, these columns may have missing values) that the user later wants to use to predict “y”. In practice such an input <code>data.frame</code> may not be immediately suitable for machine learning procedures that often expect only numeric explanatory variables, and may not tolerate missing value.</p>
+<p><code>vtreat</code> is a <code>data.frame</code> processor/conditioner (available <a href="https://github.com/WinVector/vtreat">for <code>R</code></a>, and <a href="https://github.com/WinVector/pyvtreat">for <code>Python</code></a>) that prepares real-world data for supervised machine learning or predictive modeling in a statistically sound manner.</p>
+<p>A nice video lecture on what sorts of problems <code>vtreat</code> solves can be found <a href="https://youtu.be/sniHkkrAsOc?t=42">here</a>.</p>
+<p><code>vtreat</code> takes an input <code>data.frame</code> that has a specified column called “the outcome variable” (or “y”) that is the quantity to be predicted (and must not have missing values). Other input columns are possible explanatory variables (typically numeric or categorical/string-valued, these columns may have missing values) that the user later wants to use to predict “y”. In practice such an input <code>data.frame</code> may not be immediately suitable for machine learning procedures that often expect only numeric explanatory variables, and may not tolerate missing values.</p>
 <p>To solve this, <code>vtreat</code> builds a transformed <code>data.frame</code> where all explanatory variable columns have been transformed into a number of numeric explanatory variable columns, without missing values. The <code>vtreat</code> implementation produces derived numeric columns that capture most of the information relating the explanatory columns to the specified “y” or dependent/outcome column through a number of numeric transforms (indicator variables, impact codes, prevalence codes, and more). This transformed <code>data.frame</code> is suitable for a wide range of supervised learning methods from linear regression, through gradient boosted machines.</p>
 <p>The idea is: you can take a <code>data.frame</code> of messy real world data and easily, faithfully, reliably, and repeatably prepare it for machine learning using documented methods using <code>vtreat</code>. Incorporating <code>vtreat</code> into your machine learning workflow lets you quickly work with very diverse structured data.</p>
+<p>In all cases (classification, regression, unsupervised, and multinomial classification) the intent is that <code>vtreat</code> transforms are essentially one liners.</p>
+<p>The preparation commands are organized as follows:</p>
+<ul>
+<li><strong>Regression</strong>: <a href="https://github.com/WinVector/vtreat/blob/master/Examples/Regression/Regression_FP.md"><code>R</code> regression example, fit/prepare interface</a>, <a href="https://github.com/WinVector/vtreat/blob/master/Examples/Regression/Regression.md"><code>R</code> regression example, design/prepare/experiment interface</a>, <a href="https://github.com/WinVector/pyvtreat/blob/master/Examples/Regression/Regression.md"><code>Python</code> regression example</a>.</li>
+<li><strong>Classification</strong>: <a href="https://github.com/WinVector/vtreat/blob/master/Examples/Classification/Classification_FP.md"><code>R</code> classification example, fit/prepare interface</a>, <a href="https://github.com/WinVector/vtreat/blob/master/Examples/Classification/Classification.md"><code>R</code> classification example, design/prepare/experiment interface</a>, <a href="https://github.com/WinVector/pyvtreat/blob/master/Examples/Classification/Classification.md"><code>Python</code> classification example</a>.</li>
+<li><strong>Unsupervised tasks</strong>: <a href="https://github.com/WinVector/vtreat/blob/master/Examples/Unsupervised/Unsupervised_FP.md"><code>R</code> unsupervised example, fit/prepare interface</a>, <a href="https://github.com/WinVector/vtreat/blob/master/Examples/Unsupervised/Unsupervised.md"><code>R</code> unsupervised example, design/prepare/experiment interface</a>, <a href="https://github.com/WinVector/pyvtreat/blob/master/Examples/Unsupervised/Unsupervised.md"><code>Python</code> unsupervised example</a>.</li>
+<li><strong>Multinomial classification</strong>: <a href="https://github.com/WinVector/vtreat/blob/master/Examples/Multinomial/MultinomialExample_FP.md"><code>R</code> multinomial classification example, fit/prepare interface</a>, <a href="https://github.com/WinVector/vtreat/blob/master/Examples/Multinomial/MultinomialExample.md"><code>R</code> multinomial classification example, design/prepare/experiment interface</a>, <a href="https://github.com/WinVector/pyvtreat/blob/master/Examples/Multinomial/MultinomialExample.md"><code>Python</code> multinomial classification example</a>.</li>
+</ul>
+<p>In all cases: variable preparation is intended to be a “one liner.”</p>
+<p>These current revisions of the examples are designed to be small, yet complete. So as a set they have some overlap, but the user can rely mostly on a single example for a single task type.</p>
 <p>For more detail please see here: <a href="https://arxiv.org/abs/1611.09477">arXiv:1611.09477 stat.AP</a> (the documentation describes the <code>R</code> version, however all of the examples can be found worked in <code>Python</code> <a href="https://github.com/WinVector/pyvtreat/tree/master/Examples/vtreat_paper1">here</a>).</p>
 <p><code>vtreat</code> is available as an <a href="https://github.com/WinVector/vtreat"><code>R</code> package</a>, and also as a <a href="https://github.com/WinVector/vtreat"><code>Python</code>/<code>Pandas</code> package</a>.</p>
 <p>Even with modern machine learning techniques (random forests, support vector machines, neural nets, gradient boosted trees, and so on) or standard statistical methods (regression, generalized regression, generalized additive models) there are <em>common</em> data issues that can cause modeling to fail. vtreat deals with a number of these in a principled and automated fashion.</p>
@@ -317,19 +346,19 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <li>Treatment of missing values through safe replacement plus indicator column (a simple but very powerful method when combined with downstream machine learning algorithms).</li>
 <li>Treatment of novel levels (new values of categorical variable seen during test or application, but not seen during training) through sub-models (or impact/effects coding of pooled rare events).</li>
 <li>Explicit coding of categorical variable levels as new indicator variables (with optional suppression of non-significant indicators).</li>
-<li>Treatment of categorical variables with very large numbers of levels through sub-models (again <a href="http://www.win-vector.com/blog/2012/07/modeling-trick-impact-coding-of-categorical-variables-with-many-levels/">impact/effects coding</a>).</li>
+<li>Treatment of categorical variables with very large numbers of levels through sub-models (again <a href="https://win-vector.com/2012/07/23/modeling-trick-impact-coding-of-categorical-variables-with-many-levels/">impact/effects coding</a>).</li>
 <li>(optional) User specified significance pruning on levels coded into effects/impact sub-models.</li>
 <li>Correct treatment of nested models or sub-models through data split (see <a href="https://winvector.github.io/vtreat/articles/vtreatOverfit.html">here</a>) or through the generation of “cross validated” data frames (see <a href="https://winvector.github.io/vtreat/articles/vtreatCrossFrames.html">here</a>); these are issues similar to what is required to build statistically efficient stacked models or super-learners).</li>
-<li>Safe processing of “wide data” (data with very many variables, often driving common machine learning algorithms to over-fit) through <a href="https://winvector.github.io/vtreat/articles/vtreatSignificance.html">out of sample per-variable significance estimates and user controllable pruning</a> (something we have lectured on previously <a href="https://github.com/WinVector/WinVector.github.io/tree/master/DS">here</a> and <a href="http://www.win-vector.com/blog/2014/02/bad-bayes-an-example-of-why-you-need-hold-out-testing/">here</a>).</li>
+<li>Safe processing of “wide data” (data with very many variables, often driving common machine learning algorithms to over-fit) through <a href="https://winvector.github.io/vtreat/articles/vtreatSignificance.html">out of sample per-variable significance estimates and user controllable pruning</a> (something we have lectured on previously <a href="https://github.com/WinVector/WinVector.github.io/tree/master/DS">here</a> and <a href="https://win-vector.com/2014/02/01/bad-bayes-an-example-of-why-you-need-hold-out-testing/">here</a>).</li>
 <li>Collaring/Winsorizing of unexpected out of range numeric inputs.</li>
-<li>(optional) Conversion of all variables into effects (or “y-scale”) units (through the optional <code>scale</code> argument to <code>vtreat::prepare()</code>, using some of the ideas discussed <a href="http://www.win-vector.com/blog/2014/06/skimming-statistics-papers-for-the-ideas-instead-of-the-complete-procedures/">here</a>). This allows correct/sensible application of principal component analysis pre-processing in a machine learning context.</li>
+<li>(optional) Conversion of all variables into effects (or “y-scale”) units (through the optional <code>scale</code> argument to <code>vtreat::prepare()</code>, using some of the ideas discussed <a href="https://win-vector.com/2014/06/02/skimming-statistics-papers-for-the-ideas-instead-of-the-complete-procedures/">here</a>). This allows correct/sensible application of principal component analysis pre-processing in a machine learning context.</li>
 <li>Joining in additional training distribution data (which can be useful in analysis, called “catP” and “catD”).</li>
 </ul>
 <p>The idea is: even with a sophisticated machine learning algorithm there are <em>many</em> ways messy real world data can defeat the modeling process, and vtreat helps with at least ten of them. We emphasize: these problems are already in your data, you simply build better and more reliable models if you attempt to mitigate them. Automated processing is no substitute for actually looking at the data, but vtreat supplies efficient, reliable, documented, and tested implementations of many of the commonly needed transforms.</p>
 <p>To help explain the methods we have prepared some documentation:</p>
 <ul>
 <li>The <a href="https://winvector.github.io/vtreat/index.html">vtreat package overall</a>.</li>
-<li><a href="http://winvector.github.io/DataPrep/EN-CNTNT-Whitepaper-Data-Prep-Using-R.pdf">Preparing data for analysis using R white-paper</a></li>
+<li><a href="https://winvector.github.io/DataPrep/EN-CNTNT-Whitepaper-Data-Prep-Using-R.pdf">Preparing data for analysis using R white-paper</a></li>
 <li>The <a href="https://winvector.github.io/vtreat/articles/vtreatVariableTypes.html">types of new variables</a> introduced by vtreat processing (including how to limit down to domain appropriate variable types).</li>
 <li>Statistically sound treatment of the nested modeling issue introduced by any sort of pre-processing (such as vtreat itself): <a href="https://winvector.github.io/vtreat/articles/vtreatOverfit.html">nested over-fit issues</a> and a general <a href="https://winvector.github.io/vtreat/articles/vtreatCrossFrames.html">cross-frame solution</a>.</li>
 <li><a href="https://winvector.github.io/vtreat/articles/vtreatSignificance.html">Principled ways to pick significance based pruning levels</a>.</li>
@@ -340,7 +369,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <p>The purpose of <code>vtreat</code> library is to reliably prepare data for supervised machine learning. We try to leave as much as possible to the machine learning algorithms themselves, but cover most of the truly necessary typically ignored precautions. The library is designed to produce a <code>data.frame</code> that is entirely numeric and takes common precautions to guard against the following real world data issues:</p>
 <ul>
 <li><p>Categorical variables with very many levels.</p>
-<p>We re-encode such variables as a family of indicator or dummy variables for common levels plus an additional <a href="http://www.win-vector.com/blog/2012/07/modeling-trick-impact-coding-of-categorical-variables-with-many-levels/">impact code</a> (also called “effects coded”). This allows principled use (including smoothing) of huge categorical variables (like zip-codes) when building models. This is critical for some libraries (such as <code>randomForest</code>, which has hard limits on the number of allowed levels).</p></li>
+<p>We re-encode such variables as a family of indicator or dummy variables for common levels plus an additional <a href="https://win-vector.com/2012/07/23/modeling-trick-impact-coding-of-categorical-variables-with-many-levels/">impact code</a> (also called “effects coded”). This allows principled use (including smoothing) of huge categorical variables (like zip-codes) when building models. This is critical for some libraries (such as <code>randomForest</code>, which has hard limits on the number of allowed levels).</p></li>
 <li><p>Rare categorical levels.</p>
 <p>Levels that do not occur often during training tend not to have reliable effect estimates and contribute to over-fit. vtreat helps with 2 precautions in this case. First the <code>rareLevel</code> argument suppresses levels with this count our below from modeling, except possibly through a grouped contribution. Also with enough data vtreat attempts to estimate out of sample performance of derived variables. Finally we suggest users reserve a portion of data for vtreat design, separate from any data used in additional training, calibration, or testing.</p></li>
 <li><p>Novel categorical levels.</p>
@@ -352,9 +381,9 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <li><p>Constant and near-constant variables.</p>
 <p>Variables that “don’t vary” or “nearly don’t vary” are suppressed.</p></li>
 <li><p>Need for estimated single-variable model effect sizes and significances.</p>
-<p>It is a dirty secret that even popular machine learning techniques need some variable pruning (when exposed to very wide data frames, see <a href="http://www.win-vector.com/blog/2014/02/bad-bayes-an-example-of-why-you-need-hold-out-testing/">here</a> and <a href="https://www.youtube.com/watch?v=X_Rn3EOEjGE">here</a>). We make the necessary effect size estimates and significances easily available and supply initial variable pruning.</p></li>
+<p>It is a dirty secret that even popular machine learning techniques need some variable pruning (when exposed to very wide data frames, see <a href="https://win-vector.com/2014/02/01/bad-bayes-an-example-of-why-you-need-hold-out-testing/">here</a> and <a href="https://www.youtube.com/watch?v=X_Rn3EOEjGE">here</a>). We make the necessary effect size estimates and significances easily available and supply initial variable pruning.</p></li>
 </ul>
-<p>The above are all awful things that often lurk in real world data. Automating these steps ensures they are easy enough that you actually perform them and leaves the analyst time to look for additional data issues. For example this allowed us to essentially automate a number of the steps taught in chapters 4 and 6 of <a href="http://practicaldatascience.com/"><em>Practical Data Science with R</em> (Zumel, Mount; Manning 2014)</a> into a <a href="http://winvector.github.io/KDD2009/KDD2009RF.html">very short worksheet</a> (though we think for understanding it is <em>essential</em> to work all the steps by hand as we did in the book). The 2nd edition of <em>Practical Data Science with R</em> covers using <code>vtreat</code> in <code>R</code> in chapter 8 “Advanced Data Preparation.”</p>
+<p>The above are all awful things that often lurk in real world data. Automating these steps ensures they are easy enough that you actually perform them and leaves the analyst time to look for additional data issues. For example this allowed us to essentially automate a number of the steps taught in chapters 4 and 6 of <a href="https://win-vector.com/practical-data-science-with-r/"><em>Practical Data Science with R</em> (Zumel, Mount; Manning 2014)</a> into a <a href="https://winvector.github.io/KDD2009/KDD2009RF.html">very short worksheet</a> (though we think for understanding it is <em>essential</em> to work all the steps by hand as we did in the book). The 2nd edition of <em>Practical Data Science with R</em> covers using <code>vtreat</code> in <code>R</code> in chapter 8 “Advanced Data Preparation.”</p>
 <p>The idea is: <code>data.frame</code>s prepared with the <code>vtreat</code> library are somewhat safe to train on as some precaution has been taken against all of the above issues. Also of interest are the <code>vtreat</code> variable significances (help in initial variable pruning, a necessity when there are a large number of columns) and <code>vtreat::prepare(scale=TRUE)</code> which re-encodes all variables into effect units making them suitable for y-aware dimension reduction (variable clustering, or principal component analysis) and for geometry sensitive machine learning techniques (k-means, knn, linear SVM, and more). You may want to do more than the <code>vtreat</code> library does (such as Bayesian imputation, variable clustering, and more) but you certainly do not want to do less.</p>
 <p>There have been a number of recent substantial improvements to the library, including:</p>
 <ul>
@@ -364,138 +393,494 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </ul>
 <p>Some of our related articles (which should make clear some of our motivations, and design decisions):</p>
 <ul>
-<li><a href="http://www.win-vector.com/blog/2012/07/modeling-trick-impact-coding-of-categorical-variables-with-many-levels/">Modeling trick: impact coding of categorical variables with many levels</a></li>
-<li><a href="http://www.win-vector.com/blog/2012/08/a-bit-more-on-impact-coding/">A bit more on impact coding</a></li>
-<li><a href="http://www.win-vector.com/blog/2014/08/vtreat-designing-a-package-for-variable-treatment/">vtreat: designing a package for variable treatment</a></li>
-<li><a href="http://www.win-vector.com/blog/2014/12/a-comment-on-preparing-data-for-classifiers/">A comment on preparing data for classifiers</a></li>
-<li><a href="http://www.slideshare.net/ChesterChen/vtreat">Nina Zumel presenting on vtreat</a></li>
-<li><a href="http://www.win-vector.com/blog/2015/05/what-is-new-in-the-vtreat-library/">What is new in the vtreat library?</a></li>
-<li><a href="http://www.win-vector.com/blog/2015/08/how-do-you-know-if-your-data-has-signal/">How do you know if your data has signal?</a></li>
+<li><a href="https://win-vector.com/2012/07/23/modeling-trick-impact-coding-of-categorical-variables-with-many-levels/">Modeling trick: impact coding of categorical variables with many levels</a></li>
+<li><a href="https://win-vector.com/2012/08/02/a-bit-more-on-impact-coding/">A bit more on impact coding</a></li>
+<li><a href="https://win-vector.com/2014/08/07/vtreat-designing-a-package-for-variable-treatment/">vtreat: designing a package for variable treatment</a></li>
+<li><a href="https://win-vector.com/2014/12/04/a-comment-on-preparing-data-for-classifiers/">A comment on preparing data for classifiers</a></li>
+<li><a href="https://www.slideshare.net/ChesterChen/vtreat">Nina Zumel presenting on vtreat</a></li>
+<li><a href="https://win-vector.com/2015/05/07/what-is-new-in-the-vtreat-library/">What is new in the vtreat library?</a></li>
+<li><a href="https://win-vector.com/2015/08/10/how-do-you-know-if-your-data-has-signal/">How do you know if your data has signal?</a></li>
 </ul>
-<p>Examples of current best practice using <code>vtreat</code> (variable coding, train, test split) can be found <a href="https://winvector.github.io/vtreat/articles/vtreatOverfit.html">here</a> and <a href="http://winvector.github.io/KDD2009/KDD2009RF.html">here</a>.</p>
-<p>Trivial example:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw">library</span>(<span class="st">&quot;vtreat&quot;</span>)</a>
-<a class="sourceLine" id="cb1-2" data-line-number="2"><span class="kw">packageVersion</span>(<span class="st">&quot;vtreat&quot;</span>)</a></code></pre></div>
-<pre><code>## [1] '1.6.0'</code></pre>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1"><span class="kw">citation</span>(<span class="st">'vtreat'</span>)</a></code></pre></div>
+<p>Examples of current best practice using <code>vtreat</code> (variable coding, train, test split) can be found <a href="https://winvector.github.io/vtreat/articles/vtreatOverfit.html">here</a> and <a href="https://winvector.github.io/KDD2009/KDD2009RF.html">here</a>.</p>
+<p>Some small examples:</p>
+<p>We attach our packages.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="kw">library</span>(<span class="st">&quot;vtreat&quot;</span>)</span>
+<span id="cb1-2"><a href="#cb1-2"></a><span class="kw">packageVersion</span>(<span class="st">&quot;vtreat&quot;</span>)</span></code></pre></div>
+<pre><code>## [1] &#39;1.6.1&#39;</code></pre>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="kw">citation</span>(<span class="st">&#39;vtreat&#39;</span>)</span></code></pre></div>
 <pre><code>## 
-## To cite package 'vtreat' in publications use:
+## To cite package &#39;vtreat&#39; in publications use:
 ## 
 ##   John Mount and Nina Zumel (2020). vtreat: A Statistically Sound
-##   'data.frame' Processor/Conditioner.
+##   &#39;data.frame&#39; Processor/Conditioner.
 ##   https://github.com/WinVector/vtreat/,
 ##   https://winvector.github.io/vtreat/.
 ## 
 ## A BibTeX entry for LaTeX users is
 ## 
 ##   @Manual{,
-##     title = {vtreat: A Statistically Sound 'data.frame' Processor/Conditioner},
+##     title = {vtreat: A Statistically Sound &#39;data.frame&#39; Processor/Conditioner},
 ##     author = {John Mount and Nina Zumel},
 ##     year = {2020},
 ##     note = {https://github.com/WinVector/vtreat/, https://winvector.github.io/vtreat/},
 ##   }</code></pre>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1"><span class="co"># categorical example</span></a>
-<a class="sourceLine" id="cb5-2" data-line-number="2">dTrainC &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">x=</span><span class="kw">c</span>(<span class="st">'a'</span>, <span class="st">'a'</span>, <span class="st">'a'</span>, <span class="st">'b'</span>, <span class="st">'b'</span>, <span class="ot">NA</span>, <span class="ot">NA</span>),</a>
-<a class="sourceLine" id="cb5-3" data-line-number="3">   <span class="dt">z=</span><span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="ot">NA</span>, <span class="dv">6</span>, <span class="ot">NA</span>),</a>
-<a class="sourceLine" id="cb5-4" data-line-number="4">   <span class="dt">y=</span><span class="kw">c</span>(<span class="ot">FALSE</span>, <span class="ot">FALSE</span>, <span class="ot">TRUE</span>, <span class="ot">FALSE</span>, <span class="ot">TRUE</span>, <span class="ot">TRUE</span>, <span class="ot">TRUE</span>))</a>
-<a class="sourceLine" id="cb5-5" data-line-number="5">dTestC &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">x=</span><span class="kw">c</span>(<span class="st">'a'</span>, <span class="st">'b'</span>, <span class="st">'c'</span>, <span class="ot">NA</span>), <span class="dt">z=</span><span class="kw">c</span>(<span class="dv">10</span>, <span class="dv">20</span>, <span class="dv">30</span>, <span class="ot">NA</span>))</a>
-<a class="sourceLine" id="cb5-6" data-line-number="6"></a>
-<a class="sourceLine" id="cb5-7" data-line-number="7"><span class="co"># help(&quot;designTreatmentsC&quot;)</span></a>
-<a class="sourceLine" id="cb5-8" data-line-number="8"></a>
-<a class="sourceLine" id="cb5-9" data-line-number="9">treatmentsC &lt;-<span class="st"> </span><span class="kw">designTreatmentsC</span>(dTrainC, <span class="kw">colnames</span>(dTrainC), <span class="st">'y'</span>, <span class="ot">TRUE</span>,</a>
-<a class="sourceLine" id="cb5-10" data-line-number="10">                                 <span class="dt">verbose=</span><span class="ot">FALSE</span>)</a>
-<a class="sourceLine" id="cb5-11" data-line-number="11"><span class="kw">print</span>(treatmentsC<span class="op">$</span>scoreFrame[, <span class="kw">c</span>(<span class="st">'origName'</span>, <span class="st">'varName'</span>, <span class="st">'code'</span>, <span class="st">'rsq'</span>, <span class="st">'sig'</span>, <span class="st">'extraModelDegrees'</span>)])</a></code></pre></div>
-<pre><code>##   origName   varName  code         rsq        sig extraModelDegrees
-## 1        x    x_catP  catP 0.166956795 0.20643885                 2
-## 2        x    x_catB  catB 0.254788311 0.11858143                 2
-## 3        z         z clean 0.237601767 0.13176020                 0
-## 4        z   z_isBAD isBAD 0.296065432 0.09248399                 0
-## 5        x  x_lev_NA   lev 0.296065432 0.09248399                 0
-## 6        x x_lev_x_a   lev 0.130005705 0.26490379                 0
-## 7        x x_lev_x_b   lev 0.006067337 0.80967242                 0</code></pre>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1"><span class="co"># help(&quot;prepare&quot;)</span></a>
-<a class="sourceLine" id="cb7-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb7-3" data-line-number="3">dTrainCTreated &lt;-<span class="st"> </span><span class="kw">prepare</span>(treatmentsC, dTrainC, <span class="dt">pruneSig=</span><span class="fl">1.0</span>, <span class="dt">scale=</span><span class="ot">TRUE</span>)</a></code></pre></div>
-<pre><code>## Warning in prepare.treatmentplan(treatmentsC, dTrainC, pruneSig = 1, scale =
-## TRUE): possibly called prepare() on same data frame as designTreatments*()/
-## mkCrossFrame*Experiment(), this can lead to over-fit. To avoid this, please use
-## mkCrossFrame*Experiment$crossFrame.</code></pre>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1">varsC &lt;-<span class="st"> </span><span class="kw">setdiff</span>(<span class="kw">colnames</span>(dTrainCTreated), <span class="st">'y'</span>)</a>
-<a class="sourceLine" id="cb9-2" data-line-number="2"><span class="co"># all input variables should be mean 0</span></a>
-<a class="sourceLine" id="cb9-3" data-line-number="3"><span class="kw">sapply</span>(dTrainCTreated[, varsC, <span class="dt">drop=</span><span class="ot">FALSE</span>], mean)</a></code></pre></div>
-<pre><code>##        x_catP        x_catB             z       z_isBAD      x_lev_NA 
-##  2.537498e-16 -1.268826e-16  6.336166e-17  2.536414e-16 -2.537653e-16 
-##     x_lev_x_a     x_lev_x_b 
-## -6.345680e-17  1.189718e-17</code></pre>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" data-line-number="1"><span class="co"># all non NA slopes should be 1</span></a>
-<a class="sourceLine" id="cb11-2" data-line-number="2"><span class="kw">sapply</span>(varsC, <span class="cf">function</span>(c) { <span class="kw">lm</span>(<span class="kw">paste</span>(<span class="st">'y'</span>, c, <span class="dt">sep=</span><span class="st">'~'</span>),</a>
-<a class="sourceLine" id="cb11-3" data-line-number="3">   <span class="dt">data=</span>dTrainCTreated)<span class="op">$</span>coefficients[[<span class="dv">2</span>]]})</a></code></pre></div>
-<pre><code>##     x_catP     x_catB          z    z_isBAD   x_lev_NA  x_lev_x_a  x_lev_x_b 
-## 0.23254609 0.05841932 0.16062145 0.03162633 0.03162633 0.23254609 0.24663035</code></pre>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" data-line-number="1">dTestCTreated &lt;-<span class="st"> </span><span class="kw">prepare</span>(treatmentsC, dTestC, <span class="dt">pruneSig=</span><span class="kw">c</span>(), <span class="dt">scale=</span><span class="ot">TRUE</span>)</a>
-<a class="sourceLine" id="cb13-2" data-line-number="2"><span class="kw">print</span>(dTestCTreated)</a></code></pre></div>
-<pre><code>##       x_catP    x_catB         z   z_isBAD  x_lev_NA  x_lev_x_a  x_lev_x_b
-## 1 -1.0238626 -3.248380  7.437329 -5.420438 -5.420438 -1.0238626  0.1158472
-## 2  0.7678969 -2.550396 18.374578 -5.420438 -5.420438  0.7678969 -0.2896179
-## 3  3.4555361 -2.260694 29.311827 -5.420438 -5.420438  0.7678969  0.1158472
-## 4  0.7678969  7.422967  0.000000 13.551095 13.551095  0.7678969  0.1158472</code></pre>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" data-line-number="1"><span class="co"># numeric example</span></a>
-<a class="sourceLine" id="cb15-2" data-line-number="2">dTrainN &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">x=</span><span class="kw">c</span>(<span class="st">'a'</span>, <span class="st">'a'</span>, <span class="st">'a'</span>, <span class="st">'a'</span>, <span class="st">'b'</span>, <span class="st">'b'</span>, <span class="ot">NA</span>, <span class="ot">NA</span>),</a>
-<a class="sourceLine" id="cb15-3" data-line-number="3">   <span class="dt">z=</span><span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>, <span class="ot">NA</span>, <span class="dv">7</span>, <span class="ot">NA</span>), <span class="dt">y=</span><span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>))</a>
-<a class="sourceLine" id="cb15-4" data-line-number="4">dTestN &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">x=</span><span class="kw">c</span>(<span class="st">'a'</span>, <span class="st">'b'</span>, <span class="st">'c'</span>, <span class="ot">NA</span>), <span class="dt">z=</span><span class="kw">c</span>(<span class="dv">10</span>, <span class="dv">20</span>, <span class="dv">30</span>, <span class="ot">NA</span>))</a>
-<a class="sourceLine" id="cb15-5" data-line-number="5"><span class="co"># help(&quot;designTreatmentsN&quot;)</span></a>
-<a class="sourceLine" id="cb15-6" data-line-number="6">treatmentsN =<span class="st"> </span><span class="kw">designTreatmentsN</span>(dTrainN, <span class="kw">colnames</span>(dTrainN), <span class="st">'y'</span>,</a>
-<a class="sourceLine" id="cb15-7" data-line-number="7">                                <span class="dt">verbose=</span><span class="ot">FALSE</span>)</a>
-<a class="sourceLine" id="cb15-8" data-line-number="8"><span class="kw">print</span>(treatmentsN<span class="op">$</span>scoreFrame[, <span class="kw">c</span>(<span class="st">'origName'</span>, <span class="st">'varName'</span>, <span class="st">'code'</span>, <span class="st">'rsq'</span>, <span class="st">'sig'</span>, <span class="st">'extraModelDegrees'</span>)])</a></code></pre></div>
-<pre><code>##   origName   varName  code          rsq       sig extraModelDegrees
-## 1        x    x_catP  catP 2.941176e-01 0.1649303                 2
-## 2        x    x_catN  catN 6.583561e-02 0.5396025                 2
-## 3        x    x_catD  catD 9.777348e-03 0.8158041                 2
-## 4        z         z clean 2.880952e-01 0.1701892                 0
-## 5        z   z_isBAD isBAD 3.333333e-01 0.1339746                 0
-## 6        x  x_lev_NA   lev 3.333333e-01 0.1339746                 0
-## 7        x x_lev_x_a   lev 2.500000e-01 0.2070312                 0
-## 8        x x_lev_x_b   lev 1.110223e-16 1.0000000                 0</code></pre>
-<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb17-1" data-line-number="1">dTrainNTreated &lt;-<span class="st"> </span><span class="kw">prepare</span>(treatmentsN, dTrainN, <span class="dt">pruneSig=</span><span class="fl">1.0</span>, <span class="dt">scale=</span><span class="ot">TRUE</span>)</a></code></pre></div>
-<pre><code>## Warning in prepare.treatmentplan(treatmentsN, dTrainN, pruneSig = 1, scale =
-## TRUE): possibly called prepare() on same data frame as designTreatments*()/
-## mkCrossFrame*Experiment(), this can lead to over-fit. To avoid this, please use
-## mkCrossFrame*Experiment$crossFrame.</code></pre>
-<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb19-1" data-line-number="1">varsN &lt;-<span class="st"> </span><span class="kw">setdiff</span>(<span class="kw">colnames</span>(dTrainNTreated), <span class="st">'y'</span>)</a>
-<a class="sourceLine" id="cb19-2" data-line-number="2"><span class="co"># all input variables should be mean 0</span></a>
-<a class="sourceLine" id="cb19-3" data-line-number="3"><span class="kw">sapply</span>(dTrainNTreated[, varsN, <span class="dt">drop=</span><span class="ot">FALSE</span>], mean) </a></code></pre></div>
-<pre><code>##        x_catP        x_catN        x_catD             z       z_isBAD 
-##  2.775558e-17  0.000000e+00 -2.775558e-17  4.857226e-17  6.938894e-18 
-##      x_lev_NA     x_lev_x_a     x_lev_x_b 
-##  6.938894e-18  0.000000e+00  7.703720e-34</code></pre>
-<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb21-1" data-line-number="1"><span class="co"># all non NA slopes should be 1</span></a>
-<a class="sourceLine" id="cb21-2" data-line-number="2"><span class="kw">sapply</span>(varsN, <span class="cf">function</span>(c) { <span class="kw">lm</span>(<span class="kw">paste</span>(<span class="st">'y'</span>, c, <span class="dt">sep=</span><span class="st">'~'</span>),</a>
-<a class="sourceLine" id="cb21-3" data-line-number="3">   <span class="dt">data=</span>dTrainNTreated)<span class="op">$</span>coefficients[[<span class="dv">2</span>]]}) </a></code></pre></div>
-<pre><code>##    x_catP    x_catN    x_catD         z   z_isBAD  x_lev_NA x_lev_x_a x_lev_x_b 
-##         1         1         1         1         1         1         1         1</code></pre>
-<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb23-1" data-line-number="1">dTestNTreated &lt;-<span class="st"> </span><span class="kw">prepare</span>(treatmentsN, dTestN, <span class="dt">pruneSig=</span><span class="kw">c</span>(), <span class="dt">scale=</span><span class="ot">TRUE</span>)</a>
-<a class="sourceLine" id="cb23-2" data-line-number="2"><span class="kw">print</span>(dTestNTreated)</a></code></pre></div>
-<pre><code>##   x_catP x_catN      x_catD         z    z_isBAD   x_lev_NA x_lev_x_a
-## 1 -0.250  -0.25 -0.06743804 0.9952381 -0.1666667 -0.1666667     -0.25
-## 2  0.250   0.00 -0.25818161 2.5666667 -0.1666667 -0.1666667      0.25
-## 3  0.625   0.00 -0.25818161 4.1380952 -0.1666667 -0.1666667      0.25
-## 4  0.250   0.50  0.39305768 0.0000000  0.5000000  0.5000000      0.25
-##       x_lev_x_b
-## 1 -2.266233e-17
-## 2  6.798700e-17
-## 3 -2.266233e-17
-## 4 -2.266233e-17</code></pre>
-<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb25-1" data-line-number="1"><span class="co"># for large data sets you can consider designing the treatments on </span></a>
-<a class="sourceLine" id="cb25-2" data-line-number="2"><span class="co"># a subset like: d[sample(1:dim(d)[[1]], 1000), ]</span></a>
-<a class="sourceLine" id="cb25-3" data-line-number="3"></a>
-<a class="sourceLine" id="cb25-4" data-line-number="4"><span class="co"># One can also use treatment plans as pipe targets.</span></a>
-<a class="sourceLine" id="cb25-5" data-line-number="5">dTrainN <span class="op">%.&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb25-6" data-line-number="6"><span class="st">  </span>treatmentsN <span class="op">%.&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb25-7" data-line-number="7"><span class="st">  </span>knitr<span class="op">::</span><span class="kw">kable</span>(.)</a></code></pre></div>
-<pre><code>## Warning in prepare.treatmentplan(pipe_right_arg, pipe_left_arg):
-## possibly called prepare() on same data frame as designTreatments*()/
-## mkCrossFrame*Experiment(), this can lead to over-fit. To avoid this, please use
-## mkCrossFrame*Experiment$crossFrame.</code></pre>
+<p>A small categorical example.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a><span class="co"># categorical example</span></span>
+<span id="cb5-2"><a href="#cb5-2"></a><span class="kw">set.seed</span>(<span class="dv">23525</span>)</span>
+<span id="cb5-3"><a href="#cb5-3"></a></span>
+<span id="cb5-4"><a href="#cb5-4"></a><span class="co"># we set up our raw training and application data</span></span>
+<span id="cb5-5"><a href="#cb5-5"></a>dTrainC &lt;-<span class="st"> </span><span class="kw">data.frame</span>(</span>
+<span id="cb5-6"><a href="#cb5-6"></a>  <span class="dt">x =</span> <span class="kw">c</span>(<span class="st">&#39;a&#39;</span>, <span class="st">&#39;a&#39;</span>, <span class="st">&#39;a&#39;</span>, <span class="st">&#39;b&#39;</span>, <span class="st">&#39;b&#39;</span>, <span class="ot">NA</span>, <span class="ot">NA</span>),</span>
+<span id="cb5-7"><a href="#cb5-7"></a>  <span class="dt">z =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="ot">NA</span>, <span class="dv">6</span>, <span class="ot">NA</span>),</span>
+<span id="cb5-8"><a href="#cb5-8"></a>  <span class="dt">y =</span> <span class="kw">c</span>(<span class="ot">FALSE</span>, <span class="ot">FALSE</span>, <span class="ot">TRUE</span>, <span class="ot">FALSE</span>, <span class="ot">TRUE</span>, <span class="ot">TRUE</span>, <span class="ot">TRUE</span>))</span>
+<span id="cb5-9"><a href="#cb5-9"></a></span>
+<span id="cb5-10"><a href="#cb5-10"></a>dTestC &lt;-<span class="st"> </span><span class="kw">data.frame</span>(</span>
+<span id="cb5-11"><a href="#cb5-11"></a>  <span class="dt">x =</span> <span class="kw">c</span>(<span class="st">&#39;a&#39;</span>, <span class="st">&#39;b&#39;</span>, <span class="st">&#39;c&#39;</span>, <span class="ot">NA</span>), </span>
+<span id="cb5-12"><a href="#cb5-12"></a>  <span class="dt">z =</span> <span class="kw">c</span>(<span class="dv">10</span>, <span class="dv">20</span>, <span class="dv">30</span>, <span class="ot">NA</span>))</span>
+<span id="cb5-13"><a href="#cb5-13"></a></span>
+<span id="cb5-14"><a href="#cb5-14"></a><span class="co"># we perform a vtreat cross frame experiment</span></span>
+<span id="cb5-15"><a href="#cb5-15"></a><span class="co"># and unpack the results into treatmentsC</span></span>
+<span id="cb5-16"><a href="#cb5-16"></a><span class="co"># and dTrainCTreated</span></span>
+<span id="cb5-17"><a href="#cb5-17"></a>unpack[</span>
+<span id="cb5-18"><a href="#cb5-18"></a>  treatmentsC =<span class="st"> </span>treatments,</span>
+<span id="cb5-19"><a href="#cb5-19"></a>  dTrainCTreated =<span class="st"> </span>crossFrame</span>
+<span id="cb5-20"><a href="#cb5-20"></a>  ] &lt;-<span class="st"> </span><span class="kw">mkCrossFrameCExperiment</span>(</span>
+<span id="cb5-21"><a href="#cb5-21"></a>  <span class="dt">dframe =</span> dTrainC,</span>
+<span id="cb5-22"><a href="#cb5-22"></a>  <span class="dt">varlist =</span> <span class="kw">setdiff</span>(<span class="kw">colnames</span>(dTrainC), <span class="st">&#39;y&#39;</span>),</span>
+<span id="cb5-23"><a href="#cb5-23"></a>  <span class="dt">outcomename =</span> <span class="st">&#39;y&#39;</span>,</span>
+<span id="cb5-24"><a href="#cb5-24"></a>  <span class="dt">outcometarget =</span> <span class="ot">TRUE</span>,</span>
+<span id="cb5-25"><a href="#cb5-25"></a>  <span class="dt">verbose =</span> <span class="ot">FALSE</span>)</span>
+<span id="cb5-26"><a href="#cb5-26"></a></span>
+<span id="cb5-27"><a href="#cb5-27"></a><span class="co"># the treatments include a score frame relating new</span></span>
+<span id="cb5-28"><a href="#cb5-28"></a><span class="co"># derived variables to original columns</span></span>
+<span id="cb5-29"><a href="#cb5-29"></a>treatmentsC<span class="op">$</span>scoreFrame[, <span class="kw">c</span>(<span class="st">&#39;origName&#39;</span>, <span class="st">&#39;varName&#39;</span>, <span class="st">&#39;code&#39;</span>, <span class="st">&#39;rsq&#39;</span>, <span class="st">&#39;sig&#39;</span>, <span class="st">&#39;extraModelDegrees&#39;</span>, <span class="st">&#39;recommended&#39;</span>)] <span class="op">%.&gt;%</span></span>
+<span id="cb5-30"><a href="#cb5-30"></a><span class="st">  </span>knitr<span class="op">::</span><span class="kw">kable</span>(.)</span></code></pre></div>
+<table>
+<thead>
+<tr class="header">
+<th align="left">origName</th>
+<th align="left">varName</th>
+<th align="left">code</th>
+<th align="right">rsq</th>
+<th align="right">sig</th>
+<th align="right">extraModelDegrees</th>
+<th align="left">recommended</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">x</td>
+<td align="left">x_catP</td>
+<td align="left">catP</td>
+<td align="right">0.1669568</td>
+<td align="right">0.2064389</td>
+<td align="right">2</td>
+<td align="left">FALSE</td>
+</tr>
+<tr class="even">
+<td align="left">x</td>
+<td align="left">x_catB</td>
+<td align="left">catB</td>
+<td align="right">0.2547883</td>
+<td align="right">0.1185814</td>
+<td align="right">2</td>
+<td align="left">TRUE</td>
+</tr>
+<tr class="odd">
+<td align="left">z</td>
+<td align="left">z</td>
+<td align="left">clean</td>
+<td align="right">0.2376018</td>
+<td align="right">0.1317602</td>
+<td align="right">0</td>
+<td align="left">TRUE</td>
+</tr>
+<tr class="even">
+<td align="left">z</td>
+<td align="left">z_isBAD</td>
+<td align="left">isBAD</td>
+<td align="right">0.2960654</td>
+<td align="right">0.0924840</td>
+<td align="right">0</td>
+<td align="left">TRUE</td>
+</tr>
+<tr class="odd">
+<td align="left">x</td>
+<td align="left">x_lev_NA</td>
+<td align="left">lev</td>
+<td align="right">0.2960654</td>
+<td align="right">0.0924840</td>
+<td align="right">0</td>
+<td align="left">FALSE</td>
+</tr>
+<tr class="even">
+<td align="left">x</td>
+<td align="left">x_lev_x_a</td>
+<td align="left">lev</td>
+<td align="right">0.1300057</td>
+<td align="right">0.2649038</td>
+<td align="right">0</td>
+<td align="left">FALSE</td>
+</tr>
+<tr class="odd">
+<td align="left">x</td>
+<td align="left">x_lev_x_b</td>
+<td align="left">lev</td>
+<td align="right">0.0060673</td>
+<td align="right">0.8096724</td>
+<td align="right">0</td>
+<td align="left">FALSE</td>
+</tr>
+</tbody>
+</table>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="co"># the treated frame is a &quot;cross frame&quot; which</span></span>
+<span id="cb6-2"><a href="#cb6-2"></a><span class="co"># is a transform of the training data built </span></span>
+<span id="cb6-3"><a href="#cb6-3"></a><span class="co"># as if the treatment were learned on a different</span></span>
+<span id="cb6-4"><a href="#cb6-4"></a><span class="co"># disjoint training set to avoid nested model</span></span>
+<span id="cb6-5"><a href="#cb6-5"></a><span class="co"># bias and over-fit.</span></span>
+<span id="cb6-6"><a href="#cb6-6"></a>dTrainCTreated <span class="op">%.&gt;%</span></span>
+<span id="cb6-7"><a href="#cb6-7"></a><span class="st">  </span><span class="kw">head</span>(.) <span class="op">%.&gt;%</span></span>
+<span id="cb6-8"><a href="#cb6-8"></a><span class="st">  </span>knitr<span class="op">::</span><span class="kw">kable</span>(.)</span></code></pre></div>
+<table>
+<thead>
+<tr class="header">
+<th align="right">x_catP</th>
+<th align="right">x_catB</th>
+<th align="right">z</th>
+<th align="right">z_isBAD</th>
+<th align="right">x_lev_NA</th>
+<th align="right">x_lev_x_a</th>
+<th align="right">x_lev_x_b</th>
+<th align="left">y</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">0.50</td>
+<td align="right">0.0000000</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="left">FALSE</td>
+</tr>
+<tr class="even">
+<td align="right">0.40</td>
+<td align="right">-0.4054484</td>
+<td align="right">2</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="left">FALSE</td>
+</tr>
+<tr class="odd">
+<td align="right">0.40</td>
+<td align="right">-10.3089860</td>
+<td align="right">3</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="left">TRUE</td>
+</tr>
+<tr class="even">
+<td align="right">0.20</td>
+<td align="right">8.8049919</td>
+<td align="right">4</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="left">FALSE</td>
+</tr>
+<tr class="odd">
+<td align="right">0.25</td>
+<td align="right">-9.2104404</td>
+<td align="right">3</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="left">TRUE</td>
+</tr>
+<tr class="even">
+<td align="right">0.25</td>
+<td align="right">9.2104404</td>
+<td align="right">6</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="left">TRUE</td>
+</tr>
+</tbody>
+</table>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="co"># Any future application data is prepared with</span></span>
+<span id="cb7-2"><a href="#cb7-2"></a><span class="co"># the prepare method.</span></span>
+<span id="cb7-3"><a href="#cb7-3"></a>dTestCTreated &lt;-<span class="st"> </span><span class="kw">prepare</span>(treatmentsC, dTestC, <span class="dt">pruneSig=</span><span class="ot">NULL</span>)</span>
+<span id="cb7-4"><a href="#cb7-4"></a></span>
+<span id="cb7-5"><a href="#cb7-5"></a>dTestCTreated <span class="op">%.&gt;%</span></span>
+<span id="cb7-6"><a href="#cb7-6"></a><span class="st">  </span><span class="kw">head</span>(.) <span class="op">%.&gt;%</span></span>
+<span id="cb7-7"><a href="#cb7-7"></a><span class="st">  </span>knitr<span class="op">::</span><span class="kw">kable</span>(.)</span></code></pre></div>
+<table>
+<thead>
+<tr class="header">
+<th align="right">x_catP</th>
+<th align="right">x_catB</th>
+<th align="right">z</th>
+<th align="right">z_isBAD</th>
+<th align="right">x_lev_NA</th>
+<th align="right">x_lev_x_a</th>
+<th align="right">x_lev_x_b</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">0.4285714</td>
+<td align="right">-0.9807709</td>
+<td align="right">10.0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="right">0.2857143</td>
+<td align="right">-0.2876737</td>
+<td align="right">20.0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="right">0.0714286</td>
+<td align="right">0.0000000</td>
+<td align="right">30.0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="right">0.2857143</td>
+<td align="right">9.6158638</td>
+<td align="right">3.2</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+</tbody>
+</table>
+<p>A small numeric example.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a><span class="co"># numeric example</span></span>
+<span id="cb8-2"><a href="#cb8-2"></a><span class="kw">set.seed</span>(<span class="dv">23525</span>)</span>
+<span id="cb8-3"><a href="#cb8-3"></a></span>
+<span id="cb8-4"><a href="#cb8-4"></a><span class="co"># we set up our raw training and application data</span></span>
+<span id="cb8-5"><a href="#cb8-5"></a>dTrainN &lt;-<span class="st"> </span><span class="kw">data.frame</span>(</span>
+<span id="cb8-6"><a href="#cb8-6"></a>  <span class="dt">x =</span> <span class="kw">c</span>(<span class="st">&#39;a&#39;</span>, <span class="st">&#39;a&#39;</span>, <span class="st">&#39;a&#39;</span>, <span class="st">&#39;a&#39;</span>, <span class="st">&#39;b&#39;</span>, <span class="st">&#39;b&#39;</span>, <span class="ot">NA</span>, <span class="ot">NA</span>),</span>
+<span id="cb8-7"><a href="#cb8-7"></a>  <span class="dt">z =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>, <span class="ot">NA</span>, <span class="dv">7</span>, <span class="ot">NA</span>), </span>
+<span id="cb8-8"><a href="#cb8-8"></a>  <span class="dt">y =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>))</span>
+<span id="cb8-9"><a href="#cb8-9"></a></span>
+<span id="cb8-10"><a href="#cb8-10"></a>dTestN &lt;-<span class="st"> </span><span class="kw">data.frame</span>(</span>
+<span id="cb8-11"><a href="#cb8-11"></a>  <span class="dt">x =</span> <span class="kw">c</span>(<span class="st">&#39;a&#39;</span>, <span class="st">&#39;b&#39;</span>, <span class="st">&#39;c&#39;</span>, <span class="ot">NA</span>), </span>
+<span id="cb8-12"><a href="#cb8-12"></a>  <span class="dt">z =</span> <span class="kw">c</span>(<span class="dv">10</span>, <span class="dv">20</span>, <span class="dv">30</span>, <span class="ot">NA</span>))</span>
+<span id="cb8-13"><a href="#cb8-13"></a></span>
+<span id="cb8-14"><a href="#cb8-14"></a><span class="co"># we perform a vtreat cross frame experiment</span></span>
+<span id="cb8-15"><a href="#cb8-15"></a><span class="co"># and unpack the results into treatmentsN</span></span>
+<span id="cb8-16"><a href="#cb8-16"></a><span class="co"># and dTrainNTreated</span></span>
+<span id="cb8-17"><a href="#cb8-17"></a>unpack[</span>
+<span id="cb8-18"><a href="#cb8-18"></a>  treatmentsN =<span class="st"> </span>treatments,</span>
+<span id="cb8-19"><a href="#cb8-19"></a>  dTrainNTreated =<span class="st"> </span>crossFrame</span>
+<span id="cb8-20"><a href="#cb8-20"></a>  ] &lt;-<span class="st"> </span><span class="kw">mkCrossFrameNExperiment</span>(</span>
+<span id="cb8-21"><a href="#cb8-21"></a>  <span class="dt">dframe =</span> dTrainN,</span>
+<span id="cb8-22"><a href="#cb8-22"></a>  <span class="dt">varlist =</span> <span class="kw">setdiff</span>(<span class="kw">colnames</span>(dTrainN), <span class="st">&#39;y&#39;</span>),</span>
+<span id="cb8-23"><a href="#cb8-23"></a>  <span class="dt">outcomename =</span> <span class="st">&#39;y&#39;</span>,</span>
+<span id="cb8-24"><a href="#cb8-24"></a>  <span class="dt">verbose =</span> <span class="ot">FALSE</span>)</span>
+<span id="cb8-25"><a href="#cb8-25"></a></span>
+<span id="cb8-26"><a href="#cb8-26"></a><span class="co"># the treatments include a score frame relating new</span></span>
+<span id="cb8-27"><a href="#cb8-27"></a><span class="co"># derived variables to original columns</span></span>
+<span id="cb8-28"><a href="#cb8-28"></a>treatmentsN<span class="op">$</span>scoreFrame[, <span class="kw">c</span>(<span class="st">&#39;origName&#39;</span>, <span class="st">&#39;varName&#39;</span>, <span class="st">&#39;code&#39;</span>, <span class="st">&#39;rsq&#39;</span>, <span class="st">&#39;sig&#39;</span>, <span class="st">&#39;extraModelDegrees&#39;</span>)] <span class="op">%.&gt;%</span></span>
+<span id="cb8-29"><a href="#cb8-29"></a><span class="st">  </span>knitr<span class="op">::</span><span class="kw">kable</span>(.)</span></code></pre></div>
+<table>
+<thead>
+<tr class="header">
+<th align="left">origName</th>
+<th align="left">varName</th>
+<th align="left">code</th>
+<th align="right">rsq</th>
+<th align="right">sig</th>
+<th align="right">extraModelDegrees</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">x</td>
+<td align="left">x_catP</td>
+<td align="left">catP</td>
+<td align="right">0.4047085</td>
+<td align="right">0.0899406</td>
+<td align="right">2</td>
+</tr>
+<tr class="even">
+<td align="left">x</td>
+<td align="left">x_catN</td>
+<td align="left">catN</td>
+<td align="right">0.2822908</td>
+<td align="right">0.1753958</td>
+<td align="right">2</td>
+</tr>
+<tr class="odd">
+<td align="left">x</td>
+<td align="left">x_catD</td>
+<td align="left">catD</td>
+<td align="right">0.0209693</td>
+<td align="right">0.7322571</td>
+<td align="right">2</td>
+</tr>
+<tr class="even">
+<td align="left">z</td>
+<td align="left">z</td>
+<td align="left">clean</td>
+<td align="right">0.2880952</td>
+<td align="right">0.1701892</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">z</td>
+<td align="left">z_isBAD</td>
+<td align="left">isBAD</td>
+<td align="right">0.3333333</td>
+<td align="right">0.1339746</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">x</td>
+<td align="left">x_lev_NA</td>
+<td align="left">lev</td>
+<td align="right">0.3333333</td>
+<td align="right">0.1339746</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">x</td>
+<td align="left">x_lev_x_a</td>
+<td align="left">lev</td>
+<td align="right">0.2500000</td>
+<td align="right">0.2070312</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">x</td>
+<td align="left">x_lev_x_b</td>
+<td align="left">lev</td>
+<td align="right">0.0000000</td>
+<td align="right">1.0000000</td>
+<td align="right">0</td>
+</tr>
+</tbody>
+</table>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a><span class="co"># the treated frame is a &quot;cross frame&quot; which</span></span>
+<span id="cb9-2"><a href="#cb9-2"></a><span class="co"># is a transform of the training data built </span></span>
+<span id="cb9-3"><a href="#cb9-3"></a><span class="co"># as if the treatment were learned on a different</span></span>
+<span id="cb9-4"><a href="#cb9-4"></a><span class="co"># disjoint training set to avoid nested model</span></span>
+<span id="cb9-5"><a href="#cb9-5"></a><span class="co"># bias and over-fit.</span></span>
+<span id="cb9-6"><a href="#cb9-6"></a>dTrainNTreated <span class="op">%.&gt;%</span></span>
+<span id="cb9-7"><a href="#cb9-7"></a><span class="st">  </span><span class="kw">head</span>(.) <span class="op">%.&gt;%</span></span>
+<span id="cb9-8"><a href="#cb9-8"></a><span class="st">  </span>knitr<span class="op">::</span><span class="kw">kable</span>(.)</span></code></pre></div>
+<table>
+<thead>
+<tr class="header">
+<th align="right">x_catN</th>
+<th align="right">x_catD</th>
+<th align="right">z</th>
+<th align="right">z_isBAD</th>
+<th align="right">x_lev_NA</th>
+<th align="right">x_lev_x_a</th>
+<th align="right">x_lev_x_b</th>
+<th align="right">x_catP</th>
+<th align="right">y</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">-0.2666667</td>
+<td align="right">0.5000000</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">0.6</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="right">-0.5000000</td>
+<td align="right">0.0000000</td>
+<td align="right">2</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">0.5</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="right">-0.0666667</td>
+<td align="right">0.5000000</td>
+<td align="right">3</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">0.6</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="right">-0.5000000</td>
+<td align="right">0.0000000</td>
+<td align="right">4</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">0.5</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="right">0.4000000</td>
+<td align="right">0.7071068</td>
+<td align="right">5</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">0.2</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="right">-0.4000000</td>
+<td align="right">0.7071068</td>
+<td align="right">3</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">0.2</td>
+<td align="right">1</td>
+</tr>
+</tbody>
+</table>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a><span class="co"># Any future application data is prepared with</span></span>
+<span id="cb10-2"><a href="#cb10-2"></a><span class="co"># the prepare method.</span></span>
+<span id="cb10-3"><a href="#cb10-3"></a>dTestNTreated &lt;-<span class="st"> </span><span class="kw">prepare</span>(treatmentsN, dTestN, <span class="dt">pruneSig=</span><span class="ot">NULL</span>)</span>
+<span id="cb10-4"><a href="#cb10-4"></a></span>
+<span id="cb10-5"><a href="#cb10-5"></a>dTestNTreated <span class="op">%.&gt;%</span></span>
+<span id="cb10-6"><a href="#cb10-6"></a><span class="st">  </span><span class="kw">head</span>(.) <span class="op">%.&gt;%</span></span>
+<span id="cb10-7"><a href="#cb10-7"></a><span class="st">  </span>knitr<span class="op">::</span><span class="kw">kable</span>(.)</span></code></pre></div>
 <table>
 <thead>
 <tr class="header">
@@ -507,89 +892,41 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <th align="right">x_lev_NA</th>
 <th align="right">x_lev_x_a</th>
 <th align="right">x_lev_x_b</th>
-<th align="right">y</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="right">0.50</td>
+<td align="right">0.5000</td>
 <td align="right">-0.25</td>
 <td align="right">0.5000000</td>
-<td align="right">1.000000</td>
+<td align="right">10.000000</td>
 <td align="right">0</td>
 <td align="right">0</td>
 <td align="right">1</td>
-<td align="right">0</td>
 <td align="right">0</td>
 </tr>
 <tr class="even">
-<td align="right">0.50</td>
-<td align="right">-0.25</td>
-<td align="right">0.5000000</td>
-<td align="right">2.000000</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">0</td>
-</tr>
-<tr class="odd">
-<td align="right">0.50</td>
-<td align="right">-0.25</td>
-<td align="right">0.5000000</td>
-<td align="right">3.000000</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">0</td>
-</tr>
-<tr class="even">
-<td align="right">0.50</td>
-<td align="right">-0.25</td>
-<td align="right">0.5000000</td>
-<td align="right">4.000000</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">1</td>
-</tr>
-<tr class="odd">
-<td align="right">0.25</td>
+<td align="right">0.2500</td>
 <td align="right">0.00</td>
 <td align="right">0.7071068</td>
-<td align="right">5.000000</td>
+<td align="right">20.000000</td>
 <td align="right">0</td>
 <td align="right">0</td>
 <td align="right">0</td>
 <td align="right">1</td>
-<td align="right">0</td>
 </tr>
-<tr class="even">
-<td align="right">0.25</td>
+<tr class="odd">
+<td align="right">0.0625</td>
 <td align="right">0.00</td>
 <td align="right">0.7071068</td>
-<td align="right">3.666667</td>
-<td align="right">1</td>
+<td align="right">30.000000</td>
 <td align="right">0</td>
 <td align="right">0</td>
-<td align="right">1</td>
-<td align="right">1</td>
-</tr>
-<tr class="odd">
-<td align="right">0.25</td>
-<td align="right">0.50</td>
-<td align="right">0.0000000</td>
-<td align="right">7.000000</td>
-<td align="right">0</td>
-<td align="right">1</td>
 <td align="right">0</td>
 <td align="right">0</td>
-<td align="right">1</td>
 </tr>
 <tr class="even">
-<td align="right">0.25</td>
+<td align="right">0.2500</td>
 <td align="right">0.50</td>
 <td align="right">0.0000000</td>
 <td align="right">3.666667</td>
@@ -597,24 +934,19 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <td align="right">1</td>
 <td align="right">0</td>
 <td align="right">0</td>
-<td align="right">1</td>
 </tr>
 </tbody>
 </table>
 <p>Related work:</p>
 <ul>
-<li>Cohen J, Cohen P (1983). Applied Multiple Regression/Correlation Analysis For The Behav- ioral Sciences. 2 edition. Lawrence Erlbaum Associates, Inc. ISBN 0-89859-268-2.</li>
-<li><a href="http://dl.acm.org/citation.cfm?id=507538">“A preprocessing scheme for high-cardinality categorical attributes in classification and prediction problems”</a> Daniele Micci-Barreca; ACM SIGKDD Explorations, Volume 3 Issue 1, July 2001 Pages 27-32.</li>
-<li><a href="http://www.win-vector.com/blog/2012/07/modeling-trick-impact-coding-of-categorical-variables-with-many-levels/">“Modeling Trick: Impact Coding of Categorical Variables with Many Levels”</a> Nina Zumel; Win-Vector blog, 2012.</li>
+<li>Cohen J, Cohen P (1983). Applied Multiple Regression/Correlation Analysis For The Behavioral Sciences. 2 edition. Lawrence Erlbaum Associates, Inc. ISBN 0-89859-268-2.</li>
+<li><a href="https://dl.acm.org/doi/10.1145/507533.507538">“A preprocessing scheme for high-cardinality categorical attributes in classification and prediction problems”</a> Daniele Micci-Barreca; ACM SIGKDD Explorations, Volume 3 Issue 1, July 2001 Pages 27-32.</li>
+<li><a href="https://win-vector.com/2012/07/23/modeling-trick-impact-coding-of-categorical-variables-with-many-levels/">“Modeling Trick: Impact Coding of Categorical Variables with Many Levels”</a> Nina Zumel; Win-Vector blog, 2012.</li>
 <li>“Big Learning Made Easy – with Counts!”, Misha Bilenko, Cortana Intelligence and Machine Learning Blog, 2015.</li>
 </ul>
-<div id="installation" class="section level2">
-<h2>Installation</h2>
-<p>To install, from inside <code>R</code> please run:</p>
-<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb27-1" data-line-number="1"><span class="kw">install.packages</span>(<span class="st">&quot;vtreat&quot;</span>)</a></code></pre></div>
-</div>
 <div id="note" class="section level2">
 <h2>Note</h2>
+<p>Notes on controlling <code>vtreat</code>’s cross-validation plans can be found <a href="https://github.com/WinVector/vtreat/blob/master/Examples/CustomizedCrossPlan/CustomizedCrossPlan.md">here</a>.</p>
 <p>Note: <code>vtreat</code> is meant only for “tame names”, that is: variables and column names that are also valid <em>simple</em> (without quotes) <code>R</code> variables names.</p>
 </div>
 
