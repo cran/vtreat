@@ -1,8 +1,8 @@
 Package: vtreat
 Type: Package
 Title: A Statistically Sound 'data.frame' Processor/Conditioner
-Version: 1.6.2
-Date: 2020-10-17
+Version: 1.6.3
+Date: 2021-06-11
 Authors@R: c(
     person("John", "Mount", email = "jmount@win-vector.com", role = c("aut", "cre")),
     person("Nina", "Zumel", email = "nzumel@win-vector.com", role = c("aut")),
@@ -19,19 +19,18 @@ Description: A 'data.frame' processor/conditioner that prepares real-world data 
     categorical levels (levels seen during application, but not during training). Reference: 
     "'vtreat': a data.frame Processor for Predictive Modeling", Zumel, Mount, 2016, <DOI:10.5281/zenodo.1173313>.
 License: GPL-2 | GPL-3
-Depends: R (>= 3.4.0), wrapr (>= 2.0.2)
+Depends: R (>= 3.4.0), wrapr (>= 2.0.7)
 Imports: stats, digest
-Suggests: rquery (>= 1.4.5), rqdatatable (>= 1.2.8), data.table (>=
+Suggests: rquery (>= 1.4.6), rqdatatable (>= 1.2.9), data.table (>=
         1.12.2), isotone, lme4, knitr, rmarkdown, parallel, DBI,
         RSQLite, datasets, R.rsp, tinytest
-LazyData: true
 VignetteBuilder: knitr, R.rsp
 RoxygenNote: 7.1.1
 ByteCompile: true
 NeedsCompilation: no
-Packaged: 2020-10-17 15:12:10 UTC; johnmount
+Packaged: 2021-06-11 14:32:21 UTC; johnmount
 Author: John Mount [aut, cre],
   Nina Zumel [aut],
   Win-Vector LLC [cph]
 Repository: CRAN
-Date/Publication: 2020-10-17 15:40:02 UTC
+Date/Publication: 2021-06-11 15:10:01 UTC
