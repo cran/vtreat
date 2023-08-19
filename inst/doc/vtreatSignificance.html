@@ -12,29 +12,42 @@
 
 <meta name="author" content="John Mount, Nina Zumel" />
 
-<meta name="date" content="2021-06-11" />
+<meta name="date" content="2023-08-19" />
 
 <title>vtreat significance</title>
 
-<script src="data:application/javascript;base64,Ly8gUGFuZG9jIDIuOSBhZGRzIGF0dHJpYnV0ZXMgb24gYm90aCBoZWFkZXIgYW5kIGRpdi4gV2UgcmVtb3ZlIHRoZSBmb3JtZXIgKHRvCi8vIGJlIGNvbXBhdGlibGUgd2l0aCB0aGUgYmVoYXZpb3Igb2YgUGFuZG9jIDwgMi44KS4KZG9jdW1lbnQuYWRkRXZlbnRMaXN0ZW5lcignRE9NQ29udGVudExvYWRlZCcsIGZ1bmN0aW9uKGUpIHsKICB2YXIgaHMgPSBkb2N1bWVudC5xdWVyeVNlbGVjdG9yQWxsKCJkaXYuc2VjdGlvbltjbGFzcyo9J2xldmVsJ10gPiA6Zmlyc3QtY2hpbGQiKTsKICB2YXIgaSwgaCwgYTsKICBmb3IgKGkgPSAwOyBpIDwgaHMubGVuZ3RoOyBpKyspIHsKICAgIGggPSBoc1tpXTsKICAgIGlmICghL15oWzEtNl0kL2kudGVzdChoLnRhZ05hbWUpKSBjb250aW51ZTsgIC8vIGl0IHNob3VsZCBiZSBhIGhlYWRlciBoMS1oNgogICAgYSA9IGguYXR0cmlidXRlczsKICAgIHdoaWxlIChhLmxlbmd0aCA+IDApIGgucmVtb3ZlQXR0cmlidXRlKGFbMF0ubmFtZSk7CiAgfQp9KTsK"></script>
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
 
 <style type="text/css">
-  code{white-space: pre-wrap;}
-  span.smallcaps{font-variant: small-caps;}
-  span.underline{text-decoration: underline;}
-  div.column{display: inline-block; vertical-align: top; width: 50%;}
-  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-  ul.task-list{list-style: none;}
-    </style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
 
 
 <style type="text/css">
-  code {
-    white-space: pre;
-  }
-  .sourceCode {
-    overflow: visible;
-  }
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
 </style>
 <style type="text/css" data-origin="pandoc">
 pre > code.sourceCode { white-space: pre; position: relative; }
@@ -52,55 +65,54 @@ pre > code.sourceCode { white-space: pre-wrap; }
 pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
-  { counter-reset: source-line 0; }
+{ counter-reset: source-line 0; }
 pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
+{ position: relative; left: -4em; counter-increment: source-line; }
 pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-    color: #aaaaaa;
-  }
-pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
 div.sourceCode
-  {   }
+{ }
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-code span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code span.at { color: #7d9029; } /* Attribute */
-code span.bn { color: #40a070; } /* BaseN */
-code span.bu { } /* BuiltIn */
-code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code span.ch { color: #4070a0; } /* Char */
-code span.cn { color: #880000; } /* Constant */
-code span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code span.dt { color: #902000; } /* DataType */
-code span.dv { color: #40a070; } /* DecVal */
-code span.er { color: #ff0000; font-weight: bold; } /* Error */
-code span.ex { } /* Extension */
-code span.fl { color: #40a070; } /* Float */
-code span.fu { color: #06287e; } /* Function */
-code span.im { } /* Import */
-code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
-code span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code span.op { color: #666666; } /* Operator */
-code span.ot { color: #007020; } /* Other */
-code span.pp { color: #bc7a00; } /* Preprocessor */
-code span.sc { color: #4070a0; } /* SpecialChar */
-code span.ss { color: #bb6688; } /* SpecialString */
-code span.st { color: #4070a0; } /* String */
-code span.va { color: #19177c; } /* Variable */
-code span.vs { color: #4070a0; } /* VerbatimString */
-code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
-
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
 </style>
 <script>
 // apply pandoc div.sourceCode style to pre.sourceCode instead
@@ -109,13 +121,20 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   for (var i = 0; i < sheets.length; i++) {
     if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
     try { var rules = sheets[i].cssRules; } catch (e) { continue; }
-    for (var j = 0; j < rules.length; j++) {
+    var j = 0;
+    while (j < rules.length) {
       var rule = rules[j];
       // check if there is a div.sourceCode rule
-      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
       var style = rule.style.cssText;
       // check if color or background-color is set
-      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
       // replace div.sourceCode by a pre.sourceCode rule
       sheets[i].deleteRule(j);
       sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
@@ -127,7 +146,187 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 
 
-<link rel="stylesheet" href="data:text/css,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" type="text/css" />
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
 
 
 
@@ -141,27 +340,57 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 <h1 class="title toc-ignore">vtreat significance</h1>
 <h4 class="author">John Mount, Nina Zumel</h4>
-<h4 class="date">2021-06-11</h4>
+<h4 class="date">2023-08-19</h4>
 
 
 
-<p><code>vtreat::prepare</code> includes a required argument <code>pruneSig</code> that (if not NULL) is used to prune variables. Obviously significance depends on training set size (so is not an intrinsic property of just the variables) and there are issues of bias in the estimate (which vtreat attempts to eliminate by estimating significance of complex sub-model variables on cross-validated or out of sample data). As always there is a question of what to set a significance control to.</p>
+<p><code>vtreat::prepare</code> includes a required argument
+<code>pruneSig</code> that (if not NULL) is used to prune variables.
+Obviously significance depends on training set size (so is not an
+intrinsic property of just the variables) and there are issues of bias
+in the estimate (which vtreat attempts to eliminate by estimating
+significance of complex sub-model variables on cross-validated or out of
+sample data). As always there is a question of what to set a
+significance control to.</p>
 <p>Our advice is the following pragmatic:</p>
-<p>Use variable filtering on wide datasets (datasets with many columns or variables). Most machine learning algorithms can not defend themselves against large numbers of noise variables (including those algorithms that have cross-validation procedures built in). Examples are given <a href="https://win-vector.com/2014/02/01/bad-bayes-an-example-of-why-you-need-hold-out-testing/">here</a>.</p>
-<p>As an upper bound think of setting <code>pruneSig</code> below <em>1/numberOfColumns</em>. Setting <code>pruneSig</code> to <em>1/numberOfColumns</em> means that (in expectation) only a constant number of pure noise variables (variables with no actual relation to the outcome we are trying to predict) should create columns. This means (under some assumptions, and in expectation) we expect only a bounded number of noisy columns to be exposed to downstream statistical and machine learning algorithms (which they can presumably handle).</p>
-<p>As a lower bound think of what sort of good variables get thrown out at a given setting of <code>pruneSig</code>. For example suppose our problem is categorization in a data set with <em>n/2</em> positive examples and <em>n/2</em> negative examples. Consider the observed significance of a rare indicator variable that is on <em>k</em> times in training and is only on for positive instances. A random variable that is on <em>k</em> times would achieve this purity with probability <span class="math inline">\(2^{-k}\)</span>, so we expect it to have a <em>-log(significance)</em> in the ballpark of <em>k</em>. So a <code>pruneSig</code> of <span class="math inline">\(2^{-k}\)</span> will filter all such variables out (be they good or bad). Thus if you want levels or indicators that are on only a <em>z</em> fraction of the time on a training set of size <em>n</em> you want <code>pruneSig</code> &gt;&gt; <span class="math inline">\(2^{-z*n}\)</span>.</p>
+<p>Use variable filtering on wide datasets (datasets with many columns
+or variables). Most machine learning algorithms can not defend
+themselves against large numbers of noise variables (including those
+algorithms that have cross-validation procedures built in). Examples are
+given <a href="https://win-vector.com/2014/02/01/bad-bayes-an-example-of-why-you-need-hold-out-testing/">here</a>.</p>
+<p>As an upper bound think of setting <code>pruneSig</code> below
+<em>1/numberOfColumns</em>. Setting <code>pruneSig</code> to
+<em>1/numberOfColumns</em> means that (in expectation) only a constant
+number of pure noise variables (variables with no actual relation to the
+outcome we are trying to predict) should create columns. This means
+(under some assumptions, and in expectation) we expect only a bounded
+number of noisy columns to be exposed to downstream statistical and
+machine learning algorithms (which they can presumably handle).</p>
+<p>As a lower bound think of what sort of good variables get thrown out
+at a given setting of <code>pruneSig</code>. For example suppose our
+problem is categorization in a data set with <em>n/2</em> positive
+examples and <em>n/2</em> negative examples. Consider the observed
+significance of a rare indicator variable that is on <em>k</em> times in
+training and is only on for positive instances. A random variable that
+is on <em>k</em> times would achieve this purity with probability <span class="math inline">\(2^{-k}\)</span>, so we expect it to have a
+<em>-log(significance)</em> in the ballpark of <em>k</em>. So a
+<code>pruneSig</code> of <span class="math inline">\(2^{-k}\)</span>
+will filter all such variables out (be they good or bad). Thus if you
+want levels or indicators that are on only a <em>z</em> fraction of the
+time on a training set of size <em>n</em> you want <code>pruneSig</code>
+&gt;&gt; <span class="math inline">\(2^{-z*n}\)</span>.</p>
 <p>Example:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>signk <span class="ot">&lt;-</span> <span class="cf">function</span>(n,k) {</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  sigTab <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">y=</span><span class="fu">c</span>(<span class="fu">rep</span>(<span class="cn">TRUE</span>,n<span class="sc">/</span><span class="dv">2</span>),<span class="fu">rep</span>(<span class="cn">FALSE</span>,n<span class="sc">/</span><span class="dv">2</span>)),<span class="at">v=</span><span class="cn">FALSE</span>)</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  sigTab[<span class="fu">seq_len</span>(k),<span class="st">&#39;v&#39;</span>] <span class="ot">&lt;-</span> <span class="cn">TRUE</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  vtreat<span class="sc">::</span><span class="fu">designTreatmentsC</span>(sigTab,<span class="st">&#39;v&#39;</span>,<span class="st">&#39;y&#39;</span>,<span class="cn">TRUE</span>,<span class="at">verbose=</span><span class="cn">FALSE</span>)<span class="sc">$</span>scoreFrame[<span class="dv">1</span>,<span class="st">&#39;sig&#39;</span>]</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>sigTab <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">k=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">4</span>,<span class="dv">5</span>,<span class="dv">10</span>,<span class="dv">20</span>,<span class="dv">50</span>,<span class="dv">100</span>))</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co"># If you want to see a rare but perfect indicator of positive class</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co"># that&#39;s only on k times out of 1000, this is the lower bound on pruneSig</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>sigTab<span class="sc">$</span>sigEst <span class="ot">=</span> <span class="fu">vapply</span>(sigTab<span class="sc">$</span>k,<span class="cf">function</span>(k) <span class="fu">signk</span>(<span class="dv">1000</span>,k),<span class="fu">numeric</span>(<span class="dv">1</span>)) </span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>sigTab<span class="sc">$</span>minusLogSig <span class="ot">=</span> <span class="sc">-</span><span class="fu">log</span>(sigTab<span class="sc">$</span>sigEst) <span class="co"># we expect this to be approximately k</span></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(sigTab)</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a>signk <span class="ot">&lt;-</span> <span class="cf">function</span>(n,k) {</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>  sigTab <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">y=</span><span class="fu">c</span>(<span class="fu">rep</span>(<span class="cn">TRUE</span>,n<span class="sc">/</span><span class="dv">2</span>),<span class="fu">rep</span>(<span class="cn">FALSE</span>,n<span class="sc">/</span><span class="dv">2</span>)),<span class="at">v=</span><span class="cn">FALSE</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a>  sigTab[<span class="fu">seq_len</span>(k),<span class="st">&#39;v&#39;</span>] <span class="ot">&lt;-</span> <span class="cn">TRUE</span></span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a>  vtreat<span class="sc">::</span><span class="fu">designTreatmentsC</span>(sigTab,<span class="st">&#39;v&#39;</span>,<span class="st">&#39;y&#39;</span>,<span class="cn">TRUE</span>,<span class="at">verbose=</span><span class="cn">FALSE</span>)<span class="sc">$</span>scoreFrame[<span class="dv">1</span>,<span class="st">&#39;sig&#39;</span>]</span>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a>}</span>
+<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a>sigTab <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">k=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">4</span>,<span class="dv">5</span>,<span class="dv">10</span>,<span class="dv">20</span>,<span class="dv">50</span>,<span class="dv">100</span>))</span>
+<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a><span class="co"># If you want to see a rare but perfect indicator of positive class</span></span>
+<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a><span class="co"># that&#39;s only on k times out of 1000, this is the lower bound on pruneSig</span></span>
+<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a>sigTab<span class="sc">$</span>sigEst <span class="ot">=</span> <span class="fu">vapply</span>(sigTab<span class="sc">$</span>k,<span class="cf">function</span>(k) <span class="fu">signk</span>(<span class="dv">1000</span>,k),<span class="fu">numeric</span>(<span class="dv">1</span>)) </span>
+<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a>sigTab<span class="sc">$</span>minusLogSig <span class="ot">=</span> <span class="sc">-</span><span class="fu">log</span>(sigTab<span class="sc">$</span>sigEst) <span class="co"># we expect this to be approximately k</span></span>
+<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a><span class="fu">print</span>(sigTab)</span></code></pre></div>
 <pre><code>##     k       sigEst minusLogSig
 ## 1   1 2.388636e-01    1.431863
 ## 2   2 9.565153e-02    2.347044
@@ -172,16 +401,26 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ## 7  20 1.131954e-07   15.994150
 ## 8  50 2.209988e-17   38.350959
 ## 9 100 1.952762e-34   77.618649</code></pre>
-<p>For a data set with 100 variables (and 1000 rows), you might want to set <code>pruneSig</code> &lt;= 0.01 to limit the number of pure noise variables that enter the model. Note that this value is smaller than the lower bounds given above for <span class="math inline">\(k &lt; 5\)</span>. This means that in a data set of this width and length, you may not be able to detect rare but perfect indicators that occur fewer than 5 times. You would have a chance of using such rare indicators in a <em>catN</em> or <em>catB</em> effects coded variable.</p>
-<p>Below we design a data frame with a perfect categorical variable (completely determines the outcome y) where each level occurs exactly 2 times. The individual levels are insignificant, but we can still extract a significant <em>catB</em> effect coded variable.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">3346</span>)</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">1000</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>k <span class="ot">&lt;-</span> <span class="dv">4</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">y=</span><span class="fu">rbinom</span>(n,<span class="at">size=</span><span class="dv">1</span>,<span class="at">prob=</span><span class="fl">0.5</span>)<span class="sc">&gt;</span><span class="dv">0</span>)</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>d<span class="sc">$</span>catVarNoise <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="fu">paste0</span>(<span class="st">&#39;lev&#39;</span>,<span class="fu">sprintf</span>(<span class="st">&quot;%03d&quot;</span>,<span class="dv">1</span><span class="sc">:</span><span class="fu">floor</span>(n<span class="sc">/</span>k))),(k<span class="sc">+</span><span class="dv">1</span>))[<span class="dv">1</span><span class="sc">:</span>n]</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>d<span class="sc">$</span>catVarPerfect <span class="ot">&lt;-</span> <span class="fu">paste0</span>(d<span class="sc">$</span>catVar,<span class="fu">substr</span>(<span class="fu">as.character</span>(d<span class="sc">$</span>y),<span class="dv">1</span>,<span class="dv">1</span>))</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> d[<span class="fu">order</span>(d<span class="sc">$</span>catVarPerfect),]</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(d)</span></code></pre></div>
+<p>For a data set with 100 variables (and 1000 rows), you might want to
+set <code>pruneSig</code> &lt;= 0.01 to limit the number of pure noise
+variables that enter the model. Note that this value is smaller than the
+lower bounds given above for <span class="math inline">\(k &lt;
+5\)</span>. This means that in a data set of this width and length, you
+may not be able to detect rare but perfect indicators that occur fewer
+than 5 times. You would have a chance of using such rare indicators in a
+<em>catN</em> or <em>catB</em> effects coded variable.</p>
+<p>Below we design a data frame with a perfect categorical variable
+(completely determines the outcome y) where each level occurs exactly 2
+times. The individual levels are insignificant, but we can still extract
+a significant <em>catB</em> effect coded variable.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">3346</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">1000</span></span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>k <span class="ot">&lt;-</span> <span class="dv">4</span></span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">y=</span><span class="fu">rbinom</span>(n,<span class="at">size=</span><span class="dv">1</span>,<span class="at">prob=</span><span class="fl">0.5</span>)<span class="sc">&gt;</span><span class="dv">0</span>)</span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>d<span class="sc">$</span>catVarNoise <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="fu">paste0</span>(<span class="st">&#39;lev&#39;</span>,<span class="fu">sprintf</span>(<span class="st">&quot;%03d&quot;</span>,<span class="dv">1</span><span class="sc">:</span><span class="fu">floor</span>(n<span class="sc">/</span>k))),(k<span class="sc">+</span><span class="dv">1</span>))[<span class="dv">1</span><span class="sc">:</span>n]</span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a>d<span class="sc">$</span>catVarPerfect <span class="ot">&lt;-</span> <span class="fu">paste0</span>(d<span class="sc">$</span>catVar,<span class="fu">substr</span>(<span class="fu">as.character</span>(d<span class="sc">$</span>y),<span class="dv">1</span>,<span class="dv">1</span>))</span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a>d <span class="ot">&lt;-</span> d[<span class="fu">order</span>(d<span class="sc">$</span>catVarPerfect),]</span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a><span class="fu">head</span>(d)</span></code></pre></div>
 <pre><code>##         y catVarNoise catVarPerfect
 ## 1   FALSE      lev001       lev001F
 ## 501 FALSE      lev001       lev001F
@@ -189,49 +428,56 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ## 751  TRUE      lev001       lev001T
 ## 2   FALSE      lev002       lev002F
 ## 252 FALSE      lev002       lev002F</code></pre>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>treatmentsC <span class="ot">&lt;-</span> vtreat<span class="sc">::</span><span class="fu">designTreatmentsC</span>(d,<span class="fu">c</span>(<span class="st">&#39;catVarNoise&#39;</span>,<span class="st">&#39;catVarPerfect&#39;</span>),<span class="st">&#39;y&#39;</span>,<span class="cn">TRUE</span>)</span></code></pre></div>
-<pre><code>## [1] &quot;vtreat 1.6.3 inspecting inputs Fri Jun 11 07:32:19 2021&quot;
-## [1] &quot;designing treatments Fri Jun 11 07:32:19 2021&quot;
-## [1] &quot; have initial level statistics Fri Jun 11 07:32:19 2021&quot;
-## [1] &quot; scoring treatments Fri Jun 11 07:32:19 2021&quot;
-## [1] &quot;have treatment plan Fri Jun 11 07:32:19 2021&quot;
-## [1] &quot;rescoring complex variables Fri Jun 11 07:32:19 2021&quot;
-## [1] &quot;done rescoring complex variables Fri Jun 11 07:32:19 2021&quot;</code></pre>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Estimate effect significance (not coefficient significance).</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>estSigGLM <span class="ot">&lt;-</span> <span class="cf">function</span>(xVar,yVar,<span class="at">numberOfHiddenDegrees=</span><span class="dv">0</span>) {</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  d <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">x=</span>xVar,<span class="at">y=</span>yVar,<span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  model <span class="ot">&lt;-</span> stats<span class="sc">::</span><span class="fu">glm</span>(stats<span class="sc">::</span><span class="fu">as.formula</span>(<span class="st">&#39;y~x&#39;</span>),</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>                      <span class="at">data=</span>d,</span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>                      <span class="at">family=</span>stats<span class="sc">::</span><span class="fu">binomial</span>(<span class="at">link=</span><span class="st">&#39;logit&#39;</span>))</span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  delta_deviance <span class="ot">&lt;-</span> model<span class="sc">$</span>null.deviance <span class="sc">-</span> model<span class="sc">$</span>deviance</span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  delta_df <span class="ot">&lt;-</span> model<span class="sc">$</span>df.null <span class="sc">-</span> model<span class="sc">$</span>df.residual <span class="sc">+</span> numberOfHiddenDegrees</span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>  pRsq <span class="ot">&lt;-</span> <span class="fl">1.0</span> <span class="sc">-</span> model<span class="sc">$</span>deviance<span class="sc">/</span>model<span class="sc">$</span>null.deviance</span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>  sig <span class="ot">&lt;-</span> stats<span class="sc">::</span><span class="fu">pchisq</span>(delta_deviance, delta_df, <span class="at">lower.tail=</span><span class="cn">FALSE</span>)</span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>  sig</span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>prepD <span class="ot">&lt;-</span> vtreat<span class="sc">::</span><span class="fu">prepare</span>(treatmentsC,d,<span class="at">pruneSig=</span><span class="fu">c</span>())</span></code></pre></div>
-<pre><code>## Warning in prepare.treatmentplan(treatmentsC, d, pruneSig = c()):
-## possibly called prepare() on same data frame as designTreatments*()/
-## mkCrossFrame*Experiment(), this can lead to over-fit. To avoid this, please use
-## mkCrossFrame*Experiment$crossFrame.</code></pre>
-<p>vtreat produces good variable significances using out of sample simulation (cross frames).</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(treatmentsC<span class="sc">$</span>scoreFrame[,<span class="fu">c</span>(<span class="st">&#39;varName&#39;</span>,<span class="st">&#39;rsq&#39;</span>,<span class="st">&#39;sig&#39;</span>,<span class="st">&#39;extraModelDegrees&#39;</span>)])</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>treatmentsC <span class="ot">&lt;-</span> vtreat<span class="sc">::</span><span class="fu">designTreatmentsC</span>(d,<span class="fu">c</span>(<span class="st">&#39;catVarNoise&#39;</span>,<span class="st">&#39;catVarPerfect&#39;</span>),<span class="st">&#39;y&#39;</span>,<span class="cn">TRUE</span>)</span></code></pre></div>
+<pre><code>## [1] &quot;vtreat 1.6.4 inspecting inputs Sat Aug 19 12:10:24 2023&quot;
+## [1] &quot;designing treatments Sat Aug 19 12:10:24 2023&quot;
+## [1] &quot; have initial level statistics Sat Aug 19 12:10:24 2023&quot;
+## [1] &quot; scoring treatments Sat Aug 19 12:10:24 2023&quot;
+## [1] &quot;have treatment plan Sat Aug 19 12:10:24 2023&quot;
+## [1] &quot;rescoring complex variables Sat Aug 19 12:10:24 2023&quot;
+## [1] &quot;done rescoring complex variables Sat Aug 19 12:10:24 2023&quot;</code></pre>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="co"># Estimate effect significance (not coefficient significance).</span></span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>estSigGLM <span class="ot">&lt;-</span> <span class="cf">function</span>(xVar,yVar,<span class="at">numberOfHiddenDegrees=</span><span class="dv">0</span>) {</span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>  d <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">x=</span>xVar,<span class="at">y=</span>yVar,<span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a>  model <span class="ot">&lt;-</span> stats<span class="sc">::</span><span class="fu">glm</span>(stats<span class="sc">::</span><span class="fu">as.formula</span>(<span class="st">&#39;y~x&#39;</span>),</span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a>                      <span class="at">data=</span>d,</span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a>                      <span class="at">family=</span>stats<span class="sc">::</span><span class="fu">binomial</span>(<span class="at">link=</span><span class="st">&#39;logit&#39;</span>))</span>
+<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a>  delta_deviance <span class="ot">&lt;-</span> model<span class="sc">$</span>null.deviance <span class="sc">-</span> model<span class="sc">$</span>deviance</span>
+<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a>  delta_df <span class="ot">&lt;-</span> model<span class="sc">$</span>df.null <span class="sc">-</span> model<span class="sc">$</span>df.residual <span class="sc">+</span> numberOfHiddenDegrees</span>
+<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a>  pRsq <span class="ot">&lt;-</span> <span class="fl">1.0</span> <span class="sc">-</span> model<span class="sc">$</span>deviance<span class="sc">/</span>model<span class="sc">$</span>null.deviance</span>
+<span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a>  sig <span class="ot">&lt;-</span> stats<span class="sc">::</span><span class="fu">pchisq</span>(delta_deviance, delta_df, <span class="at">lower.tail=</span><span class="cn">FALSE</span>)</span>
+<span id="cb7-11"><a href="#cb7-11" tabindex="-1"></a>  sig</span>
+<span id="cb7-12"><a href="#cb7-12" tabindex="-1"></a>}</span>
+<span id="cb7-13"><a href="#cb7-13" tabindex="-1"></a></span>
+<span id="cb7-14"><a href="#cb7-14" tabindex="-1"></a>prepD <span class="ot">&lt;-</span> vtreat<span class="sc">::</span><span class="fu">prepare</span>(treatmentsC,d,<span class="at">pruneSig=</span><span class="fu">c</span>())</span></code></pre></div>
+<pre><code>## Warning in prepare.treatmentplan(treatmentsC, d, pruneSig = c()): possibly
+## called prepare() on same data frame as
+## designTreatments*()/mkCrossFrame*Experiment(), this can lead to over-fit.  To
+## avoid this, please use mkCrossFrame*Experiment$crossFrame.</code></pre>
+<p>vtreat produces good variable significances using out of sample
+simulation (cross frames).</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="fu">print</span>(treatmentsC<span class="sc">$</span>scoreFrame[,<span class="fu">c</span>(<span class="st">&#39;varName&#39;</span>,<span class="st">&#39;rsq&#39;</span>,<span class="st">&#39;sig&#39;</span>,<span class="st">&#39;extraModelDegrees&#39;</span>)])</span></code></pre></div>
 <pre><code>##              varName         rsq           sig extraModelDegrees
 ## 1   catVarNoise_catB 0.001071310  2.231012e-01               249
 ## 2 catVarPerfect_catP 0.001512584  1.477140e-01               473
 ## 3 catVarPerfect_catB 0.695865944 1.125597e-211               473</code></pre>
-<p>For categorical targets we have in the <code>scoreFrame</code> the <code>sig</code> column is the significance of the single variable logistic regression using the named variable (plus a constant term), and the <code>rsq</code> column is the “pseudo-r-squared” or portion of deviance explained (please see <a href="https://win-vector.com/2011/09/14/the-simpler-derivation-of-logistic-regression/">here</a> for some notes). For numeric targets the <code>sig</code> column is the significance of the single variable linear regression using the named variable (plus a constant term), and the <code>rsq</code> column is the “r-squared” or portion of variance explained (please see <a href="https://win-vector.com/2011/11/21/correlation-and-r-squared/">here</a>) for some notes).</p>
-<p>Signal carrying complex variables can score as significant, even those composed of rare levels.</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">glm</span>(y<span class="sc">~</span>d<span class="sc">$</span>catVarPerfect<span class="sc">==</span><span class="st">&#39;lev001T&#39;</span>,<span class="at">data=</span>d,<span class="at">family=</span>binomial))</span></code></pre></div>
+<p>For categorical targets we have in the <code>scoreFrame</code> the
+<code>sig</code> column is the significance of the single variable
+logistic regression using the named variable (plus a constant term), and
+the <code>rsq</code> column is the “pseudo-r-squared” or portion of
+deviance explained (please see <a href="https://win-vector.com/2011/09/14/the-simpler-derivation-of-logistic-regression/">here</a>
+for some notes). For numeric targets the <code>sig</code> column is the
+significance of the single variable linear regression using the named
+variable (plus a constant term), and the <code>rsq</code> column is the
+“r-squared” or portion of variance explained (please see <a href="https://win-vector.com/2011/11/21/correlation-and-r-squared/">here</a>)
+for some notes).</p>
+<p>Signal carrying complex variables can score as significant, even
+those composed of rare levels.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">glm</span>(y<span class="sc">~</span>d<span class="sc">$</span>catVarPerfect<span class="sc">==</span><span class="st">&#39;lev001T&#39;</span>,<span class="at">data=</span>d,<span class="at">family=</span>binomial))</span></code></pre></div>
 <pre><code>## 
 ## Call:
 ## glm(formula = y ~ d$catVarPerfect == &quot;lev001T&quot;, family = binomial, 
 ##     data = d)
-## 
-## Deviance Residuals: 
-##    Min      1Q  Median      3Q     Max  
-## -1.152  -1.152  -1.152   1.203   1.203  
 ## 
 ## Coefficients:
 ##                                   Estimate Std. Error z value Pr(&gt;|z|)
@@ -245,23 +491,20 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ## AIC: 1386.6
 ## 
 ## Number of Fisher Scoring iterations: 12</code></pre>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">estSigGLM</span>(prepD<span class="sc">$</span>catVarPerfect_catB,prepD<span class="sc">$</span>y,<span class="dv">0</span>) <span class="co"># wrong est</span></span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a><span class="fu">estSigGLM</span>(prepD<span class="sc">$</span>catVarPerfect_catB,prepD<span class="sc">$</span>y,<span class="dv">0</span>) <span class="co"># wrong est</span></span></code></pre></div>
 <pre><code>## Warning: glm.fit: algorithm did not converge</code></pre>
 <pre><code>## [1] 2.958641e-303</code></pre>
-<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">estSigGLM</span>(prepD<span class="sc">$</span>catVarPerfect_catB,prepD<span class="sc">$</span>y,</span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>          <span class="at">numberOfHiddenDegrees=</span><span class="fu">length</span>(<span class="fu">unique</span>(d<span class="sc">$</span>catVarPerfect))<span class="sc">-</span><span class="dv">1</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a><span class="fu">estSigGLM</span>(prepD<span class="sc">$</span>catVarPerfect_catB,prepD<span class="sc">$</span>y,</span>
+<span id="cb16-2"><a href="#cb16-2" tabindex="-1"></a>          <span class="at">numberOfHiddenDegrees=</span><span class="fu">length</span>(<span class="fu">unique</span>(d<span class="sc">$</span>catVarPerfect))<span class="sc">-</span><span class="dv">1</span>)</span></code></pre></div>
 <pre><code>## Warning: glm.fit: algorithm did not converge</code></pre>
 <pre><code>## [1] 3.963376e-90</code></pre>
-<p>Noise variables (those without a relation to outcome) are also scored correctly as long was we account for the degrees of freedom.</p>
-<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">glm</span>(y<span class="sc">~</span>d<span class="sc">$</span>catVarNoise<span class="sc">==</span><span class="st">&#39;lev001&#39;</span>,<span class="at">data=</span>d,<span class="at">family=</span>binomial))</span></code></pre></div>
+<p>Noise variables (those without a relation to outcome) are also scored
+correctly as long was we account for the degrees of freedom.</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">glm</span>(y<span class="sc">~</span>d<span class="sc">$</span>catVarNoise<span class="sc">==</span><span class="st">&#39;lev001&#39;</span>,<span class="at">data=</span>d,<span class="at">family=</span>binomial))</span></code></pre></div>
 <pre><code>## 
 ## Call:
 ## glm(formula = y ~ d$catVarNoise == &quot;lev001&quot;, family = binomial, 
 ##     data = d)
-## 
-## Deviance Residuals: 
-##    Min      1Q  Median      3Q     Max  
-## -1.177  -1.154  -1.154   1.201   1.201  
 ## 
 ## Coefficients:
 ##                               Estimate Std. Error z value Pr(&gt;|z|)
@@ -275,10 +518,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ## AIC: 1389.5
 ## 
 ## Number of Fisher Scoring iterations: 3</code></pre>
-<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">estSigGLM</span>(prepD<span class="sc">$</span>catVarNoise_catB,prepD<span class="sc">$</span>y,<span class="dv">0</span>) <span class="co"># wrong est</span></span></code></pre></div>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" tabindex="-1"></a><span class="fu">estSigGLM</span>(prepD<span class="sc">$</span>catVarNoise_catB,prepD<span class="sc">$</span>y,<span class="dv">0</span>) <span class="co"># wrong est</span></span></code></pre></div>
 <pre><code>## [1] 1.223667e-63</code></pre>
-<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">estSigGLM</span>(prepD<span class="sc">$</span>catVarNoise_catB,prepD<span class="sc">$</span>y,</span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>          <span class="at">numberOfHiddenDegrees=</span><span class="fu">length</span>(<span class="fu">unique</span>(d<span class="sc">$</span>catVarNoise))<span class="sc">-</span><span class="dv">1</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" tabindex="-1"></a><span class="fu">estSigGLM</span>(prepD<span class="sc">$</span>catVarNoise_catB,prepD<span class="sc">$</span>y,</span>
+<span id="cb23-2"><a href="#cb23-2" tabindex="-1"></a>          <span class="at">numberOfHiddenDegrees=</span><span class="fu">length</span>(<span class="fu">unique</span>(d<span class="sc">$</span>catVarNoise))<span class="sc">-</span><span class="dv">1</span>)</span></code></pre></div>
 <pre><code>## [1] 0.07074029</code></pre>
 
 

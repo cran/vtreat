@@ -12,29 +12,42 @@
 
 <meta name="author" content="John Mount, Nina Zumel" />
 
-<meta name="date" content="2021-06-11" />
+<meta name="date" content="2023-08-19" />
 
 <title>vtreat overfit</title>
 
-<script src="data:application/javascript;base64,Ly8gUGFuZG9jIDIuOSBhZGRzIGF0dHJpYnV0ZXMgb24gYm90aCBoZWFkZXIgYW5kIGRpdi4gV2UgcmVtb3ZlIHRoZSBmb3JtZXIgKHRvCi8vIGJlIGNvbXBhdGlibGUgd2l0aCB0aGUgYmVoYXZpb3Igb2YgUGFuZG9jIDwgMi44KS4KZG9jdW1lbnQuYWRkRXZlbnRMaXN0ZW5lcignRE9NQ29udGVudExvYWRlZCcsIGZ1bmN0aW9uKGUpIHsKICB2YXIgaHMgPSBkb2N1bWVudC5xdWVyeVNlbGVjdG9yQWxsKCJkaXYuc2VjdGlvbltjbGFzcyo9J2xldmVsJ10gPiA6Zmlyc3QtY2hpbGQiKTsKICB2YXIgaSwgaCwgYTsKICBmb3IgKGkgPSAwOyBpIDwgaHMubGVuZ3RoOyBpKyspIHsKICAgIGggPSBoc1tpXTsKICAgIGlmICghL15oWzEtNl0kL2kudGVzdChoLnRhZ05hbWUpKSBjb250aW51ZTsgIC8vIGl0IHNob3VsZCBiZSBhIGhlYWRlciBoMS1oNgogICAgYSA9IGguYXR0cmlidXRlczsKICAgIHdoaWxlIChhLmxlbmd0aCA+IDApIGgucmVtb3ZlQXR0cmlidXRlKGFbMF0ubmFtZSk7CiAgfQp9KTsK"></script>
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
 
 <style type="text/css">
-  code{white-space: pre-wrap;}
-  span.smallcaps{font-variant: small-caps;}
-  span.underline{text-decoration: underline;}
-  div.column{display: inline-block; vertical-align: top; width: 50%;}
-  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-  ul.task-list{list-style: none;}
-    </style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
 
 
 <style type="text/css">
-  code {
-    white-space: pre;
-  }
-  .sourceCode {
-    overflow: visible;
-  }
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
 </style>
 <style type="text/css" data-origin="pandoc">
 pre > code.sourceCode { white-space: pre; position: relative; }
@@ -52,55 +65,54 @@ pre > code.sourceCode { white-space: pre-wrap; }
 pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
-  { counter-reset: source-line 0; }
+{ counter-reset: source-line 0; }
 pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
+{ position: relative; left: -4em; counter-increment: source-line; }
 pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-    color: #aaaaaa;
-  }
-pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
 div.sourceCode
-  {   }
+{ }
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-code span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code span.at { color: #7d9029; } /* Attribute */
-code span.bn { color: #40a070; } /* BaseN */
-code span.bu { } /* BuiltIn */
-code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code span.ch { color: #4070a0; } /* Char */
-code span.cn { color: #880000; } /* Constant */
-code span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code span.dt { color: #902000; } /* DataType */
-code span.dv { color: #40a070; } /* DecVal */
-code span.er { color: #ff0000; font-weight: bold; } /* Error */
-code span.ex { } /* Extension */
-code span.fl { color: #40a070; } /* Float */
-code span.fu { color: #06287e; } /* Function */
-code span.im { } /* Import */
-code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
-code span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code span.op { color: #666666; } /* Operator */
-code span.ot { color: #007020; } /* Other */
-code span.pp { color: #bc7a00; } /* Preprocessor */
-code span.sc { color: #4070a0; } /* SpecialChar */
-code span.ss { color: #bb6688; } /* SpecialString */
-code span.st { color: #4070a0; } /* String */
-code span.va { color: #19177c; } /* Variable */
-code span.vs { color: #4070a0; } /* VerbatimString */
-code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
-
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
 </style>
 <script>
 // apply pandoc div.sourceCode style to pre.sourceCode instead
@@ -109,13 +121,20 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   for (var i = 0; i < sheets.length; i++) {
     if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
     try { var rules = sheets[i].cssRules; } catch (e) { continue; }
-    for (var j = 0; j < rules.length; j++) {
+    var j = 0;
+    while (j < rules.length) {
       var rule = rules[j];
       // check if there is a div.sourceCode rule
-      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
       var style = rule.style.cssText;
       // check if color or background-color is set
-      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
       // replace div.sourceCode by a pre.sourceCode rule
       sheets[i].deleteRule(j);
       sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
@@ -127,7 +146,187 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 
 
-<link rel="stylesheet" href="data:text/css,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" type="text/css" />
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
 
 
 
@@ -141,56 +340,67 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 <h1 class="title toc-ignore">vtreat overfit</h1>
 <h4 class="author">John Mount, Nina Zumel</h4>
-<h4 class="date">2021-06-11</h4>
+<h4 class="date">2023-08-19</h4>
 
 
 
-<p>Example showing safe “best practice” use of the <a href="https://cran.r-project.org/package=vtreat">‘vtreat’</a> variable preparation library. For more on <code>vtreat</code> see <a href="https://github.com/WinVector/vtreat">here</a>.</p>
-<p>Below we generate an example data frame with no relation between x and y. We are using a synthetic data set so we know what the “right answer is” (no signal). False fitting on no-signal variables is bad for several reasons:</p>
+<p>Example showing safe “best practice” use of the <a href="https://cran.r-project.org/package=vtreat">‘vtreat’</a> variable
+preparation library. For more on <code>vtreat</code> see <a href="https://github.com/WinVector/vtreat">here</a>.</p>
+<p>Below we generate an example data frame with no relation between x
+and y. We are using a synthetic data set so we know what the “right
+answer is” (no signal). False fitting on no-signal variables is bad for
+several reasons:</p>
 <ul>
-<li>It creates undesirable biases in variable quality estimates and in subsequent models.</li>
+<li>It creates undesirable biases in variable quality estimates and in
+subsequent models.</li>
 <li>It “hides degrees of freedom” from subsequent models.</li>
-<li>It creates the false impression you have a good result (which you may fail to falsify).</li>
-<li>Complex bad variables can starve out simple weak good variables.</li>
+<li>It creates the false impression you have a good result (which you
+may fail to falsify).</li>
+<li>Complex bad variables can starve out simple weak good
+variables.</li>
 </ul>
-<p>This example shows things we don’t want to happen, and then the additional precautions that help prevent them.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">22626</span>)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">x=</span><span class="fu">sample</span>(<span class="fu">paste</span>(<span class="st">&#39;level&#39;</span>,<span class="dv">1</span><span class="sc">:</span><span class="dv">1000</span>,<span class="at">sep=</span><span class="st">&#39;&#39;</span>),<span class="dv">2000</span>,<span class="at">replace=</span><span class="cn">TRUE</span>)) <span class="co"># independent variable.</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>d<span class="sc">$</span>y <span class="ot">&lt;-</span> <span class="fu">runif</span>(<span class="fu">nrow</span>(d))<span class="sc">&gt;</span><span class="fl">0.5</span>  <span class="co"># the quantity to be predicted, notice: independent of variables.</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>d<span class="sc">$</span>rgroup <span class="ot">&lt;-</span> <span class="fu">round</span>(<span class="dv">100</span><span class="sc">*</span><span class="fu">runif</span>(<span class="fu">nrow</span>(d)))  <span class="co"># the random group used for splitting the data set, not a variable.</span></span></code></pre></div>
+<p>This example shows things we don’t want to happen, and then the
+additional precautions that help prevent them.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">22626</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">x=</span><span class="fu">sample</span>(<span class="fu">paste</span>(<span class="st">&#39;level&#39;</span>,<span class="dv">1</span><span class="sc">:</span><span class="dv">1000</span>,<span class="at">sep=</span><span class="st">&#39;&#39;</span>),<span class="dv">2000</span>,<span class="at">replace=</span><span class="cn">TRUE</span>)) <span class="co"># independent variable.</span></span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a>d<span class="sc">$</span>y <span class="ot">&lt;-</span> <span class="fu">runif</span>(<span class="fu">nrow</span>(d))<span class="sc">&gt;</span><span class="fl">0.5</span>  <span class="co"># the quantity to be predicted, notice: independent of variables.</span></span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a>d<span class="sc">$</span>rgroup <span class="ot">&lt;-</span> <span class="fu">round</span>(<span class="dv">100</span><span class="sc">*</span><span class="fu">runif</span>(<span class="fu">nrow</span>(d)))  <span class="co"># the random group used for splitting the data set, not a variable.</span></span></code></pre></div>
 <div id="bad-practice-using-the-same-data-to-treat-and-to-train" class="section level2">
 <h2>Bad Practice: Using the same data to treat and to train</h2>
-<p>Using the same set of data to prepare the variable encoding and train the model can lead to the false belief (derived from the training set) that the model fit well. This is largely due to the treated variable appearing to consume only one degree of freedom, when it in fact consumes many more. In many cases a reasonable setting of <code>pruneSig</code> (say 0.01) will help against a noise variable being considered desirable, but selected variables may still be mis-used by downstream modeling.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>dTrain <span class="ot">&lt;-</span> d[d<span class="sc">$</span>rgroup<span class="sc">&lt;=</span><span class="dv">80</span>,,drop<span class="ot">=</span><span class="cn">FALSE</span>]</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>dTest <span class="ot">&lt;-</span> d[d<span class="sc">$</span>rgroup<span class="sc">&gt;</span><span class="dv">80</span>,,drop<span class="ot">=</span><span class="cn">FALSE</span>]</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">&#39;vtreat&#39;</span>)</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>treatments <span class="ot">&lt;-</span> vtreat<span class="sc">::</span><span class="fu">designTreatmentsC</span>(dTrain,<span class="st">&#39;x&#39;</span>,<span class="st">&#39;y&#39;</span>,<span class="cn">TRUE</span>,</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">rareCount=</span><span class="dv">0</span> <span class="co"># Note: usually want rareCount&gt;0, setting to zero to illustrate problem</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
-<pre><code>## [1] &quot;vtreat 1.6.3 inspecting inputs Fri Jun 11 07:32:16 2021&quot;
-## [1] &quot;designing treatments Fri Jun 11 07:32:16 2021&quot;
-## [1] &quot; have initial level statistics Fri Jun 11 07:32:16 2021&quot;
-## [1] &quot; scoring treatments Fri Jun 11 07:32:16 2021&quot;
-## [1] &quot;have treatment plan Fri Jun 11 07:32:16 2021&quot;
-## [1] &quot;rescoring complex variables Fri Jun 11 07:32:16 2021&quot;
-## [1] &quot;done rescoring complex variables Fri Jun 11 07:32:16 2021&quot;</code></pre>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>dTrainTreated <span class="ot">&lt;-</span> vtreat<span class="sc">::</span><span class="fu">prepare</span>(treatments,dTrain,</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">pruneSig=</span><span class="fu">c</span>() <span class="co"># Note: usually want pruneSig to be a small fraction, setting to null to illustrate problem</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
-<pre><code>## Warning in prepare.treatmentplan(treatments, dTrain, pruneSig = c()):
-## possibly called prepare() on same data frame as designTreatments*()/
-## mkCrossFrame*Experiment(), this can lead to over-fit. To avoid this, please use
-## mkCrossFrame*Experiment$crossFrame.</code></pre>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>m1 <span class="ot">&lt;-</span> <span class="fu">glm</span>(y<span class="sc">~</span>x_catB,<span class="at">data=</span>dTrainTreated,<span class="at">family=</span><span class="fu">binomial</span>(<span class="at">link=</span><span class="st">&#39;logit&#39;</span>))</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">summary</span>(m1))  <span class="co"># notice low residual deviance</span></span></code></pre></div>
+<p>Using the same set of data to prepare the variable encoding and train
+the model can lead to the false belief (derived from the training set)
+that the model fit well. This is largely due to the treated variable
+appearing to consume only one degree of freedom, when it in fact
+consumes many more. In many cases a reasonable setting of
+<code>pruneSig</code> (say 0.01) will help against a noise variable
+being considered desirable, but selected variables may still be mis-used
+by downstream modeling.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>dTrain <span class="ot">&lt;-</span> d[d<span class="sc">$</span>rgroup<span class="sc">&lt;=</span><span class="dv">80</span>,,drop<span class="ot">=</span><span class="cn">FALSE</span>]</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>dTest <span class="ot">&lt;-</span> d[d<span class="sc">$</span>rgroup<span class="sc">&gt;</span><span class="dv">80</span>,,drop<span class="ot">=</span><span class="cn">FALSE</span>]</span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a><span class="fu">library</span>(<span class="st">&#39;vtreat&#39;</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>treatments <span class="ot">&lt;-</span> vtreat<span class="sc">::</span><span class="fu">designTreatmentsC</span>(dTrain,<span class="st">&#39;x&#39;</span>,<span class="st">&#39;y&#39;</span>,<span class="cn">TRUE</span>,</span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>  <span class="at">rareCount=</span><span class="dv">0</span> <span class="co"># Note: usually want rareCount&gt;0, setting to zero to illustrate problem</span></span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a>)</span></code></pre></div>
+<pre><code>## [1] &quot;vtreat 1.6.4 inspecting inputs Sat Aug 19 12:10:21 2023&quot;
+## [1] &quot;designing treatments Sat Aug 19 12:10:21 2023&quot;
+## [1] &quot; have initial level statistics Sat Aug 19 12:10:21 2023&quot;
+## [1] &quot; scoring treatments Sat Aug 19 12:10:21 2023&quot;
+## [1] &quot;have treatment plan Sat Aug 19 12:10:21 2023&quot;
+## [1] &quot;rescoring complex variables Sat Aug 19 12:10:21 2023&quot;
+## [1] &quot;done rescoring complex variables Sat Aug 19 12:10:21 2023&quot;</code></pre>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>dTrainTreated <span class="ot">&lt;-</span> vtreat<span class="sc">::</span><span class="fu">prepare</span>(treatments,dTrain,</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>  <span class="at">pruneSig=</span><span class="fu">c</span>() <span class="co"># Note: usually want pruneSig to be a small fraction, setting to null to illustrate problem</span></span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>)</span></code></pre></div>
+<pre><code>## Warning in prepare.treatmentplan(treatments, dTrain, pruneSig = c()): possibly
+## called prepare() on same data frame as
+## designTreatments*()/mkCrossFrame*Experiment(), this can lead to over-fit.  To
+## avoid this, please use mkCrossFrame*Experiment$crossFrame.</code></pre>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a>m1 <span class="ot">&lt;-</span> <span class="fu">glm</span>(y<span class="sc">~</span>x_catB,<span class="at">data=</span>dTrainTreated,<span class="at">family=</span><span class="fu">binomial</span>(<span class="at">link=</span><span class="st">&#39;logit&#39;</span>))</span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">summary</span>(m1))  <span class="co"># notice low residual deviance</span></span></code></pre></div>
 <pre><code>## 
 ## Call:
 ## glm(formula = y ~ x_catB, family = binomial(link = &quot;logit&quot;), 
 ##     data = dTrainTreated)
-## 
-## Deviance Residuals: 
-##      Min        1Q    Median        3Q       Max  
-## -1.79811  -0.75642   0.00684   0.75617   1.89724  
 ## 
 ## Coefficients:
 ##             Estimate Std. Error z value Pr(&gt;|z|)    
@@ -206,89 +416,135 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ## AIC: 1135.2
 ## 
 ## Number of Fisher Scoring iterations: 8</code></pre>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>dTrain<span class="sc">$</span>predM1 <span class="ot">&lt;-</span> <span class="fu">predict</span>(m1,<span class="at">newdata=</span>dTrainTreated,<span class="at">type=</span><span class="st">&#39;response&#39;</span>)</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co"># devtools::install_github(&quot;WinVector/WVPlots&quot;)</span></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co"># library(&#39;WVPlots&#39;)</span></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>plotRes <span class="ot">&lt;-</span> <span class="cf">function</span>(d,predName,yName,title) {</span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(title)</span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>  tab <span class="ot">&lt;-</span> <span class="fu">table</span>(<span class="at">truth=</span>d[[yName]],<span class="at">pred=</span>d[[predName]]<span class="sc">&gt;</span><span class="fl">0.5</span>)</span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(tab)</span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>  diag <span class="ot">&lt;-</span> <span class="fu">sum</span>(<span class="fu">vapply</span>(<span class="fu">seq_len</span>(<span class="fu">min</span>(<span class="fu">dim</span>(tab))),</span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>                     <span class="cf">function</span>(i) tab[i,i],<span class="fu">numeric</span>(<span class="dv">1</span>)))</span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>  acc <span class="ot">&lt;-</span> diag<span class="sc">/</span><span class="fu">sum</span>(tab)</span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="co">#  if(requireNamespace(&quot;WVPlots&quot;,quietly=TRUE)) {</span></span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="co">#     print(WVPlots::ROCPlot(d,predName,yName,title))</span></span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a><span class="co">#  }</span></span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(<span class="fu">paste</span>(<span class="st">&#39;accuracy&#39;</span>,acc))</span>
-<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a><span class="co"># evaluate model on training</span></span>
-<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a><span class="fu">plotRes</span>(dTrain,<span class="st">&#39;predM1&#39;</span>,<span class="st">&#39;y&#39;</span>,<span class="st">&#39;model1 on train&#39;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a>dTrain<span class="sc">$</span>predM1 <span class="ot">&lt;-</span> <span class="fu">predict</span>(m1,<span class="at">newdata=</span>dTrainTreated,<span class="at">type=</span><span class="st">&#39;response&#39;</span>)</span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a><span class="co"># devtools::install_github(&quot;WinVector/WVPlots&quot;)</span></span>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a><span class="co"># library(&#39;WVPlots&#39;)</span></span>
+<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a>plotRes <span class="ot">&lt;-</span> <span class="cf">function</span>(d,predName,yName,title) {</span>
+<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a>  <span class="fu">print</span>(title)</span>
+<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a>  tab <span class="ot">&lt;-</span> <span class="fu">table</span>(<span class="at">truth=</span>d[[yName]],<span class="at">pred=</span>d[[predName]]<span class="sc">&gt;</span><span class="fl">0.5</span>)</span>
+<span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a>  <span class="fu">print</span>(tab)</span>
+<span id="cb8-9"><a href="#cb8-9" tabindex="-1"></a>  diag <span class="ot">&lt;-</span> <span class="fu">sum</span>(<span class="fu">vapply</span>(<span class="fu">seq_len</span>(<span class="fu">min</span>(<span class="fu">dim</span>(tab))),</span>
+<span id="cb8-10"><a href="#cb8-10" tabindex="-1"></a>                     <span class="cf">function</span>(i) tab[i,i],<span class="fu">numeric</span>(<span class="dv">1</span>)))</span>
+<span id="cb8-11"><a href="#cb8-11" tabindex="-1"></a>  acc <span class="ot">&lt;-</span> diag<span class="sc">/</span><span class="fu">sum</span>(tab)</span>
+<span id="cb8-12"><a href="#cb8-12" tabindex="-1"></a><span class="co">#  if(requireNamespace(&quot;WVPlots&quot;,quietly=TRUE)) {</span></span>
+<span id="cb8-13"><a href="#cb8-13" tabindex="-1"></a><span class="co">#     print(WVPlots::ROCPlot(d,predName,yName,title))</span></span>
+<span id="cb8-14"><a href="#cb8-14" tabindex="-1"></a><span class="co">#  }</span></span>
+<span id="cb8-15"><a href="#cb8-15" tabindex="-1"></a>  <span class="fu">print</span>(<span class="fu">paste</span>(<span class="st">&#39;accuracy&#39;</span>,acc))</span>
+<span id="cb8-16"><a href="#cb8-16" tabindex="-1"></a>}</span>
+<span id="cb8-17"><a href="#cb8-17" tabindex="-1"></a></span>
+<span id="cb8-18"><a href="#cb8-18" tabindex="-1"></a><span class="co"># evaluate model on training</span></span>
+<span id="cb8-19"><a href="#cb8-19" tabindex="-1"></a><span class="fu">plotRes</span>(dTrain,<span class="st">&#39;predM1&#39;</span>,<span class="st">&#39;y&#39;</span>,<span class="st">&#39;model1 on train&#39;</span>)</span></code></pre></div>
 <pre><code>## [1] &quot;model1 on train&quot;
 ##        pred
 ## truth   FALSE TRUE
 ##   FALSE   556  248
 ##   TRUE     92  739
 ## [1] &quot;accuracy 0.792048929663609&quot;</code></pre>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># evaluate model on test</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>dTestTreated <span class="ot">&lt;-</span> vtreat<span class="sc">::</span><span class="fu">prepare</span>(treatments,dTest,<span class="at">pruneSig=</span><span class="fu">c</span>())</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>dTest<span class="sc">$</span>predM1 <span class="ot">&lt;-</span> <span class="fu">predict</span>(m1,<span class="at">newdata=</span>dTestTreated,<span class="at">type=</span><span class="st">&#39;response&#39;</span>)</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plotRes</span>(dTest,<span class="st">&#39;predM1&#39;</span>,<span class="st">&#39;y&#39;</span>,<span class="st">&#39;model1 on test&#39;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a><span class="co"># evaluate model on test</span></span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a>dTestTreated <span class="ot">&lt;-</span> vtreat<span class="sc">::</span><span class="fu">prepare</span>(treatments,dTest,<span class="at">pruneSig=</span><span class="fu">c</span>())</span>
+<span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a>dTest<span class="sc">$</span>predM1 <span class="ot">&lt;-</span> <span class="fu">predict</span>(m1,<span class="at">newdata=</span>dTestTreated,<span class="at">type=</span><span class="st">&#39;response&#39;</span>)</span>
+<span id="cb10-4"><a href="#cb10-4" tabindex="-1"></a><span class="fu">plotRes</span>(dTest,<span class="st">&#39;predM1&#39;</span>,<span class="st">&#39;y&#39;</span>,<span class="st">&#39;model1 on test&#39;</span>)</span></code></pre></div>
 <pre><code>## [1] &quot;model1 on test&quot;
 ##        pred
 ## truth   FALSE TRUE
 ##   FALSE    57  123
 ##   TRUE     65  120
 ## [1] &quot;accuracy 0.484931506849315&quot;</code></pre>
-<p>The above is bad: we saw a “significant” model fit on training data (even though there is no relation to be found). This means the treated training data can be confusing to machine learning techniques and to the analyst. The issue is that the training data is no longer exchangeable with the test data because the training data was used to build the variable encodings. One way to avoid this is to not use the training data for variable encoding construction, but instead use a third set for this task.</p>
+<p>The above is bad: we saw a “significant” model fit on training data
+(even though there is no relation to be found). This means the treated
+training data can be confusing to machine learning techniques and to the
+analyst. The issue is that the training data is no longer exchangeable
+with the test data because the training data was used to build the
+variable encodings. One way to avoid this is to not use the training
+data for variable encoding construction, but instead use a third set for
+this task.</p>
 <div id="what-went-wrong" class="section level3">
 <h3>What went wrong?</h3>
-<p>Notice that vtreat did not think there was any usable signal, and did not want us to use the variables: the values in <code>treatments$scoreFrame$sig</code> are all much larger than a nominally acceptable significance level like 0.05. The variables stayed in our model because we did not prune them (<em>ie</em> we set <code>pruneSig=c()</code>). Also notice we set <code>rareCount=0</code>, which allows the use of very rare levels (which help drive the problem).</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(treatments<span class="sc">$</span>scoreFrame)</span></code></pre></div>
+<p>Notice that vtreat did not think there was any usable signal, and did
+not want us to use the variables: the values in
+<code>treatments$scoreFrame$sig</code> are all much larger than a
+nominally acceptable significance level like 0.05. The variables stayed
+in our model because we did not prune them (<em>ie</em> we set
+<code>pruneSig=c()</code>). Also notice we set <code>rareCount=0</code>,
+which allows the use of very rare levels (which help drive the
+problem).</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a><span class="fu">print</span>(treatments<span class="sc">$</span>scoreFrame)</span></code></pre></div>
 <pre><code>##   varName varMoves          rsq        sig needsSplit extraModelDegrees
 ## 1  x_catP     TRUE 0.0001174834 0.60586892       TRUE               803
 ## 2  x_catB     TRUE 0.0020852084 0.02972052       TRUE               803
 ##   origName code default_threshold recommended
 ## 1        x catP               0.5       FALSE
 ## 2        x catB               0.5        TRUE</code></pre>
-<p>Subsequently, the down-stream machine learning (in this case a standard logistic regression) used the variable incorrectly. The modeling algorithm gave the variable a non-negligible coefficient (around 3) that it thought was reliably bounded away from zero; it also believed that the resulting model almost halved deviance (when in fact it explained nothing). So any variables that do get through may have distributional issues (and misleadingly low apparent degrees of freedom).</p>
+<p>Subsequently, the down-stream machine learning (in this case a
+standard logistic regression) used the variable incorrectly. The
+modeling algorithm gave the variable a non-negligible coefficient
+(around 3) that it thought was reliably bounded away from zero; it also
+believed that the resulting model almost halved deviance (when in fact
+it explained nothing). So any variables that do get through may have
+distributional issues (and misleadingly low apparent degrees of
+freedom).</p>
 <p><strong>Rare levels of a categorical variable</strong></p>
-<p>The biggest contributors to this distributional issue tend to be rare levels of categorical variables. Since the individual levels are rare we have unreliable estimates for their effects, and if there are very many of them we may see quite a large effect in aggregate. To help combat this we have a control called <code>rareLevels</code>. Any level that is observed no more than <code>rareLevels</code> times during training is re-mapped to a new special level called <em>rare</em> and not allowed to directly contribute (i.e. can not generate unique indicator columns, and doesn’t have a direct effect on <code>catB</code> or <code>catN</code> encodings). If all the rare levels have a distinct behavior after grouping, the <em>rare</em> level can capture that.</p>
-<p><strong>Impact-coding of categorical variables with many levels</strong></p>
-<p>Another undesirable effect is over-estimating significance of derived variable fit for <code>catB</code> and <code>catN</code> impact-coded variables. To fight this vtreat attempts to estimate out of sample or cross-validated effect significances (when it has enough data). With enough data, setting the <code>pruneSig</code> parameter during <code>prepare()</code> will help remove noise variables. One can set <code>pruneSig</code> to something like <em>1/number-of-columns</em> to ensure that with high probability only an constant number of truly useless variables make it to later modeling. However, the significance of a given effect size for variables that actually have some signal (i.e. non-noise variables) can still be sensitive to in/out sample scoring and the hiding of degrees of freedom that occurs when a large categorical variable (that represents a large number of degrees of freedom) is re-coded as an impact or effect (which appears to have only a single degree of freedom).</p>
-<p>We next show how to avoid these undesirable illusory effects: better practice in partitioning and using training data. We are doing more with our data (essentially chaining models), so we have to take a bit more care with our data.</p>
+<p>The biggest contributors to this distributional issue tend to be rare
+levels of categorical variables. Since the individual levels are rare we
+have unreliable estimates for their effects, and if there are very many
+of them we may see quite a large effect in aggregate. To help combat
+this we have a control called <code>rareLevels</code>. Any level that is
+observed no more than <code>rareLevels</code> times during training is
+re-mapped to a new special level called <em>rare</em> and not allowed to
+directly contribute (i.e. can not generate unique indicator columns, and
+doesn’t have a direct effect on <code>catB</code> or <code>catN</code>
+encodings). If all the rare levels have a distinct behavior after
+grouping, the <em>rare</em> level can capture that.</p>
+<p><strong>Impact-coding of categorical variables with many
+levels</strong></p>
+<p>Another undesirable effect is over-estimating significance of derived
+variable fit for <code>catB</code> and <code>catN</code> impact-coded
+variables. To fight this vtreat attempts to estimate out of sample or
+cross-validated effect significances (when it has enough data). With
+enough data, setting the <code>pruneSig</code> parameter during
+<code>prepare()</code> will help remove noise variables. One can set
+<code>pruneSig</code> to something like <em>1/number-of-columns</em> to
+ensure that with high probability only an constant number of truly
+useless variables make it to later modeling. However, the significance
+of a given effect size for variables that actually have some signal
+(i.e. non-noise variables) can still be sensitive to in/out sample
+scoring and the hiding of degrees of freedom that occurs when a large
+categorical variable (that represents a large number of degrees of
+freedom) is re-coded as an impact or effect (which appears to have only
+a single degree of freedom).</p>
+<p>We next show how to avoid these undesirable illusory effects: better
+practice in partitioning and using training data. We are doing more with
+our data (essentially chaining models), so we have to take a bit more
+care with our data.</p>
 </div>
 </div>
 <div id="correct-practice-12-use-different-data-to-treat-and-train" class="section level2">
 <h2>Correct Practice 1/2: Use different data to treat and train</h2>
-<p>Below is part of our suggested work pattern: coding/train/test split.</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>dCode <span class="ot">&lt;-</span> d[d<span class="sc">$</span>rgroup<span class="sc">&lt;=</span><span class="dv">20</span>,,drop<span class="ot">=</span><span class="cn">FALSE</span>]</span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>dTrain <span class="ot">&lt;-</span> d[(d<span class="sc">$</span>rgroup<span class="sc">&gt;</span><span class="dv">20</span>) <span class="sc">&amp;</span> (d<span class="sc">$</span>rgroup<span class="sc">&lt;=</span><span class="dv">80</span>),,drop<span class="ot">=</span><span class="cn">FALSE</span>]</span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>treatments <span class="ot">&lt;-</span> vtreat<span class="sc">::</span><span class="fu">designTreatmentsC</span>(dCode,<span class="st">&#39;x&#39;</span>,<span class="st">&#39;y&#39;</span>,<span class="cn">TRUE</span>,</span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>                                        <span class="at">rareCount=</span><span class="dv">0</span>,  <span class="co"># Note set this to something larger, like 5</span></span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>                                        <span class="at">rareSig=</span><span class="fu">c</span>() <span class="co"># Note set this to something like 0.3</span></span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
-<pre><code>## [1] &quot;vtreat 1.6.3 inspecting inputs Fri Jun 11 07:32:16 2021&quot;
-## [1] &quot;designing treatments Fri Jun 11 07:32:16 2021&quot;
-## [1] &quot; have initial level statistics Fri Jun 11 07:32:16 2021&quot;
-## [1] &quot; scoring treatments Fri Jun 11 07:32:16 2021&quot;
-## [1] &quot;have treatment plan Fri Jun 11 07:32:16 2021&quot;
-## [1] &quot;rescoring complex variables Fri Jun 11 07:32:16 2021&quot;
-## [1] &quot;done rescoring complex variables Fri Jun 11 07:32:16 2021&quot;</code></pre>
-<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>dTrainTreated <span class="ot">&lt;-</span> vtreat<span class="sc">::</span><span class="fu">prepare</span>(treatments,dTrain,</span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>                                 <span class="at">pruneSig=</span><span class="fu">c</span>() <span class="co"># Note: set this to filter, like 0.05 or 1/nvars</span></span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>m2 <span class="ot">&lt;-</span> <span class="fu">glm</span>(y<span class="sc">~</span>x_catB,<span class="at">data=</span>dTrainTreated,<span class="at">family=</span><span class="fu">binomial</span>(<span class="at">link=</span><span class="st">&#39;logit&#39;</span>))</span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">summary</span>(m2)) <span class="co"># notice high residual deviance</span></span></code></pre></div>
+<p>Below is part of our suggested work pattern: coding/train/test
+split.</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a>dCode <span class="ot">&lt;-</span> d[d<span class="sc">$</span>rgroup<span class="sc">&lt;=</span><span class="dv">20</span>,,drop<span class="ot">=</span><span class="cn">FALSE</span>]</span>
+<span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a>dTrain <span class="ot">&lt;-</span> d[(d<span class="sc">$</span>rgroup<span class="sc">&gt;</span><span class="dv">20</span>) <span class="sc">&amp;</span> (d<span class="sc">$</span>rgroup<span class="sc">&lt;=</span><span class="dv">80</span>),,drop<span class="ot">=</span><span class="cn">FALSE</span>]</span>
+<span id="cb14-3"><a href="#cb14-3" tabindex="-1"></a>treatments <span class="ot">&lt;-</span> vtreat<span class="sc">::</span><span class="fu">designTreatmentsC</span>(dCode,<span class="st">&#39;x&#39;</span>,<span class="st">&#39;y&#39;</span>,<span class="cn">TRUE</span>,</span>
+<span id="cb14-4"><a href="#cb14-4" tabindex="-1"></a>                                        <span class="at">rareCount=</span><span class="dv">0</span>,  <span class="co"># Note set this to something larger, like 5</span></span>
+<span id="cb14-5"><a href="#cb14-5" tabindex="-1"></a>                                        <span class="at">rareSig=</span><span class="fu">c</span>() <span class="co"># Note set this to something like 0.3</span></span>
+<span id="cb14-6"><a href="#cb14-6" tabindex="-1"></a>)</span></code></pre></div>
+<pre><code>## [1] &quot;vtreat 1.6.4 inspecting inputs Sat Aug 19 12:10:21 2023&quot;
+## [1] &quot;designing treatments Sat Aug 19 12:10:21 2023&quot;
+## [1] &quot; have initial level statistics Sat Aug 19 12:10:21 2023&quot;
+## [1] &quot; scoring treatments Sat Aug 19 12:10:21 2023&quot;
+## [1] &quot;have treatment plan Sat Aug 19 12:10:21 2023&quot;
+## [1] &quot;rescoring complex variables Sat Aug 19 12:10:21 2023&quot;
+## [1] &quot;done rescoring complex variables Sat Aug 19 12:10:21 2023&quot;</code></pre>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a>dTrainTreated <span class="ot">&lt;-</span> vtreat<span class="sc">::</span><span class="fu">prepare</span>(treatments,dTrain,</span>
+<span id="cb16-2"><a href="#cb16-2" tabindex="-1"></a>                                 <span class="at">pruneSig=</span><span class="fu">c</span>() <span class="co"># Note: set this to filter, like 0.05 or 1/nvars</span></span>
+<span id="cb16-3"><a href="#cb16-3" tabindex="-1"></a>)</span>
+<span id="cb16-4"><a href="#cb16-4" tabindex="-1"></a>m2 <span class="ot">&lt;-</span> <span class="fu">glm</span>(y<span class="sc">~</span>x_catB,<span class="at">data=</span>dTrainTreated,<span class="at">family=</span><span class="fu">binomial</span>(<span class="at">link=</span><span class="st">&#39;logit&#39;</span>))</span>
+<span id="cb16-5"><a href="#cb16-5" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">summary</span>(m2)) <span class="co"># notice high residual deviance</span></span></code></pre></div>
 <pre><code>## 
 ## Call:
 ## glm(formula = y ~ x_catB, family = binomial(link = &quot;logit&quot;), 
 ##     data = dTrainTreated)
-## 
-## Deviance Residuals: 
-##    Min      1Q  Median      3Q     Max  
-## -1.254  -1.182   1.103   1.173   1.246  
 ## 
 ## Coefficients:
 ##             Estimate Std. Error z value Pr(&gt;|z|)
@@ -302,73 +558,83 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ## AIC: 1688.4
 ## 
 ## Number of Fisher Scoring iterations: 3</code></pre>
-<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>dTrain<span class="sc">$</span>predM2 <span class="ot">&lt;-</span> <span class="fu">predict</span>(m2,<span class="at">newdata=</span>dTrainTreated,<span class="at">type=</span><span class="st">&#39;response&#39;</span>)</span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plotRes</span>(dTrain,<span class="st">&#39;predM2&#39;</span>,<span class="st">&#39;y&#39;</span>,<span class="st">&#39;model2 on train&#39;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" tabindex="-1"></a>dTrain<span class="sc">$</span>predM2 <span class="ot">&lt;-</span> <span class="fu">predict</span>(m2,<span class="at">newdata=</span>dTrainTreated,<span class="at">type=</span><span class="st">&#39;response&#39;</span>)</span>
+<span id="cb18-2"><a href="#cb18-2" tabindex="-1"></a><span class="fu">plotRes</span>(dTrain,<span class="st">&#39;predM2&#39;</span>,<span class="st">&#39;y&#39;</span>,<span class="st">&#39;model2 on train&#39;</span>)</span></code></pre></div>
 <pre><code>## [1] &quot;model2 on train&quot;
 ##        pred
 ## truth   FALSE TRUE
 ##   FALSE   105  499
 ##   TRUE     92  521
 ## [1] &quot;accuracy 0.514379622021364&quot;</code></pre>
-<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># We do not advise creating dCodeTreated for any purpose other than</span></span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="co"># diagnostic plotting.  You should not use the treated coding data</span></span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="co"># for anything (as that would undo the benefit of having a separate</span></span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="co"># coding data subset).</span></span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>dCodeTreated <span class="ot">&lt;-</span> vtreat<span class="sc">::</span><span class="fu">prepare</span>(treatments,dCode,<span class="at">pruneSig=</span><span class="fu">c</span>())</span></code></pre></div>
-<pre><code>## Warning in prepare.treatmentplan(treatments, dCode, pruneSig = c()):
-## possibly called prepare() on same data frame as designTreatments*()/
-## mkCrossFrame*Experiment(), this can lead to over-fit. To avoid this, please use
-## mkCrossFrame*Experiment$crossFrame.</code></pre>
-<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>dCode<span class="sc">$</span>predM2 <span class="ot">&lt;-</span> <span class="fu">predict</span>(m2,<span class="at">newdata=</span>dCodeTreated,<span class="at">type=</span><span class="st">&#39;response&#39;</span>)</span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plotRes</span>(dCode,<span class="st">&#39;predM2&#39;</span>,<span class="st">&#39;y&#39;</span>,<span class="st">&#39;model2 on coding set&#39;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" tabindex="-1"></a><span class="co"># We do not advise creating dCodeTreated for any purpose other than</span></span>
+<span id="cb20-2"><a href="#cb20-2" tabindex="-1"></a><span class="co"># diagnostic plotting.  You should not use the treated coding data</span></span>
+<span id="cb20-3"><a href="#cb20-3" tabindex="-1"></a><span class="co"># for anything (as that would undo the benefit of having a separate</span></span>
+<span id="cb20-4"><a href="#cb20-4" tabindex="-1"></a><span class="co"># coding data subset).</span></span>
+<span id="cb20-5"><a href="#cb20-5" tabindex="-1"></a>dCodeTreated <span class="ot">&lt;-</span> vtreat<span class="sc">::</span><span class="fu">prepare</span>(treatments,dCode,<span class="at">pruneSig=</span><span class="fu">c</span>())</span></code></pre></div>
+<pre><code>## Warning in prepare.treatmentplan(treatments, dCode, pruneSig = c()): possibly
+## called prepare() on same data frame as
+## designTreatments*()/mkCrossFrame*Experiment(), this can lead to over-fit.  To
+## avoid this, please use mkCrossFrame*Experiment$crossFrame.</code></pre>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" tabindex="-1"></a>dCode<span class="sc">$</span>predM2 <span class="ot">&lt;-</span> <span class="fu">predict</span>(m2,<span class="at">newdata=</span>dCodeTreated,<span class="at">type=</span><span class="st">&#39;response&#39;</span>)</span>
+<span id="cb22-2"><a href="#cb22-2" tabindex="-1"></a><span class="fu">plotRes</span>(dCode,<span class="st">&#39;predM2&#39;</span>,<span class="st">&#39;y&#39;</span>,<span class="st">&#39;model2 on coding set&#39;</span>)</span></code></pre></div>
 <pre><code>## [1] &quot;model2 on coding set&quot;
 ##        pred
 ## truth   FALSE TRUE
 ##   FALSE   174   26
 ##   TRUE      3  215
 ## [1] &quot;accuracy 0.930622009569378&quot;</code></pre>
-<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>dTestTreated <span class="ot">&lt;-</span> vtreat<span class="sc">::</span><span class="fu">prepare</span>(treatments,dTest,<span class="at">pruneSig=</span><span class="fu">c</span>())</span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>dTest<span class="sc">$</span>predM2 <span class="ot">&lt;-</span> <span class="fu">predict</span>(m2,<span class="at">newdata=</span>dTestTreated,<span class="at">type=</span><span class="st">&#39;response&#39;</span>)</span>
-<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plotRes</span>(dTest,<span class="st">&#39;predM2&#39;</span>,<span class="st">&#39;y&#39;</span>,<span class="st">&#39;model2 on test set&#39;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" tabindex="-1"></a>dTestTreated <span class="ot">&lt;-</span> vtreat<span class="sc">::</span><span class="fu">prepare</span>(treatments,dTest,<span class="at">pruneSig=</span><span class="fu">c</span>())</span>
+<span id="cb24-2"><a href="#cb24-2" tabindex="-1"></a>dTest<span class="sc">$</span>predM2 <span class="ot">&lt;-</span> <span class="fu">predict</span>(m2,<span class="at">newdata=</span>dTestTreated,<span class="at">type=</span><span class="st">&#39;response&#39;</span>)</span>
+<span id="cb24-3"><a href="#cb24-3" tabindex="-1"></a><span class="fu">plotRes</span>(dTest,<span class="st">&#39;predM2&#39;</span>,<span class="st">&#39;y&#39;</span>,<span class="st">&#39;model2 on test set&#39;</span>)</span></code></pre></div>
 <pre><code>## [1] &quot;model2 on test set&quot;
 ##        pred
 ## truth   FALSE TRUE
 ##   FALSE    26  154
 ##   TRUE     42  143
 ## [1] &quot;accuracy 0.463013698630137&quot;</code></pre>
-<p>In the above example we saw training and test performance are similar – and equally poor, as they should be since there is no signal. Though it didn’t happen in this case, note the coding set can (falsely) show high performance. This is the bad behavior we wanted to isolate out of the training set.</p>
-<p>Remember, the goal isn’t good performance on training- it is good performance on future data (simulated by test). So doing well on training and bad on test is worse than doing bad on both test and training.</p>
-<p>There are, of course, other methods to avoid the bias introduced in using the same data to both treat/encode the variables and to train the model. vtreat incorporates a number of these methods, including smoothing (controlled through <code>smFactor</code>) and pruning of rare levels (controlled through <code>rareSig</code>).</p>
+<p>In the above example we saw training and test performance are similar
+– and equally poor, as they should be since there is no signal. Though
+it didn’t happen in this case, note the coding set can (falsely) show
+high performance. This is the bad behavior we wanted to isolate out of
+the training set.</p>
+<p>Remember, the goal isn’t good performance on training- it is good
+performance on future data (simulated by test). So doing well on
+training and bad on test is worse than doing bad on both test and
+training.</p>
+<p>There are, of course, other methods to avoid the bias introduced in
+using the same data to both treat/encode the variables and to train the
+model. vtreat incorporates a number of these methods, including
+smoothing (controlled through <code>smFactor</code>) and pruning of rare
+levels (controlled through <code>rareSig</code>).</p>
 </div>
 <div id="correct-practice-22-use-simulated-out-of-sample-methods-cross-methods" class="section level2">
-<h2>Correct Practice 2/2: Use simulated out of sample methods (cross methods)</h2>
-<p>Another effective technique: cross-constructed training frames can also be accessed by using <code>mkCrossFrameCExperiment</code> or <code>mkCrossFrameNExperiment</code>, which we demonstrate here.</p>
-<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>dTrain <span class="ot">&lt;-</span> d[d<span class="sc">$</span>rgroup<span class="sc">&lt;=</span><span class="dv">80</span>,,drop<span class="ot">=</span><span class="cn">FALSE</span>]</span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>xdat <span class="ot">&lt;-</span> vtreat<span class="sc">::</span><span class="fu">mkCrossFrameCExperiment</span>(dTrain,<span class="st">&#39;x&#39;</span>,<span class="st">&#39;y&#39;</span>,<span class="cn">TRUE</span>,</span>
-<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>                                  <span class="at">rareCount=</span><span class="dv">0</span>,  <span class="co"># Note set this to something larger, like 5</span></span>
-<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>                                  <span class="at">rareSig=</span><span class="fu">c</span>())</span></code></pre></div>
-<pre><code>## [1] &quot;vtreat 1.6.3 start initial treatment design Fri Jun 11 07:32:16 2021&quot;
-## [1] &quot; start cross frame work Fri Jun 11 07:32:16 2021&quot;
-## [1] &quot; vtreat::mkCrossFrameCExperiment done Fri Jun 11 07:32:17 2021&quot;</code></pre>
-<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>treatments <span class="ot">&lt;-</span> xdat<span class="sc">$</span>treatments</span>
-<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(treatments<span class="sc">$</span>scoreFrame)</span></code></pre></div>
+<h2>Correct Practice 2/2: Use simulated out of sample methods (cross
+methods)</h2>
+<p>Another effective technique: cross-constructed training frames can
+also be accessed by using <code>mkCrossFrameCExperiment</code> or
+<code>mkCrossFrameNExperiment</code>, which we demonstrate here.</p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" tabindex="-1"></a>dTrain <span class="ot">&lt;-</span> d[d<span class="sc">$</span>rgroup<span class="sc">&lt;=</span><span class="dv">80</span>,,drop<span class="ot">=</span><span class="cn">FALSE</span>]</span>
+<span id="cb26-2"><a href="#cb26-2" tabindex="-1"></a>xdat <span class="ot">&lt;-</span> vtreat<span class="sc">::</span><span class="fu">mkCrossFrameCExperiment</span>(dTrain,<span class="st">&#39;x&#39;</span>,<span class="st">&#39;y&#39;</span>,<span class="cn">TRUE</span>,</span>
+<span id="cb26-3"><a href="#cb26-3" tabindex="-1"></a>                                  <span class="at">rareCount=</span><span class="dv">0</span>,  <span class="co"># Note set this to something larger, like 5</span></span>
+<span id="cb26-4"><a href="#cb26-4" tabindex="-1"></a>                                  <span class="at">rareSig=</span><span class="fu">c</span>())</span></code></pre></div>
+<pre><code>## [1] &quot;vtreat 1.6.4 start initial treatment design Sat Aug 19 12:10:21 2023&quot;
+## [1] &quot; start cross frame work Sat Aug 19 12:10:21 2023&quot;
+## [1] &quot; vtreat::mkCrossFrameCExperiment done Sat Aug 19 12:10:21 2023&quot;</code></pre>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" tabindex="-1"></a>treatments <span class="ot">&lt;-</span> xdat<span class="sc">$</span>treatments</span>
+<span id="cb28-2"><a href="#cb28-2" tabindex="-1"></a><span class="fu">print</span>(treatments<span class="sc">$</span>scoreFrame)</span></code></pre></div>
 <pre><code>##   varName varMoves          rsq          sig needsSplit extraModelDegrees
 ## 1  x_catP     TRUE 2.772417e-05 0.8020822863       TRUE               803
 ## 2  x_catB     TRUE 5.776072e-03 0.0002969686       TRUE               803
 ##   origName code default_threshold recommended
 ## 1        x catP               0.5       FALSE
 ## 2        x catB               0.5        TRUE</code></pre>
-<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>dTrainTreated <span class="ot">&lt;-</span> xdat<span class="sc">$</span>crossFrame</span>
-<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>m3 <span class="ot">&lt;-</span> <span class="fu">glm</span>(y<span class="sc">~</span>x_catB,<span class="at">data=</span>dTrainTreated,<span class="at">family=</span><span class="fu">binomial</span>(<span class="at">link=</span><span class="st">&#39;logit&#39;</span>))</span>
-<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">summary</span>(m3)) <span class="co"># notice high residual deviance</span></span></code></pre></div>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" tabindex="-1"></a>dTrainTreated <span class="ot">&lt;-</span> xdat<span class="sc">$</span>crossFrame</span>
+<span id="cb30-2"><a href="#cb30-2" tabindex="-1"></a>m3 <span class="ot">&lt;-</span> <span class="fu">glm</span>(y<span class="sc">~</span>x_catB,<span class="at">data=</span>dTrainTreated,<span class="at">family=</span><span class="fu">binomial</span>(<span class="at">link=</span><span class="st">&#39;logit&#39;</span>))</span>
+<span id="cb30-3"><a href="#cb30-3" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">summary</span>(m3)) <span class="co"># notice high residual deviance</span></span></code></pre></div>
 <pre><code>## 
 ## Call:
 ## glm(formula = y ~ x_catB, family = binomial(link = &quot;logit&quot;), 
 ##     data = dTrainTreated)
-## 
-## Deviance Residuals: 
-##    Min      1Q  Median      3Q     Max  
-## -1.226  -1.191   1.131   1.164   1.199  
 ## 
 ## Coefficients:
 ##             Estimate Std. Error z value Pr(&gt;|z|)
@@ -382,24 +648,26 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ## AIC: 2269
 ## 
 ## Number of Fisher Scoring iterations: 3</code></pre>
-<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>dTrainTreated<span class="sc">$</span>predM3 <span class="ot">&lt;-</span> <span class="fu">predict</span>(m3,<span class="at">newdata=</span>dTrainTreated,<span class="at">type=</span><span class="st">&#39;response&#39;</span>)</span>
-<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plotRes</span>(dTrainTreated,<span class="st">&#39;predM3&#39;</span>,<span class="st">&#39;y&#39;</span>,<span class="st">&#39;model3 on train&#39;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" tabindex="-1"></a>dTrainTreated<span class="sc">$</span>predM3 <span class="ot">&lt;-</span> <span class="fu">predict</span>(m3,<span class="at">newdata=</span>dTrainTreated,<span class="at">type=</span><span class="st">&#39;response&#39;</span>)</span>
+<span id="cb32-2"><a href="#cb32-2" tabindex="-1"></a><span class="fu">plotRes</span>(dTrainTreated,<span class="st">&#39;predM3&#39;</span>,<span class="st">&#39;y&#39;</span>,<span class="st">&#39;model3 on train&#39;</span>)</span></code></pre></div>
 <pre><code>## [1] &quot;model3 on train&quot;
 ##        pred
 ## truth   FALSE TRUE
 ##   FALSE   184  620
 ##   TRUE    205  626
 ## [1] &quot;accuracy 0.495412844036697&quot;</code></pre>
-<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>dTestTreated <span class="ot">&lt;-</span> vtreat<span class="sc">::</span><span class="fu">prepare</span>(treatments,dTest,<span class="at">pruneSig=</span><span class="fu">c</span>())</span>
-<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>dTest<span class="sc">$</span>predM3 <span class="ot">&lt;-</span> <span class="fu">predict</span>(m3,<span class="at">newdata=</span>dTestTreated,<span class="at">type=</span><span class="st">&#39;response&#39;</span>)</span>
-<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plotRes</span>(dTest,<span class="st">&#39;predM3&#39;</span>,<span class="st">&#39;y&#39;</span>,<span class="st">&#39;model3 on test set&#39;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" tabindex="-1"></a>dTestTreated <span class="ot">&lt;-</span> vtreat<span class="sc">::</span><span class="fu">prepare</span>(treatments,dTest,<span class="at">pruneSig=</span><span class="fu">c</span>())</span>
+<span id="cb34-2"><a href="#cb34-2" tabindex="-1"></a>dTest<span class="sc">$</span>predM3 <span class="ot">&lt;-</span> <span class="fu">predict</span>(m3,<span class="at">newdata=</span>dTestTreated,<span class="at">type=</span><span class="st">&#39;response&#39;</span>)</span>
+<span id="cb34-3"><a href="#cb34-3" tabindex="-1"></a><span class="fu">plotRes</span>(dTest,<span class="st">&#39;predM3&#39;</span>,<span class="st">&#39;y&#39;</span>,<span class="st">&#39;model3 on test set&#39;</span>)</span></code></pre></div>
 <pre><code>## [1] &quot;model3 on test set&quot;
 ##        pred
 ## truth   FALSE TRUE
 ##   FALSE    44  136
 ##   TRUE     53  132
 ## [1] &quot;accuracy 0.482191780821918&quot;</code></pre>
-<p>Notice the glm significance is off, but the model quality is similar on train and test, and the scoreFrame significance is a correct indication.</p>
+<p>Notice the glm significance is off, but the model quality is similar
+on train and test, and the scoreFrame significance is a correct
+indication.</p>
 </div>
 
 
