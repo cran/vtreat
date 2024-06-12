@@ -12,7 +12,7 @@
 
 <meta name="author" content="John Mount, Nina Zumel" />
 
-<meta name="date" content="2023-08-19" />
+<meta name="date" content="2024-06-12" />
 
 <title>vtreat overfit</title>
 
@@ -340,7 +340,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">vtreat overfit</h1>
 <h4 class="author">John Mount, Nina Zumel</h4>
-<h4 class="date">2023-08-19</h4>
+<h4 class="date">2024-06-12</h4>
 
 
 
@@ -381,13 +381,13 @@ by downstream modeling.</p>
 <span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>treatments <span class="ot">&lt;-</span> vtreat<span class="sc">::</span><span class="fu">designTreatmentsC</span>(dTrain,<span class="st">&#39;x&#39;</span>,<span class="st">&#39;y&#39;</span>,<span class="cn">TRUE</span>,</span>
 <span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>  <span class="at">rareCount=</span><span class="dv">0</span> <span class="co"># Note: usually want rareCount&gt;0, setting to zero to illustrate problem</span></span>
 <span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a>)</span></code></pre></div>
-<pre><code>## [1] &quot;vtreat 1.6.4 inspecting inputs Sat Aug 19 12:10:21 2023&quot;
-## [1] &quot;designing treatments Sat Aug 19 12:10:21 2023&quot;
-## [1] &quot; have initial level statistics Sat Aug 19 12:10:21 2023&quot;
-## [1] &quot; scoring treatments Sat Aug 19 12:10:21 2023&quot;
-## [1] &quot;have treatment plan Sat Aug 19 12:10:21 2023&quot;
-## [1] &quot;rescoring complex variables Sat Aug 19 12:10:21 2023&quot;
-## [1] &quot;done rescoring complex variables Sat Aug 19 12:10:21 2023&quot;</code></pre>
+<pre><code>## [1] &quot;vtreat 1.6.5 inspecting inputs Wed Jun 12 08:51:31 2024&quot;
+## [1] &quot;designing treatments Wed Jun 12 08:51:31 2024&quot;
+## [1] &quot; have initial level statistics Wed Jun 12 08:51:31 2024&quot;
+## [1] &quot; scoring treatments Wed Jun 12 08:51:31 2024&quot;
+## [1] &quot;have treatment plan Wed Jun 12 08:51:31 2024&quot;
+## [1] &quot;rescoring complex variables Wed Jun 12 08:51:31 2024&quot;
+## [1] &quot;done rescoring complex variables Wed Jun 12 08:51:31 2024&quot;</code></pre>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>dTrainTreated <span class="ot">&lt;-</span> vtreat<span class="sc">::</span><span class="fu">prepare</span>(treatments,dTrain,</span>
 <span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>  <span class="at">pruneSig=</span><span class="fu">c</span>() <span class="co"># Note: usually want pruneSig to be a small fraction, setting to null to illustrate problem</span></span>
 <span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>)</span></code></pre></div>
@@ -529,13 +529,13 @@ split.</p>
 <span id="cb14-4"><a href="#cb14-4" tabindex="-1"></a>                                        <span class="at">rareCount=</span><span class="dv">0</span>,  <span class="co"># Note set this to something larger, like 5</span></span>
 <span id="cb14-5"><a href="#cb14-5" tabindex="-1"></a>                                        <span class="at">rareSig=</span><span class="fu">c</span>() <span class="co"># Note set this to something like 0.3</span></span>
 <span id="cb14-6"><a href="#cb14-6" tabindex="-1"></a>)</span></code></pre></div>
-<pre><code>## [1] &quot;vtreat 1.6.4 inspecting inputs Sat Aug 19 12:10:21 2023&quot;
-## [1] &quot;designing treatments Sat Aug 19 12:10:21 2023&quot;
-## [1] &quot; have initial level statistics Sat Aug 19 12:10:21 2023&quot;
-## [1] &quot; scoring treatments Sat Aug 19 12:10:21 2023&quot;
-## [1] &quot;have treatment plan Sat Aug 19 12:10:21 2023&quot;
-## [1] &quot;rescoring complex variables Sat Aug 19 12:10:21 2023&quot;
-## [1] &quot;done rescoring complex variables Sat Aug 19 12:10:21 2023&quot;</code></pre>
+<pre><code>## [1] &quot;vtreat 1.6.5 inspecting inputs Wed Jun 12 08:51:31 2024&quot;
+## [1] &quot;designing treatments Wed Jun 12 08:51:31 2024&quot;
+## [1] &quot; have initial level statistics Wed Jun 12 08:51:31 2024&quot;
+## [1] &quot; scoring treatments Wed Jun 12 08:51:31 2024&quot;
+## [1] &quot;have treatment plan Wed Jun 12 08:51:31 2024&quot;
+## [1] &quot;rescoring complex variables Wed Jun 12 08:51:31 2024&quot;
+## [1] &quot;done rescoring complex variables Wed Jun 12 08:51:31 2024&quot;</code></pre>
 <div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a>dTrainTreated <span class="ot">&lt;-</span> vtreat<span class="sc">::</span><span class="fu">prepare</span>(treatments,dTrain,</span>
 <span id="cb16-2"><a href="#cb16-2" tabindex="-1"></a>                                 <span class="at">pruneSig=</span><span class="fu">c</span>() <span class="co"># Note: set this to filter, like 0.05 or 1/nvars</span></span>
 <span id="cb16-3"><a href="#cb16-3" tabindex="-1"></a>)</span>
@@ -617,9 +617,9 @@ also be accessed by using <code>mkCrossFrameCExperiment</code> or
 <span id="cb26-2"><a href="#cb26-2" tabindex="-1"></a>xdat <span class="ot">&lt;-</span> vtreat<span class="sc">::</span><span class="fu">mkCrossFrameCExperiment</span>(dTrain,<span class="st">&#39;x&#39;</span>,<span class="st">&#39;y&#39;</span>,<span class="cn">TRUE</span>,</span>
 <span id="cb26-3"><a href="#cb26-3" tabindex="-1"></a>                                  <span class="at">rareCount=</span><span class="dv">0</span>,  <span class="co"># Note set this to something larger, like 5</span></span>
 <span id="cb26-4"><a href="#cb26-4" tabindex="-1"></a>                                  <span class="at">rareSig=</span><span class="fu">c</span>())</span></code></pre></div>
-<pre><code>## [1] &quot;vtreat 1.6.4 start initial treatment design Sat Aug 19 12:10:21 2023&quot;
-## [1] &quot; start cross frame work Sat Aug 19 12:10:21 2023&quot;
-## [1] &quot; vtreat::mkCrossFrameCExperiment done Sat Aug 19 12:10:21 2023&quot;</code></pre>
+<pre><code>## [1] &quot;vtreat 1.6.5 start initial treatment design Wed Jun 12 08:51:31 2024&quot;
+## [1] &quot; start cross frame work Wed Jun 12 08:51:31 2024&quot;
+## [1] &quot; vtreat::mkCrossFrameCExperiment done Wed Jun 12 08:51:31 2024&quot;</code></pre>
 <div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" tabindex="-1"></a>treatments <span class="ot">&lt;-</span> xdat<span class="sc">$</span>treatments</span>
 <span id="cb28-2"><a href="#cb28-2" tabindex="-1"></a><span class="fu">print</span>(treatments<span class="sc">$</span>scoreFrame)</span></code></pre></div>
 <pre><code>##   varName varMoves          rsq          sig needsSplit extraModelDegrees

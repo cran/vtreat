@@ -12,7 +12,7 @@
 
 <meta name="author" content="John Mount" />
 
-<meta name="date" content="2023-08-19" />
+<meta name="date" content="2024-06-12" />
 
 <title>vtreat Variable Importance</title>
 
@@ -340,7 +340,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">vtreat Variable Importance</h1>
 <h4 class="author">John Mount</h4>
-<h4 class="date">2023-08-19</h4>
+<h4 class="date">2024-06-12</h4>
 
 
 
@@ -403,9 +403,9 @@ follows.</p>
 <span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>  d, </span>
 <span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>  <span class="at">varlist =</span> <span class="fu">c</span>(<span class="st">&quot;x&quot;</span>, <span class="st">&quot;x_noise&quot;</span>), </span>
 <span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>  <span class="at">outcomename =</span> <span class="st">&quot;y&quot;</span>)</span></code></pre></div>
-<pre><code>## [1] &quot;vtreat 1.6.4 start initial treatment design Sat Aug 19 12:10:18 2023&quot;
-## [1] &quot; start cross frame work Sat Aug 19 12:10:18 2023&quot;
-## [1] &quot; vtreat::mkCrossFrameNExperiment done Sat Aug 19 12:10:18 2023&quot;</code></pre>
+<pre><code>## [1] &quot;vtreat 1.6.5 start initial treatment design Wed Jun 12 08:51:27 2024&quot;
+## [1] &quot; start cross frame work Wed Jun 12 08:51:27 2024&quot;
+## [1] &quot; vtreat::mkCrossFrameNExperiment done Wed Jun 12 08:51:27 2024&quot;</code></pre>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>sf <span class="ot">&lt;-</span> cfe<span class="sc">$</span>treatments<span class="sc">$</span>scoreFrame</span>
 <span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(sf[, <span class="fu">c</span>(<span class="st">&quot;varName&quot;</span>, <span class="st">&quot;rsq&quot;</span>, <span class="st">&quot;sig&quot;</span>)])</span></code></pre></div>
 <table>

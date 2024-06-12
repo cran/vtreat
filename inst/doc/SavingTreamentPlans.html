@@ -12,7 +12,7 @@
 
 <meta name="author" content="John Mount" />
 
-<meta name="date" content="2023-08-19" />
+<meta name="date" content="2024-06-12" />
 
 <title>Saving Treatment Plans</title>
 
@@ -340,7 +340,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Saving Treatment Plans</h1>
 <h4 class="author">John Mount</h4>
-<h4 class="date">2023-08-19</h4>
+<h4 class="date">2024-06-12</h4>
 
 
 
@@ -401,19 +401,20 @@ gives us the following through the <code>DBI</code> interface.</p>
 <span id="cb3-25"><a href="#cb3-25" tabindex="-1"></a>  constr <span class="ot">&lt;-</span> <span class="fu">paste</span>(<span class="fu">capture.output</span>(<span class="fu">print</span>(con)),<span class="at">collapse=</span><span class="st">&#39;</span><span class="sc">\n</span><span class="st">&#39;</span>)</span>
 <span id="cb3-26"><a href="#cb3-26" tabindex="-1"></a>  <span class="fu">paste</span>(<span class="st">&#39;saved to db: &#39;</span>, constr)</span>
 <span id="cb3-27"><a href="#cb3-27" tabindex="-1"></a>}</span></code></pre></div>
+<pre><code>## Warning: package &#39;RSQLite&#39; was built under R version 4.3.2</code></pre>
 <pre><code>## [1] &quot;saved to db:  &lt;SQLiteConnection&gt;\n  Path: :memory:\n  Extensions: TRUE&quot;</code></pre>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="fu">rm</span>(<span class="at">list=</span> <span class="fu">c</span>(<span class="st">&#39;treatmentsC&#39;</span>, <span class="st">&#39;dTestCTreated&#39;</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="fu">rm</span>(<span class="at">list=</span> <span class="fu">c</span>(<span class="st">&#39;treatmentsC&#39;</span>, <span class="st">&#39;dTestCTreated&#39;</span>))</span></code></pre></div>
 <p>And we can read the treatment back in as follows.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="cf">if</span>(<span class="sc">!</span><span class="fu">is.null</span>(con)) {</span>
-<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>  treatmentsList <span class="ot">&lt;-</span> <span class="fu">lapply</span>(</span>
-<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>    <span class="fu">dbGetQuery</span>(con, </span>
-<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a>               <span class="st">&quot;select * from treatments where key=&#39;treatmentsC&#39;&quot;</span>)<span class="sc">$</span>treatment,</span>
-<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a>    unserialize)</span>
-<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a>  treatmentsC <span class="ot">&lt;-</span> treatmentsList[[<span class="dv">1</span>]]</span>
-<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a>  <span class="fu">dbDisconnect</span>(con)</span>
-<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a>  dTestCTreated <span class="ot">&lt;-</span> <span class="fu">prepare</span>(treatmentsC, dTestC, <span class="at">pruneSig=</span> <span class="fu">c</span>())</span>
-<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a>  <span class="fu">print</span>(dTestCTreated)</span>
-<span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="cf">if</span>(<span class="sc">!</span><span class="fu">is.null</span>(con)) {</span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>  treatmentsList <span class="ot">&lt;-</span> <span class="fu">lapply</span>(</span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>    <span class="fu">dbGetQuery</span>(con, </span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a>               <span class="st">&quot;select * from treatments where key=&#39;treatmentsC&#39;&quot;</span>)<span class="sc">$</span>treatment,</span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a>    unserialize)</span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a>  treatmentsC <span class="ot">&lt;-</span> treatmentsList[[<span class="dv">1</span>]]</span>
+<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a>  <span class="fu">dbDisconnect</span>(con)</span>
+<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a>  dTestCTreated <span class="ot">&lt;-</span> <span class="fu">prepare</span>(treatmentsC, dTestC, <span class="at">pruneSig=</span> <span class="fu">c</span>())</span>
+<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a>  <span class="fu">print</span>(dTestCTreated)</span>
+<span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a>}</span></code></pre></div>
 <pre><code>##       x_catP     x_catB    z z_isBAD x_lev_NA x_lev_x_a x_lev_x_b
 ## 1 0.42857143 -0.9807709 10.0       0        0         1         0
 ## 2 0.28571429 -0.2876737 20.0       0        0         0         1

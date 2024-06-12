@@ -41,7 +41,7 @@ designSetTreated$code <- designSet$code
 summary(as.numeric(table(designSetTreated$code[designSetTreated$code_lev_rare==1])))
 summary(as.numeric(table(designSetTreated$code[designSetTreated$code_lev_rare!=1])))
 
-## ---- fig.width=6-------------------------------------------------------------
+## ----fig.width=6--------------------------------------------------------------
 testSetTreated <- vtreat::prepare(treatments,testSet,pruneSig=0.5)
 testSetTreated$code <- testSet$code
 testSetTreated$newCode <- !(testSetTreated$code %in% unique(designSet$code))
@@ -59,7 +59,7 @@ table(newCode=testSetTreated$newCode,code_lev_rare=testSetTreated$code_lev_rare)
 table(newCode=testSetTreated$newCode,
       generatedAsRare=testSetTreated$generatedAsRareCode)
 
-## ---- fig.width=6-------------------------------------------------------------
+## ----fig.width=6--------------------------------------------------------------
 # Show code_catP's behavior on rare and novel levels.
 summary(testSetTreated$code_catP)
 
